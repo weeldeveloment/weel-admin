@@ -41,6 +41,6 @@ export interface Conversation {
 }
 
 export interface WebSocketMessage {
-  type: 'message' | 'read' | 'typing' | 'online' | 'offline'
+  type: 'message' | 'read' | 'typing' | 'online' | 'offline' | 'ping'
   data: any
 }

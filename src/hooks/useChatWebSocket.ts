@@ -9,7 +9,7 @@ class ChatWebSocket {
   private reconnectAttempts = 0
   private maxReconnectAttempts = 5
   private reconnectDelay = 1000
-  private pingInterval: NodeJS.Timeout | null = null
+  private pingInterval: number | null = null
 
   connect(token: string, onMessage: (data: WebSocketMessage) => void) {
     if (this.ws?.readyState === WebSocket.OPEN) {
@@ -89,7 +89,7 @@ const chatWs = new ChatWebSocket()
 
 export function useChatWebSocket() {
   const wsRef = useRef<ChatWebSocket>(chatWs)
-  const { addMessage, setMessages, markAsRead, updatePartnerStatus } = useChatStore()
+  const { addMessage, markAsRead, updatePartnerStatus } = useChatStore()
 
   const handleMessage = useCallback((data: WebSocketMessage) => {
     switch (data.type) {
