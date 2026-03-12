@@ -1,21 +1,19 @@
-import { ReactNode } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, Outlet } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Users, MessageSquare, LogOut } from 'lucide-react'
+import { Users, MessageSquare, LogOut, Home } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-interface LayoutProps {
-  children: ReactNode
-}
+interface LayoutProps {}
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({}: LayoutProps) {
   const location = useLocation()
   const { user, logout } = useAuthStore()
 
   const navItems = [
     { icon: Users, label: 'Users', path: '/users' },
+    { icon: Home, label: 'Bookings', path: '/bookings' },
     { icon: MessageSquare, label: 'Chat', path: '/chat' },
   ]
 
@@ -69,7 +67,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden flex flex-col">
-        {children}
+        <Outlet />
       </main>
     </div>
   )

@@ -143,6 +143,33 @@ const MessageBubble = memo(({ message }: { message: ChatMessage }) => {
 
 MessageBubble.displayName = 'MessageBubble';
 
+const DateSeparator = memo(({ date }: { date: string }) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center my-4">
+      <div className="bg-muted px-3 py-1 rounded-full">
+        <span className="text-xs text-muted-foreground font-medium">{formatDate(date)}</span>
+      </div>
+    </div>
+  );
+});
+
+DateSeparator.displayName = 'DateSeparator';
+
 function toWsOrigin(raw: string): string {
   try {
     const normalized = raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('ws://') || raw.startsWith('wss://')
@@ -408,7 +435,23 @@ export default function ChatPage() {
                     No messages yet. Start the conversation!
                   </div>
                 ) : (
-                  messages.map((msg) => <MessageBubble key={msg.id} message={msg} />)
+                  <>
+                    {messages.map((msg, index) => {
+                      const showDateSeparator =
+                        index === 0 ||
+                        new Date(msg.created_at).toDateString() !==
+                          new Date(messages[index - 1].created_at).toDateString();
+
+                      return (
+                        <div key={msg.id}>
+                          {showDateSeparator && (
+                            <DateSeparator date={msg.created_at} />
+                          )}
+                          <MessageBubble message={msg} />
+                        </div>
+                      );
+                    })}
+                  </>
                 )}
                 <div ref={messageEndRef} />
               </div>

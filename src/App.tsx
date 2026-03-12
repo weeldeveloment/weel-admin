@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import Layout from './components/Layout'
 import UsersPage from './pages/UsersPage'
 import ChatPage from './pages/ChatPage'
+import BookingsPage from './pages/BookingsPage'
 
 function App() {
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore()
@@ -28,22 +29,21 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
-        path="/*"
+        path="/"
         element={
           isAuthenticated ? (
-            <Layout>
-              <Routes>
-                <Route path="/users" element={<UsersPage />} />
-                <Route path="/chat" element={<ChatPage />} />
-                <Route path="/chat/:partnerId" element={<ChatPage />} />
-                <Route path="/" element={<Navigate to="/users" replace />} />
-              </Routes>
-            </Layout>
+            <Layout />
           ) : (
             <Navigate to="/login" replace />
           )
         }
-      />
+      >
+        <Route index element={<Navigate to="/users" replace />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="bookings" element={<BookingsPage />} />
+        <Route path="chat" element={<ChatPage />} />
+        <Route path="chat/:partnerId" element={<ChatPage />} />
+      </Route>
     </Routes>
   )
 }
