@@ -15,6 +15,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { useChatWebSocket } from '@/hooks/useChatWebSocket';
 
 interface Actor {
   id: number;
@@ -46,6 +47,31 @@ interface Conversation {
   counterpart: Actor;
   last_message?: ChatMessage;
   unread_count: number;
+}
+
+function getPartnerIdFromMessage(message: ChatMessage) {
+  const senderType = message.sender?.role ?? message.sender_type;
+  const receiverType = message.receiver?.role ?? message.receiver_type;
+
+  if (senderType === 'partner') {
+    return Number(message.sender?.id ?? message.sender_id);
+  }
+
+  if (receiverType === 'partner') {
+    return Number(message.receiver?.id ?? message.receiver_id);
+  }
+
+  return null;
+}
+
+function mergeChatMessage(messages: ChatMessage[], incoming: ChatMessage) {
+  if (messages.some((entry) => entry.id === incoming.id)) {
+    return messages;
+  }
+
+  return [...messages, incoming].sort(
+    (left, right) => new Date(left.created_at).getTime() - new Date(right.created_at).getTime()
+  );
 }
 
 const ConversationItem = memo(
@@ -170,18 +196,7 @@ const DateSeparator = memo(({ date }: { date: string }) => {
 
 DateSeparator.displayName = 'DateSeparator';
 
-function toWsOrigin(raw: string): string {
-  try {
-    const normalized = raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('ws://') || raw.startsWith('wss://')
-      ? raw
-      : `https://${raw}`;
-    const url = new URL(normalized);
-    const protocol = url.protocol === 'https:' || url.protocol === 'wss:' ? 'wss:' : 'ws:';
-    return `${protocol}//${url.host}`;
-  } catch {
-    return 'wss://api.weel.uz';
-  }
-}
+
 
 export default function ChatPage() {
   const { partnerId } = useParams<{ partnerId?: string }>();
@@ -193,6 +208,60 @@ export default function ChatPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
   const activePartnerId = partnerId ? Number(partnerId) : null;
+  const markMessagesAsRead = useCallback(
+    async (targetPartnerId: number, messageIds: number[]) => {
+      if (messageIds.length === 0) return;
+
+      await api.post('/chat/read/', {
+        message_ids: messageIds,
+        partner_id: targetPartnerId,
+        partner_type: 'partner',
+      });
+
+      queryClient.setQueryData(['messages', targetPartnerId.toString()], (old: ChatMessage[] = []) =>
+        old.map((entry) => (messageIds.includes(entry.id) ? { ...entry, is_read: true } : entry))
+      );
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    },
+    [queryClient]
+  );
+  const { connect, disconnect } = useChatWebSocket({
+    onMessage: (incoming) => {
+      const incomingPartnerId = getPartnerIdFromMessage(incoming);
+
+      if (!incomingPartnerId || incomingPartnerId !== activePartnerId) {
+        queryClient.invalidateQueries({ queryKey: ['conversations'] });
+        return;
+      }
+
+      queryClient.setQueryData(['messages', partnerId], (old: ChatMessage[] = []) =>
+        mergeChatMessage(old, incoming)
+      );
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+
+      if (incoming.sender_type === 'partner' && !incoming.is_read) {
+        void markMessagesAsRead(incomingPartnerId, [incoming.id]);
+      }
+
+      scrollToBottom();
+    },
+    onRead: (payload) => {
+      if (!payload.messageIds?.length) {
+        queryClient.invalidateQueries({ queryKey: ['conversations'] });
+        return;
+      }
+
+      if (!partnerId) {
+        queryClient.invalidateQueries({ queryKey: ['conversations'] });
+        return;
+      }
+
+      queryClient.setQueryData(['messages', partnerId], (old: ChatMessage[] = []) =>
+        old.map((entry) => (payload.messageIds.includes(entry.id) ? { ...entry, is_read: true } : entry))
+      );
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    },
+  });
 
   // Fetch conversations
   const {
@@ -226,85 +295,13 @@ export default function ChatPage() {
     enabled: !!partnerId,
   });
 
-  // Simple WebSocket connection
   useEffect(() => {
-    if (!partnerId) return;
-
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
-
-    const wsOrigin = toWsOrigin(
-      import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL || 'https://api.weel.uz'
-    );
-    const pathCandidates = ['/ws/chat/', '/api/ws/chat/'];
-
-    let ws: WebSocket | null = null;
-    let pathIndex = 0;
-    let manuallyClosed = false;
-    let hasOpened = false;
-
-    const connect = () => {
-      const path = pathCandidates[pathIndex] ?? pathCandidates[0];
-      const url = `${wsOrigin}${path}?token=${token}`;
-
-      ws = new WebSocket(url);
-
-      ws.onopen = () => {
-        hasOpened = true;
-        console.log('[WebSocket] Connected:', url);
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          const incoming = data?.message || data?.data;
-
-          if ((data?.type === 'chat_message' || data?.type === 'message') && incoming) {
-            const senderType = incoming.sender?.role ?? incoming.sender_type;
-            const receiverType = incoming.receiver?.role ?? incoming.receiver_type;
-            const incomingPartnerId =
-              senderType === 'partner'
-                ? Number(incoming.sender?.id ?? incoming.sender_id)
-                : receiverType === 'partner'
-                  ? Number(incoming.receiver?.id ?? incoming.receiver_id)
-                  : null;
-
-            if (!incomingPartnerId || incomingPartnerId !== activePartnerId) {
-              queryClient.invalidateQueries({ queryKey: ['conversations'] });
-              return;
-            }
-
-            queryClient.setQueryData(['messages', partnerId], (old: ChatMessage[] = []) => {
-              if (old.some((msg) => msg.id === incoming.id)) return old;
-              return [...old, incoming];
-            });
-            queryClient.invalidateQueries({ queryKey: ['conversations'] });
-            scrollToBottom();
-          }
-        } catch (error) {
-          console.error('[WebSocket] Parse error:', error);
-        }
-      };
-
-      ws.onerror = (error) => console.error('[WebSocket] Error:', error);
-
-      ws.onclose = () => {
-        console.log('[WebSocket] Disconnected');
-        // If handshake failed on first path, try fallback path once.
-        if (!manuallyClosed && !hasOpened && pathIndex < pathCandidates.length - 1) {
-          pathIndex += 1;
-          connect();
-        }
-      };
-    };
-
     connect();
 
     return () => {
-      manuallyClosed = true;
-      ws?.close();
+      disconnect();
     };
-  }, [partnerId, activePartnerId, queryClient]);
+  }, [connect, disconnect]);
 
   useEffect(() => {
     scrollToBottom();
@@ -313,6 +310,18 @@ export default function ChatPage() {
   useEffect(() => {
     setMessageInput('');
   }, [partnerId]);
+
+  useEffect(() => {
+    if (!activePartnerId || messages.length === 0) return;
+
+    const unreadPartnerMessageIds = messages
+      .filter((entry) => entry.sender_type === 'partner' && !entry.is_read)
+      .map((entry) => entry.id);
+
+    if (unreadPartnerMessageIds.length > 0) {
+      void markMessagesAsRead(activePartnerId, unreadPartnerMessageIds);
+    }
+  }, [activePartnerId, markMessagesAsRead, messages]);
 
   const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -329,10 +338,9 @@ export default function ChatPage() {
         content: messageInput.trim(),
       });
 
-      queryClient.setQueryData(['messages', partnerId], (old: ChatMessage[] = []) => [
-        ...old,
-        response.data,
-      ]);
+      queryClient.setQueryData(['messages', partnerId], (old: ChatMessage[] = []) =>
+        mergeChatMessage(old, response.data)
+      );
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
 
       setMessageInput('');

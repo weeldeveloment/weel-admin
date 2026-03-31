@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,7 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
+  AlertTriangle,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { format } from 'date-fns'
@@ -50,12 +51,16 @@ interface Booking {
   adults: number
   children: number
   babies: number
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  status: 'pending' | 'confirmed' | 'checked_in' | 'cancelled' | 'completed' | 'no_show'
   cancellation_reason?: string
   confirmed_at?: string
+  checked_in_at?: string
+  no_show_at?: string
   cancelled_at?: string
   completed_at?: string
   created_at: string
+  conflict_flag?: boolean
+  is_overdue?: boolean
   client: BookingClient
   property: BookingProperty
   booking_price?: BookingPrice
@@ -66,39 +71,106 @@ interface PaginatedBookings {
   next: string | null
   previous: string | null
   results: Booking[]
+  queue_counts?: Record<string, number>
+}
+
+interface RegionOption {
+  guid: string
+  title: string
 }
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500 text-yellow-50',
   confirmed: 'bg-green-500 text-green-50',
+  checked_in: 'bg-emerald-500 text-emerald-50',
   cancelled: 'bg-red-500 text-red-50',
   completed: 'bg-blue-500 text-blue-50',
+  no_show: 'bg-orange-500 text-orange-50',
 }
 
 const statusLabels: Record<string, string> = {
-  pending: 'Pending',
+  pending: 'New',
   confirmed: 'Confirmed',
+  checked_in: 'Checked-in',
   cancelled: 'Cancelled',
   completed: 'Completed',
+  no_show: 'No-show',
 }
 
 export default function BookingsPage() {
+  const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [regionFilter, setRegionFilter] = useState<string>('all')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [ordering, setOrdering] = useState<'-check_in' | 'check_in'>('-check_in')
+  const [regions, setRegions] = useState<RegionOption[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+
+  useEffect(() => {
+    const loadRegions = async () => {
+      try {
+        const response = await api.get<RegionOption[]>('/property/regions/')
+        setRegions(response.data || [])
+      } catch (error) {
+        console.error('Failed to load regions', error)
+      }
+    }
+    void loadRegions()
+  }, [])
 
   const fetchBookings = async () => {
     const params: Record<string, string> = {
       page: currentPage.toString(),
       page_size: '20',
+      ordering,
     }
 
     if (searchQuery) {
       params.search = searchQuery
     }
 
-    if (statusFilter !== 'all') {
-      params.status = statusFilter
+    if (regionFilter !== 'all') {
+      params.region = regionFilter
+    }
+
+    if (dateFrom) {
+      params.date_from = dateFrom
+    }
+
+    if (dateTo) {
+      params.date_to = dateTo
+    }
+
+    switch (statusFilter) {
+      case 'new':
+        params.status = 'pending'
+        break
+      case 'confirmed':
+        params.status = 'confirmed'
+        break
+      case 'checked_in':
+        params.status = 'checked_in'
+        break
+      case 'cancelled':
+        params.status = 'cancelled'
+        break
+      case 'completed':
+        params.status = 'completed'
+        break
+      case 'no_show':
+        params.status = 'no_show'
+        break
+      case 'active':
+        params.status_in = 'confirmed,checked_in'
+        break
+      case 'overdue':
+        params.overdue = 'true'
+        params.status_in = 'pending,confirmed'
+        break
+      default:
+        break
     }
 
     const response = await api.get<PaginatedBookings>('/booking/admin/bookings/', { params })
@@ -111,7 +183,7 @@ export default function BookingsPage() {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ['bookings', currentPage, searchQuery, statusFilter],
+    queryKey: ['bookings', currentPage, searchQuery, statusFilter, regionFilter, dateFrom, dateTo, ordering],
     queryFn: fetchBookings,
     refetchInterval: 5000,
   })
@@ -124,6 +196,44 @@ export default function BookingsPage() {
   const handleStatusChange = (value: string) => {
     setStatusFilter(value)
     setCurrentPage(1)
+  }
+
+  const handleRegionChange = (value: string) => {
+    setRegionFilter(value)
+    setCurrentPage(1)
+  }
+
+  const handleDateFromChange = (value: string) => {
+    setDateFrom(value)
+    setCurrentPage(1)
+  }
+
+  const handleDateToChange = (value: string) => {
+    setDateTo(value)
+    setCurrentPage(1)
+  }
+
+  const handleOrderingToggle = () => {
+    setOrdering((prev) => (prev === '-check_in' ? 'check_in' : '-check_in'))
+    setCurrentPage(1)
+  }
+
+  const performAction = async (bookingId: string, action: 'checkin' | 'no_show' | 'ticket' | 'conflict') => {
+    const endpoints: Record<string, string> = {
+      checkin: `/booking/admin/bookings/${bookingId}/force-check-in/`,
+      no_show: `/booking/admin/bookings/${bookingId}/mark-no-show/`,
+      ticket: `/booking/admin/bookings/${bookingId}/create-ticket/`,
+      conflict: `/booking/admin/bookings/${bookingId}/escalate-conflict/`,
+    }
+
+    try {
+      await api.post(endpoints[action])
+      await queryClient.invalidateQueries({ queryKey: ['bookings'] })
+      await refetch()
+    } catch (error) {
+      console.error('Action failed', error)
+      alert('Failed to perform action. Please try again.')
+    }
   }
 
   const handlePageChange = (newPage: number) => {
@@ -153,6 +263,35 @@ export default function BookingsPage() {
     }).format(amount)
   }
 
+  const getTabCount = (tabValue: string): number | undefined => {
+    const counts = bookingsData?.queue_counts
+    if (!counts) return undefined
+    switch (tabValue) {
+      case 'new':
+        return counts['pending'] || 0
+      case 'active':
+        return (counts['confirmed'] || 0) + (counts['checked_in'] || 0)
+      case 'cancelled':
+        return counts['cancelled'] || 0
+      case 'completed':
+        return counts['completed'] || 0
+      case 'no_show':
+        return counts['no_show'] || 0
+      default:
+        return undefined
+    }
+  }
+
+  const tabs = [
+    { value: 'all', label: 'All' },
+    { value: 'new', label: 'New', accent: 'text-yellow-600' },
+    { value: 'overdue', label: 'Check-in Overdue', accent: 'text-red-600' },
+    { value: 'active', label: 'Active', accent: 'text-emerald-600' },
+    { value: 'cancelled', label: 'Cancelled', accent: 'text-red-600' },
+    { value: 'no_show', label: 'No-show', accent: 'text-orange-600' },
+    { value: 'completed', label: 'Completed', accent: 'text-blue-600' },
+  ]
+
   return (
     <div className="flex-1 overflow-hidden flex flex-col bg-muted/20">
       <div className="h-full flex flex-col">
@@ -180,27 +319,68 @@ export default function BookingsPage() {
         </div>
 
         {/* Filters */}
-        <div className="border-b bg-background p-4">
-          <div className="flex items-center gap-4">
-            <div className="flex-1 relative">
+        <div className="border-b bg-background p-4 space-y-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex-1 min-w-[240px] relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by booking number or phone..."
                 value={searchQuery}
                 onChange={handleSearch}
-                className="pl-9 max-w-md"
+                className="pl-9"
               />
             </div>
-            <Tabs value={statusFilter} onValueChange={handleStatusChange}>
-              <TabsList>
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="pending">Pending</TabsTrigger>
-                <TabsTrigger value="confirmed">Confirmed</TabsTrigger>
-                <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-muted-foreground">Region</label>
+              <select
+                value={regionFilter}
+                onChange={(e) => handleRegionChange(e.target.value)}
+                className="h-9 rounded-md border px-2 text-sm bg-background"
+              >
+                <option value="all">All regions</option>
+                {regions.map((region) => (
+                  <option key={region.guid} value={region.guid}>
+                    {region.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <label className="text-xs text-muted-foreground">Date</label>
+              <Input type="date" value={dateFrom} onChange={(e) => handleDateFromChange(e.target.value)} className="w-36" />
+              <span className="text-muted-foreground">→</span>
+              <Input type="date" value={dateTo} onChange={(e) => handleDateToChange(e.target.value)} className="w-36" />
+            </div>
+            <Button variant="outline" size="sm" onClick={handleOrderingToggle}>
+              Sort {ordering === '-check_in' ? 'Date ↓' : 'Date ↑'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isFetching}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
           </div>
+          <Tabs value={statusFilter} onValueChange={handleStatusChange}>
+            <TabsList className="flex flex-wrap">
+              {tabs.map((tab) => {
+                const count = getTabCount(tab.value)
+                return (
+                  <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2">
+                    <span className={tab.accent}>{tab.label}</span>
+                    {typeof count === 'number' && (
+                      <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                        {count}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
+                )
+              })}
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Bookings List */}
@@ -240,6 +420,16 @@ export default function BookingsPage() {
                             >
                               {statusLabels[booking.status]}
                             </Badge>
+                            {booking.is_overdue && (
+                              <span className="inline-flex items-center gap-1 text-xs text-red-600 font-semibold">
+                                <AlertTriangle className="h-3.5 w-3.5" /> Overdue
+                              </span>
+                            )}
+                            {booking.conflict_flag && (
+                              <Badge variant="outline" className="text-xs">
+                                Conflict
+                              </Badge>
+                            )}
                           </div>
                           <div className="text-xs text-muted-foreground">
                             {formatDate(booking.created_at)} {formatTime(booking.created_at)}
@@ -303,6 +493,42 @@ export default function BookingsPage() {
                             </div>
                           </div>
                         )}
+
+                        {/* Actions */}
+                        <div className="flex flex-wrap gap-2 pt-2 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => performAction(booking.guid, 'checkin')}
+                            disabled={isFetching || ['cancelled', 'completed', 'checked_in', 'no_show'].includes(booking.status)}
+                          >
+                            Force check-in
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => performAction(booking.guid, 'no_show')}
+                            disabled={isFetching || ['cancelled', 'completed', 'no_show'].includes(booking.status)}
+                          >
+                            Mark no-show
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => performAction(booking.guid, 'ticket')}
+                            disabled={isFetching}
+                          >
+                            Create ticket
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => performAction(booking.guid, 'conflict')}
+                            disabled={isFetching || booking.conflict_flag}
+                          >
+                            Escalate conflict
+                          </Button>
+                        </div>
                       </div>
 
                       {/* Status timestamps */}
@@ -313,10 +539,22 @@ export default function BookingsPage() {
                             {formatDate(booking.confirmed_at)}
                           </div>
                         )}
+                        {booking.checked_in_at && (
+                          <div>
+                            <span className="text-emerald-600">✓</span> Checked-in:{' '}
+                            {formatDate(booking.checked_in_at)}
+                          </div>
+                        )}
                         {booking.cancelled_at && (
                           <div>
                             <span className="text-red-600">✗</span> Cancelled:{' '}
                             {formatDate(booking.cancelled_at)}
+                          </div>
+                        )}
+                        {booking.no_show_at && (
+                          <div>
+                            <span className="text-orange-500">!</span> No-show:{' '}
+                            {formatDate(booking.no_show_at)}
                           </div>
                         )}
                         {booking.completed_at && (

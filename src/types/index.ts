@@ -17,6 +17,7 @@ export interface Partner {
   id: number
   full_name: string
   email: string
+  phone_number?: string
   phone?: string
   avatar?: string
   is_active: boolean
@@ -26,21 +27,28 @@ export interface Partner {
 
 export interface Message {
   id: number
+  conversation_id?: number
   sender_id: number
   receiver_id: number
+  sender_type?: 'admin' | 'partner'
+  receiver_type?: 'admin' | 'partner'
   content: string
   created_at: string
+  updated_at?: string
   is_read: boolean
   sender?: User
+  receiver?: User
 }
 
 export interface Conversation {
-  partner: Partner
+  conversation_id: number
+  counterpart: Partner
   last_message?: Message
   unread_count: number
 }
 
 export interface WebSocketMessage {
-  type: 'message' | 'read' | 'typing' | 'online' | 'offline' | 'ping'
+  type: 'message' | 'read' | 'typing' | 'online' | 'offline' | 'ping' | 'error'
   data: any
+  error?: string
 }
