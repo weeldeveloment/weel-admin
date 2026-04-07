@@ -9,7 +9,7 @@ interface UseChatWebSocketOptions {
 
 function resolveWebSocketUrl(token: string) {
   const configured = (import.meta.env.VITE_WS_URL || '').trim()
-  const fallback = 'wss://api.weel.uz/ws/chat/'
+  const fallback = 'wss://dev.weel.uz/ws/chat/'
 
   try {
     const parsed = new URL(configured || fallback)

@@ -1,28 +1,30 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, MessageSquare, Home, TrendingUp } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function DashboardPage() {
+  const { t } = useTranslation()
   const stats = [
     {
-      title: 'Total Partners',
+      title: t('dashboard.stats.totalPartners'),
       value: '248',
       change: '+12%',
       icon: Users,
     },
     {
-      title: 'Active Conversations',
+      title: t('dashboard.stats.activeConversations'),
       value: '43',
       change: '+8%',
       icon: MessageSquare,
     },
     {
-      title: 'Properties Listed',
+      title: t('dashboard.stats.propertiesListed'),
       value: '1,234',
       change: '+23%',
       icon: Home,
     },
     {
-      title: 'Growth Rate',
+      title: t('dashboard.stats.growthRate'),
       value: '18.2%',
       change: '+4%',
       icon: TrendingUp,
@@ -32,9 +34,9 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
         <p className="text-muted-foreground">
-          Welcome to Weel Admin Panel
+          {t('dashboard.welcome')}
         </p>
       </div>
 
@@ -52,7 +54,7 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">{stat.change}</span> from last month
+                  <span className="text-green-600">{stat.change}</span> {t('dashboard.stats.changeSuffix')}
                 </p>
               </CardContent>
             </Card>
@@ -63,29 +65,29 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>{t('dashboard.activity.recent')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="h-2 w-2 rounded-full bg-green-500" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium">New partner registered</p>
-                  <p className="text-xs text-muted-foreground">2 minutes ago</p>
+                  <p className="text-sm font-medium">{t('dashboard.activity.partnerRegistered')}</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.activity.ago2m')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="h-2 w-2 rounded-full bg-blue-500" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Property listing updated</p>
-                  <p className="text-xs text-muted-foreground">15 minutes ago</p>
+                  <p className="text-sm font-medium">{t('dashboard.activity.propertyUpdated')}</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.activity.ago15m')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="h-2 w-2 rounded-full bg-yellow-500" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium">New message received</p>
-                  <p className="text-xs text-muted-foreground">1 hour ago</p>
+                  <p className="text-sm font-medium">{t('dashboard.activity.messageReceived')}</p>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.activity.ago1h')}</p>
                 </div>
               </div>
             </div>
@@ -94,17 +96,17 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle>{t('dashboard.quick.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <button className="w-full rounded-md border p-3 text-left text-sm hover:bg-accent">
-              View all partners
+              {t('dashboard.quick.viewPartners')}
             </button>
             <button className="w-full rounded-md border p-3 text-left text-sm hover:bg-accent">
-              Open chat
+              {t('dashboard.quick.openChat')}
             </button>
             <button className="w-full rounded-md border p-3 text-left text-sm hover:bg-accent">
-              Review properties
+              {t('dashboard.quick.reviewProperties')}
             </button>
           </CardContent>
         </Card>

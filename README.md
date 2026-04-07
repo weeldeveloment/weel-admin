@@ -8,6 +8,8 @@ Admin panel for Weel platform built with React, TypeScript, Vite, and shadcn/ui.
 - 📊 Dashboard with statistics
 - 👥 Partner management
 - 💬 Real-time chat with partners using WebSocket
+- 🌐 English / Русский / O‘zbek language switcher
+- 🌗 Light & dark theme toggle
 - 🎨 Modern UI with shadcn/ui
 - 📱 Responsive design
 
@@ -16,7 +18,7 @@ Admin panel for Weel platform built with React, TypeScript, Vite, and shadcn/ui.
 ### Prerequisites
 
 - Node.js 18+ or Bun
-- Backend API running on `http://localhost:8000`
+- Backend API available (defaults to `https://dev.weel.uz`) or your own URL via `VITE_API_URL`
 
 ### Installation
 
@@ -37,8 +39,8 @@ cp .env.example .env
 3. Update `.env` with your backend URLs:
 
 ```env
-VITE_API_URL=http://localhost:8000
-VITE_WS_URL=ws://localhost:8000
+VITE_API_URL=https://dev.weel.uz
+VITE_WS_URL=wss://dev.weel.uz
 ```
 
 ### Development

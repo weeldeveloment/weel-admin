@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useChatWebSocket } from '@/hooks/useChatWebSocket';
+import { useTranslation } from 'react-i18next';
 
 interface Actor {
   id: number;
@@ -83,45 +84,48 @@ const ConversationItem = memo(
     conversation: Conversation;
     isActive: boolean;
     onClick: () => void;
-  }) => (
-    <button
-      onClick={onClick}
-      className={`w-full rounded-xl p-3 text-left transition-all duration-200 hover:bg-accent/80 ${
-        isActive ? 'bg-accent/50 border border-accent' : ''
-      }`}
-    >
-      <div className="flex items-start gap-3">
-        <div className="relative flex-shrink-0">
-          <Avatar className="h-12 w-12">
-            <AvatarImage
-              src={`https://api.dicebear.com/7.x/initials/svg?seed=${conversation.counterpart.full_name}`}
-            />
-            <AvatarFallback>
-              {conversation.counterpart.full_name.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-        <div className="flex-1 overflow-hidden">
-          <div className="flex items-center justify-between gap-2">
-            <p className="font-semibold truncate">{conversation.counterpart.full_name}</p>
-            {conversation.unread_count > 0 && (
-              <Badge variant="default" className="h-5 min-w-[20px] px-1.5 text-xs">
-                {conversation.unread_count}
-              </Badge>
+  }) => {
+    const { t } = useTranslation();
+    return (
+      <button
+        onClick={onClick}
+        className={`w-full rounded-xl p-3 text-left transition-all duration-200 hover:bg-accent/80 ${
+          isActive ? 'bg-accent/50 border border-accent' : ''
+        }`}
+      >
+        <div className="flex items-start gap-3">
+          <div className="relative flex-shrink-0">
+            <Avatar className="h-12 w-12">
+              <AvatarImage
+                src={`https://api.dicebear.com/7.x/initials/svg?seed=${conversation.counterpart.full_name}`}
+              />
+              <AvatarFallback>
+                {conversation.counterpart.full_name.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-semibold truncate">{conversation.counterpart.full_name}</p>
+              {conversation.unread_count > 0 && (
+                <Badge variant="default" className="h-5 min-w-[20px] px-1.5 text-xs">
+                  {conversation.unread_count}
+                </Badge>
+              )}
+            </div>
+            <p className="truncate text-sm mt-0.5 text-muted-foreground">
+              {conversation.last_message?.content || t('chat.noMessages')}
+            </p>
+            {conversation.counterpart.phone_number && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {conversation.counterpart.phone_number}
+              </p>
             )}
           </div>
-          <p className="truncate text-sm mt-0.5 text-muted-foreground">
-            {conversation.last_message?.content || 'No messages yet'}
-          </p>
-          {conversation.counterpart.phone_number && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {conversation.counterpart.phone_number}
-            </p>
-          )}
         </div>
-      </div>
-    </button>
-  )
+      </button>
+    )
+  }
 );
 
 ConversationItem.displayName = 'ConversationItem';
@@ -132,7 +136,7 @@ const MessageBubble = memo(({ message }: { message: ChatMessage }) => {
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
   };
 
   const StatusIcon = () => {
@@ -170,6 +174,7 @@ const MessageBubble = memo(({ message }: { message: ChatMessage }) => {
 MessageBubble.displayName = 'MessageBubble';
 
 const DateSeparator = memo(({ date }: { date: string }) => {
+  const { t } = useTranslation();
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const today = new Date();
@@ -177,9 +182,9 @@ const DateSeparator = memo(({ date }: { date: string }) => {
     yesterday.setDate(yesterday.getDate() - 1);
 
     if (date.toDateString() === today.toDateString()) {
-      return 'Today';
+      return t('common.today');
     } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
+      return t('common.yesterday');
     } else {
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
@@ -202,6 +207,7 @@ export default function ChatPage() {
   const { partnerId } = useParams<{ partnerId?: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [messageInput, setMessageInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -367,11 +373,11 @@ export default function ChatPage() {
       {/* Sidebar - Conversations List */}
       <Card className="w-80 flex-shrink-0 rounded-none border-l-0 border-y-0">
         <div className="p-4 border-b">
-          <h2 className="text-xl font-bold mb-4">Messages</h2>
+          <h2 className="text-xl font-bold mb-4">{t('chat.title')}</h2>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search conversations..."
+              placeholder={t('chat.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -387,7 +393,7 @@ export default function ChatPage() {
               </div>
             ) : filteredConversations.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
-                {searchQuery ? 'No conversations found' : 'No conversations yet'}
+                {searchQuery ? t('chat.noConversationsSearch') : t('chat.noConversations')}
               </div>
             ) : (
               filteredConversations.map((conv) => (
@@ -440,7 +446,7 @@ export default function ChatPage() {
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground text-sm">
-                    No messages yet. Start the conversation!
+                    {t('chat.noMessages')}
                   </div>
                 ) : (
                   <>
@@ -470,7 +476,7 @@ export default function ChatPage() {
               <div className="flex items-end gap-2 max-w-4xl mx-auto">
                 <div className="flex-1">
                   <Input
-                    placeholder="Type a message..."
+                    placeholder={t('chat.inputPlaceholder')}
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -516,8 +522,8 @@ export default function ChatPage() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Select a conversation</h3>
-              <p className="text-sm">Choose a partner from the list to start chatting</p>
+              <h3 className="text-lg font-semibold mb-2">{t('chat.selectTitle')}</h3>
+              <p className="text-sm">{t('chat.selectSubtitle')}</p>
             </div>
           </div>
         )}

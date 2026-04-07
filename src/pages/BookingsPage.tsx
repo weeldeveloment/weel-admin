@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { format } from 'date-fns'
+import { useTranslation } from 'react-i18next'
 
 interface BookingClient {
   id: number
@@ -88,17 +89,9 @@ const statusColors: Record<string, string> = {
   no_show: 'bg-orange-500 text-orange-50',
 }
 
-const statusLabels: Record<string, string> = {
-  pending: 'New',
-  confirmed: 'Confirmed',
-  checked_in: 'Checked-in',
-  cancelled: 'Cancelled',
-  completed: 'Completed',
-  no_show: 'No-show',
-}
-
 export default function BookingsPage() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [regionFilter, setRegionFilter] = useState<string>('all')
@@ -107,6 +100,14 @@ export default function BookingsPage() {
   const [ordering, setOrdering] = useState<'-check_in' | 'check_in'>('-check_in')
   const [regions, setRegions] = useState<RegionOption[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+  const statusLabels: Record<string, string> = {
+    pending: t('bookings.statuses.pending'),
+    confirmed: t('bookings.statuses.confirmed'),
+    checked_in: t('bookings.statuses.checked_in'),
+    cancelled: t('bookings.statuses.cancelled'),
+    completed: t('bookings.statuses.completed'),
+    no_show: t('bookings.statuses.no_show'),
+  }
 
   useEffect(() => {
     const loadRegions = async () => {
@@ -232,7 +233,7 @@ export default function BookingsPage() {
       await refetch()
     } catch (error) {
       console.error('Action failed', error)
-      alert('Failed to perform action. Please try again.')
+      alert(t('common.actionFailed'))
     }
   }
 
@@ -263,6 +264,19 @@ export default function BookingsPage() {
     }).format(amount)
   }
 
+  const formatGuests = (booking: Booking) => {
+    const parts = [
+      t('bookings.guests.adults', { count: booking.adults }),
+    ]
+    if (booking.children > 0) {
+      parts.push(t('bookings.guests.children', { count: booking.children }))
+    }
+    if (booking.babies > 0) {
+      parts.push(t('bookings.guests.babies', { count: booking.babies }))
+    }
+    return parts.join(', ')
+  }
+
   const getTabCount = (tabValue: string): number | undefined => {
     const counts = bookingsData?.queue_counts
     if (!counts) return undefined
@@ -283,26 +297,26 @@ export default function BookingsPage() {
   }
 
   const tabs = [
-    { value: 'all', label: 'All' },
-    { value: 'new', label: 'New', accent: 'text-yellow-600' },
-    { value: 'overdue', label: 'Check-in Overdue', accent: 'text-red-600' },
-    { value: 'active', label: 'Active', accent: 'text-emerald-600' },
-    { value: 'cancelled', label: 'Cancelled', accent: 'text-red-600' },
-    { value: 'no_show', label: 'No-show', accent: 'text-orange-600' },
-    { value: 'completed', label: 'Completed', accent: 'text-blue-600' },
+    { value: 'all', label: t('bookings.tabs.all') },
+    { value: 'new', label: t('bookings.tabs.new'), accent: 'text-yellow-600' },
+    { value: 'overdue', label: t('bookings.tabs.overdue'), accent: 'text-red-600' },
+    { value: 'active', label: t('bookings.tabs.active'), accent: 'text-emerald-600' },
+    { value: 'cancelled', label: t('bookings.tabs.cancelled'), accent: 'text-red-600' },
+    { value: 'no_show', label: t('bookings.tabs.no_show'), accent: 'text-orange-600' },
+    { value: 'completed', label: t('bookings.tabs.completed'), accent: 'text-blue-600' },
   ]
 
   return (
-    <div className="flex-1 overflow-hidden flex flex-col bg-muted/20">
+    <div className="flex-1 overflow-hidden flex flex-col bg-background">
       <div className="h-full flex flex-col">
         {/* Header */}
         <div className="border-b bg-background">
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">Bookings</h1>
+                <h1 className="text-2xl font-bold">{t('bookings.title')}</h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Real-time booking management
+                  {t('bookings.subtitle')}
                 </p>
               </div>
               <Button
@@ -312,7 +326,7 @@ export default function BookingsPage() {
                 disabled={isFetching}
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-                Refresh
+                {t('common.refresh')}
               </Button>
             </div>
           </div>
@@ -324,20 +338,20 @@ export default function BookingsPage() {
             <div className="flex-1 min-w-[240px] relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by booking number or phone..."
+                placeholder={t('bookings.searchPlaceholder')}
                 value={searchQuery}
                 onChange={handleSearch}
                 className="pl-9"
               />
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-xs text-muted-foreground">Region</label>
+              <label className="text-xs text-muted-foreground">{t('bookings.region')}</label>
               <select
                 value={regionFilter}
                 onChange={(e) => handleRegionChange(e.target.value)}
-                className="h-9 rounded-md border px-2 text-sm bg-background"
+                className="h-9 rounded-md border border-border px-2 text-sm bg-card text-foreground"
               >
-                <option value="all">All regions</option>
+                <option value="all">{t('bookings.allRegions')}</option>
                 {regions.map((region) => (
                   <option key={region.guid} value={region.guid}>
                     {region.title}
@@ -346,22 +360,13 @@ export default function BookingsPage() {
               </select>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <label className="text-xs text-muted-foreground">Date</label>
+              <label className="text-xs text-muted-foreground">{t('bookings.date')}</label>
               <Input type="date" value={dateFrom} onChange={(e) => handleDateFromChange(e.target.value)} className="w-36" />
               <span className="text-muted-foreground">→</span>
               <Input type="date" value={dateTo} onChange={(e) => handleDateToChange(e.target.value)} className="w-36" />
             </div>
             <Button variant="outline" size="sm" onClick={handleOrderingToggle}>
-              Sort {ordering === '-check_in' ? 'Date ↓' : 'Date ↑'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              disabled={isFetching}
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-              Refresh
+              {ordering === '-check_in' ? t('bookings.sortDesc') : t('bookings.sortAsc')}
             </Button>
           </div>
           <Tabs value={statusFilter} onValueChange={handleStatusChange}>
@@ -385,26 +390,26 @@ export default function BookingsPage() {
 
         {/* Bookings List */}
         <ScrollArea className="flex-1">
-          <div className="p-6">
+          <div className="p-6 space-y-4">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
-                <span className="ml-2 text-muted-foreground">Loading bookings...</span>
+                <span className="ml-2 text-muted-foreground">{t('bookings.loading')}</span>
               </div>
             ) : bookingsData?.results.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Home className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No bookings found</h3>
+                <h3 className="text-lg font-semibold mb-2">{t('bookings.empty.title')}</h3>
                 <p className="text-sm text-muted-foreground">
                   {searchQuery || statusFilter !== 'all'
-                    ? 'Try adjusting your search or filters'
-                    : 'Bookings will appear here as they are made'}
+                    ? t('bookings.empty.adjust')
+                    : t('bookings.empty.description')}
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
                 {bookingsData?.results.map((booking) => (
-                  <Card key={booking.guid} className="p-4 hover:shadow-md transition-shadow">
+                  <Card key={booking.guid} className="p-4 hover:shadow-md transition-shadow bg-card">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-3">
                         {/* Top row - Booking number and status */}
@@ -422,12 +427,12 @@ export default function BookingsPage() {
                             </Badge>
                             {booking.is_overdue && (
                               <span className="inline-flex items-center gap-1 text-xs text-red-600 font-semibold">
-                                <AlertTriangle className="h-3.5 w-3.5" /> Overdue
+                                <AlertTriangle className="h-3.5 w-3.5" /> {t('bookings.overdue')}
                               </span>
                             )}
                             {booking.conflict_flag && (
                               <Badge variant="outline" className="text-xs">
-                                Conflict
+                                {t('bookings.conflict')}
                               </Badge>
                             )}
                           </div>
@@ -466,11 +471,7 @@ export default function BookingsPage() {
                           </div>
                           <div className="flex items-center gap-1.5 text-muted-foreground">
                             <Users className="h-4 w-4" />
-                            <span>
-                              {booking.adults} adults
-                              {booking.children > 0 && `, ${booking.children} children`}
-                              {booking.babies > 0 && `, ${booking.babies} babies`}
-                            </span>
+                            <span>{formatGuests(booking)}</span>
                           </div>
                         </div>
 
@@ -481,13 +482,13 @@ export default function BookingsPage() {
                               <DollarSign className="h-4 w-4 text-muted-foreground" />
                               <div className="space-y-0.5">
                                 <div className="text-xs text-muted-foreground">
-                                  Subtotal: {formatCurrency(booking.booking_price.subtotal)}
+                                  {t('bookings.price.subtotal')}: {formatCurrency(booking.booking_price.subtotal)}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                  Service fee: {formatCurrency(booking.booking_price.service_fee)}
+                                  {t('bookings.price.serviceFee')}: {formatCurrency(booking.booking_price.service_fee)}
                                 </div>
                                 <div className="font-semibold">
-                                  Total: {formatCurrency(booking.booking_price.charge_amount)}
+                                  {t('bookings.price.total')}: {formatCurrency(booking.booking_price.charge_amount)}
                                 </div>
                               </div>
                             </div>
@@ -502,7 +503,7 @@ export default function BookingsPage() {
                             onClick={() => performAction(booking.guid, 'checkin')}
                             disabled={isFetching || ['cancelled', 'completed', 'checked_in', 'no_show'].includes(booking.status)}
                           >
-                            Force check-in
+                            {t('bookings.actions.forceCheckIn')}
                           </Button>
                           <Button
                             variant="outline"
@@ -510,7 +511,7 @@ export default function BookingsPage() {
                             onClick={() => performAction(booking.guid, 'no_show')}
                             disabled={isFetching || ['cancelled', 'completed', 'no_show'].includes(booking.status)}
                           >
-                            Mark no-show
+                            {t('bookings.actions.markNoShow')}
                           </Button>
                           <Button
                             variant="outline"
@@ -518,7 +519,7 @@ export default function BookingsPage() {
                             onClick={() => performAction(booking.guid, 'ticket')}
                             disabled={isFetching}
                           >
-                            Create ticket
+                            {t('bookings.actions.createTicket')}
                           </Button>
                           <Button
                             variant="outline"
@@ -526,7 +527,7 @@ export default function BookingsPage() {
                             onClick={() => performAction(booking.guid, 'conflict')}
                             disabled={isFetching || booking.conflict_flag}
                           >
-                            Escalate conflict
+                            {t('bookings.actions.escalateConflict')}
                           </Button>
                         </div>
                       </div>
@@ -535,31 +536,31 @@ export default function BookingsPage() {
                       <div className="text-xs text-muted-foreground space-y-1 text-right">
                         {booking.confirmed_at && (
                           <div>
-                            <span className="text-green-600">✓</span> Confirmed:{' '}
+                            <span className="text-green-600">✓</span> {t('bookings.timestamps.confirmed')}{' '}
                             {formatDate(booking.confirmed_at)}
                           </div>
                         )}
                         {booking.checked_in_at && (
                           <div>
-                            <span className="text-emerald-600">✓</span> Checked-in:{' '}
+                            <span className="text-emerald-600">✓</span> {t('bookings.timestamps.checked_in')}{' '}
                             {formatDate(booking.checked_in_at)}
                           </div>
                         )}
                         {booking.cancelled_at && (
                           <div>
-                            <span className="text-red-600">✗</span> Cancelled:{' '}
+                            <span className="text-red-600">✗</span> {t('bookings.timestamps.cancelled')}{' '}
                             {formatDate(booking.cancelled_at)}
                           </div>
                         )}
                         {booking.no_show_at && (
                           <div>
-                            <span className="text-orange-500">!</span> No-show:{' '}
+                            <span className="text-orange-500">!</span> {t('bookings.timestamps.no_show')}{' '}
                             {formatDate(booking.no_show_at)}
                           </div>
                         )}
                         {booking.completed_at && (
                           <div>
-                            <span className="text-blue-600">✓</span> Completed:{' '}
+                            <span className="text-blue-600">✓</span> {t('bookings.timestamps.completed')}{' '}
                             {formatDate(booking.completed_at)}
                           </div>
                         )}
@@ -574,7 +575,7 @@ export default function BookingsPage() {
             {bookingsData && bookingsData.results.length > 0 && (
               <div className="flex items-center justify-between mt-6 pt-4 border-t">
                 <p className="text-sm text-muted-foreground">
-                  Showing {bookingsData.results.length} of {bookingsData.count} bookings
+                  {t('bookings.info.showing', { count: bookingsData.results.length, total: bookingsData.count })}
                 </p>
                 <div className="flex items-center gap-2">
                   <Button
@@ -586,7 +587,7 @@ export default function BookingsPage() {
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <span className="text-sm font-medium px-2">
-                    Page {currentPage}
+                    {t('bookings.info.page', { page: currentPage })}
                     {bookingsData.next && '+'}
                   </span>
                   <Button

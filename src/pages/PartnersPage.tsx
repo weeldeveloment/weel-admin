@@ -2,8 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { MessageSquare } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function PartnersPage() {
+  const { t } = useTranslation()
   // Mock data - will be replaced with real data from API
   const partners = [
     {
@@ -33,16 +35,16 @@ export default function PartnersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Partners</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('partners.title')}</h1>
           <p className="text-muted-foreground">
-            Manage partner accounts and properties
+            {t('partners.subtitle')}
           </p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Partners</CardTitle>
+          <CardTitle>{t('partners.all')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -63,12 +65,14 @@ export default function PartnersPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <p className="text-sm font-medium">{partner.properties} properties</p>
-                    <p className="text-xs text-muted-foreground capitalize">{partner.status}</p>
+                    <p className="text-sm font-medium">{t('partners.properties', { count: partner.properties })}</p>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {partner.status === 'active' ? t('users.status.active') : t('users.status.inactive')}
+                    </p>
                   </div>
                   <Button size="sm" variant="outline">
                     <MessageSquare className="mr-2 h-4 w-4" />
-                    Chat
+                    {t('partners.chat')}
                   </Button>
                 </div>
               </div>

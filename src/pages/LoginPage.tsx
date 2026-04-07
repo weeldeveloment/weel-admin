@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useTranslation } from 'react-i18next'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const login = useAuthStore((state) => state.login)
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,15 +35,15 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t('auth.title')}</CardTitle>
           <CardDescription>
-            Enter your credentials to access the admin panel
+            {t('auth.subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -53,7 +55,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -64,10 +66,10 @@ export default function LoginPage() {
               />
             </div>
             {error && (
-              <div className="text-sm text-destructive">{error}</div>
+              <div className="text-sm text-destructive">{error || t('auth.error')}</div>
             )}
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t('auth.signingIn') : t('auth.signIn')}
             </Button>
           </form>
         </CardContent>

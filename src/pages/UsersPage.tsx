@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { MessageSquare, Search, ChevronLeft, ChevronRight, Users } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import api from '@/lib/api'
+import { useTranslation } from 'react-i18next'
 
 interface User {
   id: string | number
@@ -37,6 +38,7 @@ interface PaginatedResponse<T> {
 
 export default function UsersPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [clients, setClients] = useState<Client[]>([])
   const [partners, setPartners] = useState<Partner[]>([])
   const [loading, setLoading] = useState(true)
@@ -93,7 +95,7 @@ export default function UsersPage() {
       setClients(clientsData)
     } catch (err: any) {
       console.error('Error fetching users:', err)
-      setError(err.response?.data?.message || 'Failed to fetch users')
+      setError(err.response?.data?.message || t('users.error'))
     } finally {
       setLoading(false)
     }
@@ -141,27 +143,27 @@ export default function UsersPage() {
     return (
       <div className="space-y-6">
         {/* Table */}
-        <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+        <div className="border border-border rounded-xl overflow-hidden bg-card shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/50">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Phone</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Action</th>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.name')}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.phone')}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.status')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.action')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-border">
                 {paginatedUsers.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center justify-center gap-3">
-                        <Users className="h-12 w-12 text-slate-300" />
-                        <p className="text-sm text-slate-500 font-medium">
+                        <Users className="h-12 w-12 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground font-medium">
                           {filterUsers(users).length === 0 && searchQuery
-                            ? 'No users match your search'
-                            : 'No users found'}
+                            ? t('users.empty.noneSearch')
+                            : t('users.empty.none')}
                         </p>
                       </div>
                     </td>
@@ -170,11 +172,11 @@ export default function UsersPage() {
                   paginatedUsers.map((user) => (
                     <tr 
                       key={user.id} 
-                      className="hover:bg-blue-50 transition-colors duration-150 group"
+                      className="hover:bg-accent/40 transition-colors duration-150 group"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10 ring-2 ring-slate-100">
+                          <Avatar className="h-10 w-10 ring-2 ring-border">
                             <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
                             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-semibold">
                               {(user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email)
@@ -186,16 +188,16 @@ export default function UsersPage() {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-semibold text-slate-900 text-sm">
+                            <p className="font-semibold text-foreground text-sm">
                               {user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email}
                             </p>
-                            <p className="text-xs text-slate-500">{type === 'client' ? 'Client' : 'Partner'}</p>
+                            <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : t('users.type.partner')}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <p className="text-sm text-slate-700 font-medium">
-                          {user.phone_number || <span className="text-slate-400">-</span>}
+                        <p className="text-sm text-foreground font-medium">
+                          {user.phone_number || <span className="text-muted-foreground">-</span>}
                         </p>
                       </td>
                       <td className="px-6 py-4">
@@ -206,7 +208,7 @@ export default function UsersPage() {
                               ? 'text-green-700 bg-green-100 px-2.5 py-1 rounded-full' 
                               : 'text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full'
                           }`}>
-                            {user.is_active ? 'Active' : 'Inactive'}
+                            {user.is_active ? t('users.status.active') : t('users.status.inactive')}
                           </span>
                         </div>
                       </td>
@@ -216,7 +218,7 @@ export default function UsersPage() {
                           variant="ghost"
                           onClick={() => type === 'partner' && navigate(`/chat/${user.id}`)}
                           disabled={type !== 'partner'}
-                          title={type === 'partner' ? 'Open chat' : 'Chat is available for partners only'}
+                          title={type === 'partner' ? t('users.chat.open') : t('users.chat.partnersOnly')}
                           className="rounded-lg"
                         >
                           <MessageSquare className="h-4 w-4 text-blue-600" />
@@ -234,11 +236,15 @@ export default function UsersPage() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-slate-200 pt-6">
             <div className="flex items-center gap-2">
-              <p className="text-xs font-medium text-slate-600 uppercase tracking-wider">
-                Page {page} of {totalPages}
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                {t('users.pagination.page', { page, total: totalPages })}
               </p>
-              <p className="text-sm text-slate-500">
-                ({paginatedUsers.length > 0 ? (page - 1) * ITEMS_PER_PAGE + 1 : 0}–{Math.min(page * ITEMS_PER_PAGE, totalUsers)} of {totalUsers})
+              <p className="text-sm text-muted-foreground">
+                ({t('users.pagination.range', {
+                  from: paginatedUsers.length > 0 ? (page - 1) * ITEMS_PER_PAGE + 1 : 0,
+                  to: Math.min(page * ITEMS_PER_PAGE, totalUsers),
+                  total: totalUsers,
+                })})
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -289,7 +295,7 @@ export default function UsersPage() {
       <div className="flex h-96 items-center justify-center">
         <div className="text-center">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto" />
-          <p className="mt-4 text-sm font-medium text-slate-600">Loading users...</p>
+          <p className="mt-4 text-sm font-medium text-muted-foreground">{t('users.loading')}</p>
         </div>
       </div>
     )
@@ -298,9 +304,9 @@ export default function UsersPage() {
   return (
     <div className="space-y-6 p-6 overflow-y-auto h-full">
       {/* Header */}
-      <div className="border-b border-slate-200 pb-6">
-        <h1 className="text-3xl font-bold text-slate-900">Users</h1>
-        <p className="text-slate-600 mt-2">Manage and view all clients and partners</p>
+      <div className="border-b border-border pb-6">
+        <h1 className="text-3xl font-bold text-foreground">{t('users.title')}</h1>
+        <p className="text-muted-foreground mt-2">{t('users.subtitle')}</p>
       </div>
 
       {/* Error Alert */}
@@ -313,32 +319,38 @@ export default function UsersPage() {
             className="mt-3 border-red-300 text-red-700 hover:bg-red-100"
             onClick={fetchUsers}
           >
-            Retry
+            {t('common.retry')}
           </Button>
         </div>
       )}
 
       {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
-          placeholder="Search by name, email, or phone..."
+          placeholder={t('users.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 h-11 rounded-xl border-slate-200 bg-white text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+          className="pl-12 h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10"
         />
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="clients" className="space-y-6">
-        <TabsList className="bg-slate-100 rounded-lg p-1">
-          <TabsTrigger value="clients" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+        <TabsList className="bg-muted rounded-lg p-1">
+          <TabsTrigger
+            value="clients"
+            className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground"
+          >
             <Users className="h-4 w-4 mr-2" />
-            Clients <span className="ml-2 bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(clients).length}</span>
+            {t('users.tabs.clients')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(clients).length}</span>
           </TabsTrigger>
-          <TabsTrigger value="partners" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm">
+          <TabsTrigger
+            value="partners"
+            className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground"
+          >
             <Users className="h-4 w-4 mr-2" />
-            Partners <span className="ml-2 bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(partners).length}</span>
+            {t('users.tabs.partners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(partners).length}</span>
           </TabsTrigger>
         </TabsList>
 
