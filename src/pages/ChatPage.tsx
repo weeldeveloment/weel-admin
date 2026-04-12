@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 
 interface Actor {
   id: number;
-  role: 'admin' | 'partner';
+  role?: 'admin' | 'partner' | 'client';
   full_name: string;
   email?: string;
   username?: string;
@@ -33,14 +33,14 @@ interface ChatMessage {
   conversation_id?: number;
   sender?: Actor;
   receiver?: Actor;
-  sender_type?: 'admin' | 'partner';
-  receiver_type?: 'admin' | 'partner';
+  sender_type?: 'admin' | 'partner' | 'client';
+  receiver_type?: 'admin' | 'partner' | 'client';
   sender_id?: number;
   receiver_id?: number;
   content: string;
   is_read: boolean;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 interface Conversation {
@@ -50,15 +50,15 @@ interface Conversation {
   unread_count: number;
 }
 
-function getPartnerIdFromMessage(message: ChatMessage) {
+function getCounterpartIdFromMessage(message: ChatMessage, counterpartRole: 'partner' | 'client') {
   const senderType = message.sender?.role ?? message.sender_type;
   const receiverType = message.receiver?.role ?? message.receiver_type;
 
-  if (senderType === 'partner') {
+  if (senderType === counterpartRole) {
     return Number(message.sender?.id ?? message.sender_id);
   }
 
-  if (receiverType === 'partner') {
+  if (receiverType === counterpartRole) {
     return Number(message.receiver?.id ?? message.receiver_id);
   }
 
@@ -205,6 +205,7 @@ DateSeparator.displayName = 'DateSeparator';
 
 export default function ChatPage() {
   const { partnerId } = useParams<{ partnerId?: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
@@ -213,18 +214,20 @@ export default function ChatPage() {
   const [isSending, setIsSending] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
+  const requestedRole = (searchParams.get('role') || '').toLowerCase();
+  const counterpartRole: 'partner' | 'client' = requestedRole === 'client' ? 'client' : 'partner';
   const activePartnerId = partnerId ? Number(partnerId) : null;
   const markMessagesAsRead = useCallback(
-    async (targetPartnerId: number, messageIds: number[]) => {
+    async (targetPartnerId: number, messageIds: number[], targetRole: 'partner' | 'client') => {
       if (messageIds.length === 0) return;
 
       await api.post('/chat/read/', {
         message_ids: messageIds,
-        partner_id: targetPartnerId,
-        partner_type: 'partner',
+        counterpart_id: targetPartnerId,
+        counterpart_type: targetRole,
       });
 
-      queryClient.setQueryData(['messages', targetPartnerId.toString()], (old: ChatMessage[] = []) =>
+      queryClient.setQueryData(['messages', targetPartnerId.toString(), targetRole], (old: ChatMessage[] = []) =>
         old.map((entry) => (messageIds.includes(entry.id) ? { ...entry, is_read: true } : entry))
       );
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
@@ -233,20 +236,21 @@ export default function ChatPage() {
   );
   const { connect, disconnect } = useChatWebSocket({
     onMessage: (incoming) => {
-      const incomingPartnerId = getPartnerIdFromMessage(incoming);
+      const normalizedIncoming = incoming as ChatMessage;
+      const incomingPartnerId = getCounterpartIdFromMessage(normalizedIncoming, counterpartRole);
 
       if (!incomingPartnerId || incomingPartnerId !== activePartnerId) {
         queryClient.invalidateQueries({ queryKey: ['conversations'] });
         return;
       }
 
-      queryClient.setQueryData(['messages', partnerId], (old: ChatMessage[] = []) =>
-        mergeChatMessage(old, incoming)
+      queryClient.setQueryData(['messages', partnerId, counterpartRole], (old: ChatMessage[] = []) =>
+        mergeChatMessage(old, normalizedIncoming)
       );
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
 
-      if (incoming.sender_type === 'partner' && !incoming.is_read) {
-        void markMessagesAsRead(incomingPartnerId, [incoming.id]);
+      if (incoming.sender_type === counterpartRole && !incoming.is_read) {
+        void markMessagesAsRead(incomingPartnerId, [incoming.id], counterpartRole);
       }
 
       scrollToBottom();
@@ -262,7 +266,7 @@ export default function ChatPage() {
         return;
       }
 
-      queryClient.setQueryData(['messages', partnerId], (old: ChatMessage[] = []) =>
+      queryClient.setQueryData(['messages', partnerId, counterpartRole], (old: ChatMessage[] = []) =>
         old.map((entry) => (payload.messageIds.includes(entry.id) ? { ...entry, is_read: true } : entry))
       );
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
@@ -292,10 +296,14 @@ export default function ChatPage() {
     data: messages = [],
     isLoading: isLoadingMessages,
   } = useQuery<ChatMessage[]>({
-    queryKey: ['messages', partnerId],
+    queryKey: ['messages', partnerId, counterpartRole],
     queryFn: async () => {
       if (!partnerId) throw new Error('Partner ID is required');
-      const response = await api.get(`/chat/messages/${partnerId}/`);
+      const response = await api.get(`/chat/messages/${partnerId}/`, {
+        params: {
+          role: counterpartRole,
+        },
+      });
       return response.data;
     },
     enabled: !!partnerId,
@@ -321,13 +329,13 @@ export default function ChatPage() {
     if (!activePartnerId || messages.length === 0) return;
 
     const unreadPartnerMessageIds = messages
-      .filter((entry) => entry.sender_type === 'partner' && !entry.is_read)
+      .filter((entry) => entry.sender_type === counterpartRole && !entry.is_read)
       .map((entry) => entry.id);
 
     if (unreadPartnerMessageIds.length > 0) {
-      void markMessagesAsRead(activePartnerId, unreadPartnerMessageIds);
+      void markMessagesAsRead(activePartnerId, unreadPartnerMessageIds, counterpartRole);
     }
-  }, [activePartnerId, markMessagesAsRead, messages]);
+  }, [activePartnerId, markMessagesAsRead, messages, counterpartRole]);
 
   const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -340,11 +348,11 @@ export default function ChatPage() {
     try {
       const response = await api.post('/chat/send/', {
         receiver_id: parseInt(partnerId),
-        receiver_type: 'partner',
+        receiver_type: counterpartRole,
         content: messageInput.trim(),
       });
 
-      queryClient.setQueryData(['messages', partnerId], (old: ChatMessage[] = []) =>
+      queryClient.setQueryData(['messages', partnerId, counterpartRole], (old: ChatMessage[] = []) =>
         mergeChatMessage(old, response.data)
       );
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
@@ -356,17 +364,20 @@ export default function ChatPage() {
     } finally {
       setIsSending(false);
     }
-  }, [messageInput, partnerId, isSending, queryClient]);
+  }, [messageInput, partnerId, isSending, queryClient, counterpartRole]);
 
   const filteredConversations = conversations.filter((conv) =>
     conv.counterpart.full_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const selectedConversation = conversations.find(
-    (conv) => conv.counterpart.id.toString() === partnerId
+    (conv) =>
+      conv.counterpart.id.toString() === partnerId &&
+      (conv.counterpart.role || 'partner') === counterpartRole
   );
   const activeCounterpart = selectedConversation?.counterpart;
-  const activeCounterpartName = activeCounterpart?.full_name || `Partner #${partnerId}`;
+  const activeCounterpartName =
+    activeCounterpart?.full_name || `${counterpartRole === 'client' ? 'Client' : 'Partner'} #${partnerId}`;
 
   return (
     <div className="flex h-screen bg-background">
@@ -400,8 +411,13 @@ export default function ChatPage() {
                 <ConversationItem
                   key={conv.conversation_id}
                   conversation={conv}
-                  isActive={conv.counterpart.id.toString() === partnerId}
-                  onClick={() => navigate(`/chat/${conv.counterpart.id}`)}
+                  isActive={
+                    conv.counterpart.id.toString() === partnerId &&
+                    (conv.counterpart.role || 'partner') === counterpartRole
+                  }
+                  onClick={() =>
+                    navigate(`/chat/${conv.counterpart.id}?role=${conv.counterpart.role || 'partner'}`)
+                  }
                 />
               ))
             )}

@@ -216,9 +216,8 @@ export default function UsersPage() {
                         <Button 
                           size="sm" 
                           variant="ghost"
-                          onClick={() => type === 'partner' && navigate(`/chat/${user.id}`)}
-                          disabled={type !== 'partner'}
-                          title={type === 'partner' ? t('users.chat.open') : t('users.chat.partnersOnly')}
+                          onClick={() => navigate(`/chat/${user.id}?role=${type}`)}
+                          title={t('users.chat.open')}
                           className="rounded-lg"
                         >
                           <MessageSquare className="h-4 w-4 text-blue-600" />

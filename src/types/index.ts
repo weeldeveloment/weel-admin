@@ -2,7 +2,7 @@ export interface User {
   id: number
   email: string
   full_name?: string
-  role?: 'admin' | 'partner'
+  role?: 'admin' | 'partner' | 'client'
   is_staff?: boolean
   is_superuser?: boolean
 }
@@ -30,8 +30,8 @@ export interface Message {
   conversation_id?: number
   sender_id: number
   receiver_id: number
-  sender_type?: 'admin' | 'partner'
-  receiver_type?: 'admin' | 'partner'
+  sender_type?: 'admin' | 'partner' | 'client'
+  receiver_type?: 'admin' | 'partner' | 'client'
   content: string
   created_at: string
   updated_at?: string

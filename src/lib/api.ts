@@ -1,9 +1,10 @@
 import axios from 'axios'
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://dev.weel.uz'
+const API_URL = (import.meta.env.VITE_API_URL || 'https://dev.weel.uz').replace(/\/$/, '')
+const API_BASE = import.meta.env.DEV ? '/api' : `${API_URL}/api`
 
 export const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,7 +30,7 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refresh_token')
-        const response = await axios.post(`${API_URL}/api/admin-auth/token/refresh/`, {
+        const response = await axios.post(`${API_BASE}/admin-auth/token/refresh/`, {
           refresh: refreshToken,
         })
 

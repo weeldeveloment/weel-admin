@@ -3,7 +3,7 @@ import { Message, WebSocketMessage } from '@/types'
 
 interface UseChatWebSocketOptions {
   onMessage?: (message: Message) => void
-  onRead?: (payload: { partnerId: number; partnerType?: 'admin' | 'partner'; messageIds: number[] }) => void
+  onRead?: (payload: { partnerId: number; partnerType?: 'admin' | 'partner' | 'client'; messageIds: number[] }) => void
   onError?: (error: string) => void
 }
 
@@ -120,14 +120,14 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
     }
   }, [])
 
-  const sendRead = useCallback((partnerId: number, messageIds: number[]) => {
+  const sendRead = useCallback((partnerId: number, messageIds: number[], partnerType: 'partner' | 'client' = 'partner') => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || messageIds.length === 0) {
       return false
     }
 
     wsRef.current.send(JSON.stringify({
       type: 'read',
-      data: { partnerId, partnerType: 'partner', messageIds },
+      data: { partnerId, partnerType, messageIds },
     }))
     return true
   }, [])

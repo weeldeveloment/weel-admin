@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -90,7 +90,6 @@ const statusColors: Record<string, string> = {
 }
 
 export default function BookingsPage() {
-  const queryClient = useQueryClient()
   const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -217,24 +216,6 @@ export default function BookingsPage() {
   const handleOrderingToggle = () => {
     setOrdering((prev) => (prev === '-check_in' ? 'check_in' : '-check_in'))
     setCurrentPage(1)
-  }
-
-  const performAction = async (bookingId: string, action: 'checkin' | 'no_show' | 'ticket' | 'conflict') => {
-    const endpoints: Record<string, string> = {
-      checkin: `/booking/admin/bookings/${bookingId}/force-check-in/`,
-      no_show: `/booking/admin/bookings/${bookingId}/mark-no-show/`,
-      ticket: `/booking/admin/bookings/${bookingId}/create-ticket/`,
-      conflict: `/booking/admin/bookings/${bookingId}/escalate-conflict/`,
-    }
-
-    try {
-      await api.post(endpoints[action])
-      await queryClient.invalidateQueries({ queryKey: ['bookings'] })
-      await refetch()
-    } catch (error) {
-      console.error('Action failed', error)
-      alert(t('common.actionFailed'))
-    }
   }
 
   const handlePageChange = (newPage: number) => {
@@ -495,40 +476,10 @@ export default function BookingsPage() {
                           </div>
                         )}
 
-                        {/* Actions */}
-                        <div className="flex flex-wrap gap-2 pt-2 border-t">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => performAction(booking.guid, 'checkin')}
-                            disabled={isFetching || ['cancelled', 'completed', 'checked_in', 'no_show'].includes(booking.status)}
-                          >
-                            {t('bookings.actions.forceCheckIn')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => performAction(booking.guid, 'no_show')}
-                            disabled={isFetching || ['cancelled', 'completed', 'no_show'].includes(booking.status)}
-                          >
-                            {t('bookings.actions.markNoShow')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => performAction(booking.guid, 'ticket')}
-                            disabled={isFetching}
-                          >
-                            {t('bookings.actions.createTicket')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => performAction(booking.guid, 'conflict')}
-                            disabled={isFetching || booking.conflict_flag}
-                          >
-                            {t('bookings.actions.escalateConflict')}
-                          </Button>
+                        <div className="pt-2 border-t">
+                          <p className="text-xs text-muted-foreground">
+                            Booking actions are not exposed by the current admin API.
+                          </p>
                         </div>
                       </div>
 
