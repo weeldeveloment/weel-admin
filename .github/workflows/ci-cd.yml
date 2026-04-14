@@ -134,4 +134,9 @@ jobs:
             echo "Missing secret: DOKPLOY_WEBHOOK_URL"
             exit 1
           fi
-          curl -fsSL -X POST "$DOKPLOY_WEBHOOK_URL"
+          payload="$(printf '{"ref":"%s","repository":{"full_name":"%s"}}' "$GITHUB_REF" "$GITHUB_REPOSITORY")"
+          response="$(curl -sS -X POST "$DOKPLOY_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Event: push" \
+            -d "$payload")"
+          echo "$response"
