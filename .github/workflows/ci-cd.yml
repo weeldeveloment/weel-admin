@@ -90,22 +90,27 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Trigger Dokploy Redeploy (Docker Image)
+      - name: Trigger Dokploy Deployment
         env:
+          DOKPLOY_WEBHOOK_URL: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
           DOKPLOY_APPLICATION_ID: ${{ secrets.DOKPLOY_APPLICATION_ID }}
         run: |
-          if [ -z "$DOKPLOY_URL" ]; then
-            echo "Missing secret: DOKPLOY_URL"
-            exit 1
+          # Preferred: deployment webhook (no Dokploy API key required).
+          if [ -n "$DOKPLOY_WEBHOOK_URL" ]; then
+            payload="$(printf '{"ref":"%s","repository":{"full_name":"%s"}}' "$GITHUB_REF" "$GITHUB_REPOSITORY")"
+            response="$(curl -sS -X POST "$DOKPLOY_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -H "X-GitHub-Event: push" \
+              -d "$payload")"
+            echo "$response"
+            exit 0
           fi
-          if [ -z "$DOKPLOY_API_KEY" ]; then
-            echo "Missing secret: DOKPLOY_API_KEY"
-            exit 1
-          fi
-          if [ -z "$DOKPLOY_APPLICATION_ID" ]; then
-            echo "Missing secret: DOKPLOY_APPLICATION_ID"
+
+          # Optional fallback: Dokploy API redeploy (requires API key).
+          if [ -z "$DOKPLOY_URL" ] || [ -z "$DOKPLOY_API_KEY" ] || [ -z "$DOKPLOY_APPLICATION_ID" ]; then
+            echo "Missing secrets: set DOKPLOY_WEBHOOK_URL or (DOKPLOY_URL + DOKPLOY_API_KEY + DOKPLOY_APPLICATION_ID)"
             exit 1
           fi
 
