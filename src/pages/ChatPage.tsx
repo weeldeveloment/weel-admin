@@ -50,6 +50,15 @@ interface Conversation {
   unread_count: number;
 }
 
+type ConversationApi = {
+  conversation_id?: number;
+  id?: number;
+  counterpart?: Actor;
+  partner?: Actor;
+  last_message?: ChatMessage;
+  unread_count?: number;
+};
+
 function getCounterpartIdFromMessage(message: ChatMessage, counterpartRole: 'partner' | 'client') {
   const senderType = message.sender?.role ?? message.sender_type;
   const receiverType = message.receiver?.role ?? message.receiver_type;
@@ -281,9 +290,10 @@ export default function ChatPage() {
     queryKey: ['conversations'],
     queryFn: async () => {
       const response = await api.get('/chat/conversations/');
-      return (response.data || []).map((conv: any) => ({
-        conversation_id: conv.conversation_id ?? conv.id,
-        counterpart: conv.counterpart ?? conv.partner,
+      const items = (response.data ?? []) as ConversationApi[];
+      return items.map((conv) => ({
+        conversation_id: (conv.conversation_id ?? conv.id ?? 0) as number,
+        counterpart: (conv.counterpart ?? conv.partner) as Actor,
         last_message: conv.last_message,
         unread_count: conv.unread_count ?? 0,
       }));

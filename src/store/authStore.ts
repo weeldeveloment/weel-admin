@@ -42,7 +42,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem('refresh_token', refresh)
       
       set({ user: normalizeAdminUser(user), isAuthenticated: true })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login failed:', error)
       throw error
     }
@@ -74,7 +74,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
       
       set({ user: normalizeAdminUser(response.data), isAuthenticated: true, isLoading: false })
-    } catch (error) {
+    } catch {
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
       set({ user: null, isAuthenticated: false, isLoading: false })

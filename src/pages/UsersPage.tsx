@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -36,6 +36,43 @@ interface PaginatedResponse<T> {
   results: T[]
 }
 
+const getApiErrorMessage = (err: unknown): string | null => {
+  if (
+    typeof err === 'object' &&
+    err !== null &&
+    'response' in err &&
+    typeof (err as { response?: { data?: { message?: unknown } } }).response?.data?.message === 'string'
+  ) {
+    return (err as { response: { data: { message: string } } }).response.data.message
+  }
+
+  return null
+}
+
+const fetchAllPages = async <T,>(endpoint: string): Promise<T[]> => {
+  const pageSize = 100
+  let page = 1
+  const allItems: T[] = []
+
+  while (true) {
+    const response = await api.get<PaginatedResponse<T> | T[]>(endpoint, {
+      params: { page, page_size: pageSize },
+    })
+
+    if (Array.isArray(response.data)) {
+      return response.data
+    }
+
+    const { results, next } = response.data
+    allItems.push(...(results || []))
+
+    if (!next) break
+    page += 1
+  }
+
+  return allItems
+}
+
 export default function UsersPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -49,39 +86,11 @@ export default function UsersPage() {
   const ITEMS_PER_PAGE = 10
 
   useEffect(() => {
-    fetchUsers()
-  }, [])
-
-  useEffect(() => {
     setClientsPage(1)
     setPartnersPage(1)
   }, [searchQuery])
 
-  const fetchAllPages = async <T,>(endpoint: string): Promise<T[]> => {
-    const pageSize = 100
-    let page = 1
-    const allItems: T[] = []
-
-    while (true) {
-      const response = await api.get<PaginatedResponse<T> | T[]>(endpoint, {
-        params: { page, page_size: pageSize },
-      })
-
-      if (Array.isArray(response.data)) {
-        return response.data
-      }
-
-      const { results, next } = response.data
-      allItems.push(...(results || []))
-
-      if (!next) break
-      page += 1
-    }
-
-    return allItems
-  }
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -93,13 +102,17 @@ export default function UsersPage() {
 
       setPartners(partnersData)
       setClients(clientsData)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching users:', err)
-      setError(err.response?.data?.message || t('users.error'))
+      setError(getApiErrorMessage(err) || t('users.error'))
     } finally {
       setLoading(false)
     }
-  }
+  }, [t])
+
+  useEffect(() => {
+    void fetchUsers()
+  }, [fetchUsers])
 
   const filterUsers = (users: User[]) => {
     if (!searchQuery.trim()) return users

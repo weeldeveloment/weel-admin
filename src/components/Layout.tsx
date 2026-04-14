@@ -8,9 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeToggle } from './ThemeToggle'
 
-interface LayoutProps {}
-
-export default function Layout({}: LayoutProps) {
+export default function Layout() {
   const location = useLocation()
   const { user, logout } = useAuthStore()
   const { t } = useTranslation()

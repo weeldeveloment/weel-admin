@@ -49,6 +49,6 @@ export interface Conversation {
 
 export interface WebSocketMessage {
   type: 'message' | 'read' | 'typing' | 'online' | 'offline' | 'ping' | 'error'
-  data: any
+  data: unknown
   error?: string
 }

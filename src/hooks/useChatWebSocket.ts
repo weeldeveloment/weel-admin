@@ -90,7 +90,7 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
         if (data.type === 'error' && data.error) {
           optionsRef.current.onError?.(data.error)
         }
-      } catch (error) {
+      } catch {
         optionsRef.current.onError?.('Failed to parse chat websocket message')
       }
     }

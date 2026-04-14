@@ -24,8 +24,15 @@ export default function LoginPage() {
     try {
       await login(email, password)
       navigate('/users')
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.')
+    } catch (err: unknown) {
+      const message =
+        typeof err === 'object' &&
+        err !== null &&
+        'response' in err &&
+        typeof (err as { response?: { data?: { message?: unknown } } }).response?.data?.message === 'string'
+          ? (err as { response: { data: { message: string } } }).response.data.message
+          : 'Login failed. Please check your credentials.'
+      setError(message)
     } finally {
       setIsLoading(false)
     }
