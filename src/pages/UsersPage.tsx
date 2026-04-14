@@ -192,7 +192,7 @@ export default function UsersPage() {
                           <Avatar className="h-10 w-10 ring-2 ring-border">
                             <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
                             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-semibold">
-                              {(user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email)
+                              {((user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email) || '')
                                 .split(' ')
                                 .map(n => n[0])
                                 .join('')
