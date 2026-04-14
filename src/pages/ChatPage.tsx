@@ -95,7 +95,11 @@ const ConversationItem = memo(
     onClick: () => void;
   }) => {
     const { t } = useTranslation();
-    const role = conversation.counterpart.role || 'partner';
+    const counterpart = conversation.counterpart;
+    if (!counterpart) return null;
+    const role = counterpart.role || 'partner';
+    const fullName = counterpart.full_name || '';
+    const fallbackInitials = fullName.slice(0, 2).toUpperCase() || '??';
     return (
       <button
         onClick={onClick}
@@ -107,16 +111,16 @@ const ConversationItem = memo(
           <div className="relative flex-shrink-0">
             <Avatar className="h-12 w-12">
               <AvatarImage
-                src={`https://api.dicebear.com/7.x/initials/svg?seed=${conversation.counterpart.full_name}`}
+                src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName || 'unknown'}`}
               />
               <AvatarFallback>
-                {conversation.counterpart.full_name.slice(0, 2).toUpperCase()}
+                {fallbackInitials}
               </AvatarFallback>
             </Avatar>
           </div>
           <div className="flex-1 overflow-hidden">
             <div className="flex items-center justify-between gap-2">
-              <p className="font-semibold truncate">{conversation.counterpart.full_name}</p>
+              <p className="font-semibold truncate">{fullName}</p>
               {conversation.unread_count > 0 && (
                 <Badge variant="default" className="h-5 min-w-[20px] px-1.5 text-xs">
                   {conversation.unread_count}
