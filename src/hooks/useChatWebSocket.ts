@@ -7,6 +7,26 @@ interface UseChatWebSocketOptions {
   onError?: (error: string) => void
 }
 
+type ReadPayload = { partnerId: number; partnerType?: 'admin' | 'partner' | 'client'; messageIds: number[] }
+
+function isReadPayload(value: unknown): value is ReadPayload {
+  if (!value || typeof value !== 'object') return false
+  const record = value as Record<string, unknown>
+
+  if (typeof record.partnerId !== 'number') return false
+  if (!Array.isArray(record.messageIds) || !record.messageIds.every((id) => typeof id === 'number')) return false
+  if (
+    record.partnerType !== undefined &&
+    record.partnerType !== 'admin' &&
+    record.partnerType !== 'partner' &&
+    record.partnerType !== 'client'
+  ) {
+    return false
+  }
+
+  return true
+}
+
 function resolveWebSocketUrl(token: string) {
   const configured = (import.meta.env.VITE_WS_URL || '').trim()
   const fallback = 'wss://dev.weel.uz/ws/chat/'
@@ -84,7 +104,11 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
           return
         }
         if (data.type === 'read' && data.data) {
-          optionsRef.current.onRead?.(data.data)
+          if (isReadPayload(data.data)) {
+            optionsRef.current.onRead?.(data.data)
+          } else {
+            optionsRef.current.onError?.('Invalid chat websocket read payload')
+          }
           return
         }
         if (data.type === 'error' && data.error) {
