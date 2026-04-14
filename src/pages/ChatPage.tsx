@@ -95,6 +95,7 @@ const ConversationItem = memo(
     onClick: () => void;
   }) => {
     const { t } = useTranslation();
+    const role = conversation.counterpart.role || 'partner';
     return (
       <button
         onClick={onClick}
@@ -122,7 +123,15 @@ const ConversationItem = memo(
                 </Badge>
               )}
             </div>
-            <p className="truncate text-sm mt-0.5 text-muted-foreground">
+            <div className="flex items-center gap-2 mt-0.5">
+              <Badge
+                variant="secondary"
+                className="text-xs h-5 px-1.5 capitalize"
+              >
+                {role}
+              </Badge>
+            </div>
+            <p className="truncate text-sm mt-1 text-muted-foreground">
               {conversation.last_message?.content || t('chat.noMessages')}
             </p>
             {conversation.counterpart.phone_number && (
@@ -452,7 +461,15 @@ export default function ChatPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="font-semibold">{activeCounterpartName}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold">{activeCounterpartName}</h3>
+                      <Badge
+                        variant="secondary"
+                        className="text-xs h-5 px-1.5 capitalize"
+                      >
+                        {counterpartRole}
+                      </Badge>
+                    </div>
                     {activeCounterpart?.phone_number && (
                       <p className="text-xs text-muted-foreground">
                         {activeCounterpart.phone_number}
