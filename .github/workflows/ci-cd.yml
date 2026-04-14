@@ -11,7 +11,8 @@ env:
   NODE_VERSION: '20'
 
 permissions:
-  contents: write
+  contents: read
+  packages: write
 
 jobs:
   ci:
@@ -41,8 +42,8 @@ jobs:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
 
-  release-and-deploy:
-    name: Release & Deploy
+  docker-deploy:
+    name: Docker Deploy
     runs-on: ubuntu-latest
     needs: ci
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
@@ -58,85 +59,58 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Set image tags
+        id: meta
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+          echo "tag_sha=sha-${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
         with:
-          bun-version: latest
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag_sha }}
+            ${{ steps.meta.outputs.image }}:latest
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+            VITE_WS_URL=${{ secrets.VITE_WS_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Build
-        run: bun run build
+      - name: Trigger Dokploy Redeploy (Docker Image)
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
-
-      - name: Package dist
-        run: tar -czf dist.tar.gz -C dist .
-
-      - name: Configure git
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          DOKPLOY_APPLICATION_ID: ${{ secrets.DOKPLOY_APPLICATION_ID }}
         run: |
-          git config --local user.name "GitHub Actions"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Get version
-        id: version
-        run: |
-          # If HEAD is already tagged (re-run), reuse that tag instead of bumping.
-          HEAD_TAG="$(git tag --points-at HEAD | grep '^v' | head -1 || true)"
-          if [ -n "$HEAD_TAG" ]; then
-            echo "tag=$HEAD_TAG" >> $GITHUB_OUTPUT
-            echo "version=$(echo "$HEAD_TAG" | sed 's/^v//')" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          VERSION_TAG="$(git tag --sort=-v:refname | grep '^v' | head -1 || true)"
-          if [ -z "$VERSION_TAG" ]; then
-            VERSION="0.0.0"
-          else
-            VERSION="$(echo "$VERSION_TAG" | sed 's/^v//')"
-          fi
-          MAJOR="$(echo "$VERSION" | cut -d. -f1)"
-          MINOR="$(echo "$VERSION" | cut -d. -f2)"
-          PATCH="$(echo "$VERSION" | cut -d. -f3)"
-          PATCH="$((PATCH + 1))"
-          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create git tag
-        run: |
-          if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
-            echo "Tag already exists: ${{ steps.version.outputs.tag }} (skipping create)"
-            exit 0
-          fi
-          git tag "${{ steps.version.outputs.tag }}"
-
-      - name: Push git tag
-        run: git push origin "${{ steps.version.outputs.tag }}"
-
-      - name: Create GitHub Release (gh)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
-            gh release upload "${{ steps.version.outputs.tag }}" dist.tar.gz --clobber
-          else
-            gh release create "${{ steps.version.outputs.tag }}" dist.tar.gz --title "${{ steps.version.outputs.tag }}" --generate-notes
-          fi
-
-      - name: Trigger Dokploy Deployment
-        env:
-          DOKPLOY_WEBHOOK_URL: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
-        run: |
-          if [ -z "$DOKPLOY_WEBHOOK_URL" ]; then
-            echo "Missing secret: DOKPLOY_WEBHOOK_URL"
+          if [ -z "$DOKPLOY_URL" ]; then
+            echo "Missing secret: DOKPLOY_URL"
             exit 1
           fi
-          payload="$(printf '{"ref":"%s","repository":{"full_name":"%s"}}' "$GITHUB_REF" "$GITHUB_REPOSITORY")"
-          response="$(curl -sS -X POST "$DOKPLOY_WEBHOOK_URL" \
+          if [ -z "$DOKPLOY_API_KEY" ]; then
+            echo "Missing secret: DOKPLOY_API_KEY"
+            exit 1
+          fi
+          if [ -z "$DOKPLOY_APPLICATION_ID" ]; then
+            echo "Missing secret: DOKPLOY_APPLICATION_ID"
+            exit 1
+          fi
+
+          response="$(curl -sS -X POST "${DOKPLOY_URL%/}/api/application.redeploy" \
             -H "Content-Type: application/json" \
-            -H "X-GitHub-Event: push" \
-            -d "$payload")"
+            -H "x-api-key: $DOKPLOY_API_KEY" \
+            -d "{\"applicationId\":\"$DOKPLOY_APPLICATION_ID\"}")"
           echo "$response"
