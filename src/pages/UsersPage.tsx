@@ -10,12 +10,10 @@ import { useTranslation } from 'react-i18next'
 
 interface User {
   id: string | number
-  email: string
   first_name?: string
   last_name?: string
   full_name?: string
   phone_number?: string
-  is_active: boolean
   created_at?: string
 }
 
@@ -99,7 +97,6 @@ export default function UsersPage() {
         fetchAllPages<Partner>('/admin-auth/users/partners/'),
         fetchAllPages<Client>('/admin-auth/users/clients/'),
       ])
-
       setPartners(partnersData)
       setClients(clientsData)
     } catch (err: unknown) {
@@ -118,7 +115,6 @@ export default function UsersPage() {
     if (!searchQuery.trim()) return users
     return users.filter(
       (user) =>
-        user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -136,6 +132,12 @@ export default function UsersPage() {
   const getTotalPages = (users: User[]) => {
     const filtered = filterUsers(users)
     return Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  }
+
+  const getPhoneHref = (phone?: string) => {
+    if (!phone) return ''
+    const normalized = phone.replace(/[^\d+]/g, '')
+    return `tel:${normalized}`
   }
 
   const UserTable = ({ 
@@ -163,7 +165,6 @@ export default function UsersPage() {
                 <tr className="border-b border-border bg-muted/50">
                   <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.name')}</th>
                   <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.phone')}</th>
-                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.status')}</th>
                   <th className="px-4 md:px-6 py-3 md:py-4 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.action')}</th>
                 </tr>
               </thead>
@@ -186,13 +187,14 @@ export default function UsersPage() {
                     <tr 
                       key={user.id} 
                       className="hover:bg-accent/40 transition-colors duration-150 group"
+                      onClick={() => navigate(`/partner/${user.id}`)}
                     >
                       <td className="px-4 md:px-6 py-3 md:py-4">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-9 md:h-10 w-9 md:w-10 ring-2 ring-border flex-shrink-0">
-                            <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
+                            <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.phone_number || user.id}`} />
                             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-semibold">
-                              {((user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email) || '')
+                              {((user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.phone_number || `User ${user.id}`) || '')
                                 .split(' ')
                                 .map(n => n[0])
                                 .join('')
@@ -202,28 +204,24 @@ export default function UsersPage() {
                           </Avatar>
                           <div className="min-w-0">
                             <p className="font-semibold text-foreground text-sm truncate">
-                              {user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email}
+                              {user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.phone_number || `User #${user.id}`}
                             </p>
                             <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : t('users.type.partner')}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 md:px-6 py-3 md:py-4">
-                        <p className="text-sm text-foreground font-medium">
-                          {user.phone_number || <span className="text-muted-foreground">-</span>}
-                        </p>
-                      </td>
-                      <td className="px-4 md:px-6 py-3 md:py-4">
-                        <div className="inline-flex items-center gap-2">
-                          <div className={`h-2 w-2 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-slate-300'}`} />
-                          <span className={`text-xs font-semibold ${
-                            user.is_active 
-                              ? 'text-green-700 bg-green-100 px-2.5 py-1 rounded-full' 
-                              : 'text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full'
-                          }`}>
-                            {user.is_active ? t('users.status.active') : t('users.status.inactive')}
-                          </span>
-                        </div>
+                        {user.phone_number ? (
+                          <a
+                            href={getPhoneHref(user.phone_number)}
+                            className="text-sm font-medium text-foreground underline-offset-2 hover:underline"
+                            aria-label={`Call ${user.phone_number}`}
+                          >
+                            {user.phone_number}
+                          </a>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        )}
                       </td>
                       <td className="px-4 md:px-6 py-3 md:py-4 text-center">
                         <Button 

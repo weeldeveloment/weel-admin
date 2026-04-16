@@ -105,7 +105,7 @@ const ConversationItem = memo(
     return (
       <button
         onClick={onClick}
-        className={`w-full rounded-xl p-3 text-left transition-all duration-200 hover:bg-accent/80 ${
+        className={`w-full min-w-0 rounded-xl p-3 text-left transition-all duration-200 hover:bg-accent/80 ${
           isActive ? 'bg-accent/50 border border-accent' : ''
         }`}
       >
@@ -413,7 +413,7 @@ export default function ChatPage() {
     <div className="flex h-full min-h-0 bg-background">
       {/* Sidebar - Conversations List */}
       <Card className={cn(
-        "flex h-full min-h-0 w-full flex-col rounded-none border-y-0 border-l-0 md:w-[360px] md:border-r",
+        "flex h-full min-h-0 w-full flex-col rounded-none border-y-0 border-l-0 md:w-auto md:basis-[clamp(320px,30vw,420px)] md:min-w-[320px] md:max-w-[420px] md:shrink-0 md:border-r",
         mobileShowChat && partnerId ? "hidden md:flex" : "flex"
       )}>
         {/* Header */}
@@ -432,7 +432,7 @@ export default function ChatPage() {
 
         {/* Conversations List */}
         <ScrollArea className="min-h-0 flex-1">
-          <div className="p-3 space-y-2">
+          <div className="space-y-2 p-3 pr-5">
             {isLoadingConversations ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
