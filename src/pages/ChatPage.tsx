@@ -12,9 +12,11 @@ import {
   Search,
   Check,
   CheckCheck,
-  Loader2
+  Loader2,
+  ArrowLeft
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { cn } from '@/lib/utils';
 import { useChatWebSocket } from '@/hooks/useChatWebSocket';
 import { useTranslation } from 'react-i18next';
 
@@ -107,7 +109,7 @@ const ConversationItem = memo(
           isActive ? 'bg-accent/50 border border-accent' : ''
         }`}
       >
-        <div className="flex items-start gap-3">
+        <div className="flex min-w-0 items-start gap-3">
           <div className="relative flex-shrink-0">
             <Avatar className="h-12 w-12">
               <AvatarImage
@@ -118,9 +120,9 @@ const ConversationItem = memo(
               </AvatarFallback>
             </Avatar>
           </div>
-          <div className="flex-1 overflow-hidden">
+          <div className="min-w-0 flex-1 overflow-hidden">
             <div className="flex items-center justify-between gap-2">
-              <p className="font-semibold truncate">{fullName}</p>
+              <p className="min-w-0 flex-1 truncate font-semibold">{fullName}</p>
               {conversation.unread_count > 0 && (
                 <Badge variant="default" className="h-5 min-w-[20px] px-1.5 text-xs">
                   {conversation.unread_count}
@@ -139,7 +141,7 @@ const ConversationItem = memo(
               {conversation.last_message?.content || t('chat.noMessages')}
             </p>
             {conversation.counterpart.phone_number && (
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="truncate text-xs text-muted-foreground mt-1">
                 {conversation.counterpart.phone_number}
               </p>
             )}
@@ -234,11 +236,16 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [messageInput, setMessageInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [mobileShowChat, setMobileShowChat] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
   const requestedRole = (searchParams.get('role') || '').toLowerCase();
   const counterpartRole: 'partner' | 'client' = requestedRole === 'client' ? 'client' : 'partner';
   const activePartnerId = partnerId ? Number(partnerId) : null;
+
+  useEffect(() => {
+    setMobileShowChat(!!partnerId);
+  }, [partnerId]);
   const markMessagesAsRead = useCallback(
     async (targetPartnerId: number, messageIds: number[], targetRole: 'partner' | 'client') => {
       if (messageIds.length === 0) return;
@@ -403,23 +410,28 @@ export default function ChatPage() {
     activeCounterpart?.full_name || `${counterpartRole === 'client' ? 'Client' : 'Partner'} #${partnerId}`;
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-full min-h-0 bg-background">
       {/* Sidebar - Conversations List */}
-      <Card className="w-80 flex-shrink-0 rounded-none border-l-0 border-y-0">
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-bold mb-4">{t('chat.title')}</h2>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Card className={cn(
+        "flex h-full min-h-0 w-full flex-col rounded-none border-y-0 border-l-0 md:w-[360px] md:border-r",
+        mobileShowChat && partnerId ? "hidden md:flex" : "flex"
+      )}>
+        {/* Header */}
+        <div className="border-b bg-background p-3 md:p-4">
+          <h2 className="text-lg md:text-xl font-bold mb-3">{t('chat.title')}</h2>
+          <div className="relative flex items-center w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground flex-shrink-0" />
             <Input
               placeholder={t('chat.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="flex-1 h-10 md:h-11 pl-10"
             />
           </div>
         </div>
 
-        <ScrollArea className="h-[calc(100vh-140px)]">
+        {/* Conversations List */}
+        <ScrollArea className="min-h-0 flex-1">
           <div className="p-3 space-y-2">
             {isLoadingConversations ? (
               <div className="flex items-center justify-center py-8">
@@ -438,9 +450,10 @@ export default function ChatPage() {
                     conv.counterpart.id.toString() === partnerId &&
                     (conv.counterpart.role || 'partner') === counterpartRole
                   }
-                  onClick={() =>
+                  onClick={() => {
                     navigate(`/chat/${conv.counterpart.id}?role=${conv.counterpart.role || 'partner'}`)
-                  }
+                    setMobileShowChat(true)
+                  }}
                 />
               ))
             )}
@@ -449,13 +462,28 @@ export default function ChatPage() {
       </Card>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className={cn(
+        "flex min-h-0 flex-1 flex-col",
+        !partnerId || !mobileShowChat ? "hidden md:flex" : "flex"
+      )}>
         {partnerId ? (
           <>
             {/* Chat Header */}
             <div className="border-b p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  {/* Mobile back button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    onClick={() => {
+                      navigate('/chat')
+                      setMobileShowChat(false)
+                    }}
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
                   <Avatar className="h-10 w-10">
                     <AvatarImage
                       src={`https://api.dicebear.com/7.x/initials/svg?seed=${activeCounterpartName}`}
@@ -464,9 +492,9 @@ export default function ChatPage() {
                       {activeCounterpartName.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{activeCounterpartName}</h3>
+                  <div className="min-w-0">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <h3 className="truncate font-semibold">{activeCounterpartName}</h3>
                       <Badge
                         variant="secondary"
                         className="text-xs h-5 px-1.5 capitalize"
@@ -475,7 +503,7 @@ export default function ChatPage() {
                       </Badge>
                     </div>
                     {activeCounterpart?.phone_number && (
-                      <p className="text-xs text-muted-foreground">
+                      <p className="truncate text-xs text-muted-foreground">
                         {activeCounterpart.phone_number}
                       </p>
                     )}
@@ -485,7 +513,7 @@ export default function ChatPage() {
             </div>
 
             {/* Messages Area */}
-            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+            <ScrollArea className="min-h-0 flex-1 p-4" ref={scrollAreaRef}>
               <div className="space-y-4 max-w-4xl mx-auto">
                 {isLoadingMessages ? (
                   <div className="flex items-center justify-center py-8">

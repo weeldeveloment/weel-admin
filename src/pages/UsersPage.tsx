@@ -158,21 +158,21 @@ export default function UsersPage() {
         {/* Table */}
         <div className="border border-border rounded-xl overflow-hidden bg-card shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.name')}</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.phone')}</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.status')}</th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.action')}</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.name')}</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.phone')}</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.status')}</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.action')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {paginatedUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-16 text-center">
+                    <td colSpan={4} className="px-4 md:px-6 py-12 md:py-16 text-center">
                       <div className="flex flex-col items-center justify-center gap-3">
-                        <Users className="h-12 w-12 text-muted-foreground" />
+                        <Users className="h-10 md:h-12 w-10 md:w-12 text-muted-foreground" />
                         <p className="text-sm text-muted-foreground font-medium">
                           {filterUsers(users).length === 0 && searchQuery
                             ? t('users.empty.noneSearch')
@@ -187,9 +187,9 @@ export default function UsersPage() {
                       key={user.id} 
                       className="hover:bg-accent/40 transition-colors duration-150 group"
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-3 md:py-4">
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10 ring-2 ring-border">
+                          <Avatar className="h-9 md:h-10 w-9 md:w-10 ring-2 ring-border flex-shrink-0">
                             <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} />
                             <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-semibold">
                               {((user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email) || '')
@@ -200,20 +200,20 @@ export default function UsersPage() {
                                 .slice(0, 2)}
                             </AvatarFallback>
                           </Avatar>
-                          <div>
-                            <p className="font-semibold text-foreground text-sm">
+                          <div className="min-w-0">
+                            <p className="font-semibold text-foreground text-sm truncate">
                               {user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email}
                             </p>
                             <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : t('users.type.partner')}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-3 md:py-4">
                         <p className="text-sm text-foreground font-medium">
                           {user.phone_number || <span className="text-muted-foreground">-</span>}
                         </p>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 md:px-6 py-3 md:py-4">
                         <div className="inline-flex items-center gap-2">
                           <div className={`h-2 w-2 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-slate-300'}`} />
                           <span className={`text-xs font-semibold ${
@@ -225,7 +225,7 @@ export default function UsersPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 md:px-6 py-3 md:py-4 text-center">
                         <Button 
                           size="sm" 
                           variant="ghost"
@@ -246,8 +246,8 @@ export default function UsersPage() {
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-200 pt-6">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 pt-6">
+            <div className="flex items-center gap-2 order-2 sm:order-1">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {t('users.pagination.page', { page, total: totalPages })}
               </p>
@@ -259,7 +259,7 @@ export default function UsersPage() {
                 })})
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 order-1 sm:order-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -314,11 +314,11 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="space-y-6 p-6 overflow-y-auto h-full">
+    <div className="space-y-6 p-4 md:p-6 overflow-y-auto h-full">
       {/* Header */}
-      <div className="border-b border-border pb-6">
-        <h1 className="text-3xl font-bold text-foreground">{t('users.title')}</h1>
-        <p className="text-muted-foreground mt-2">{t('users.subtitle')}</p>
+      <div className="border-b border-border pb-4 md:pb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('users.title')}</h1>
+        <p className="text-muted-foreground mt-1 md:mt-2 text-sm md:text-base">{t('users.subtitle')}</p>
       </div>
 
       {/* Error Alert */}
@@ -338,28 +338,28 @@ export default function UsersPage() {
 
       {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 md:h-5 w-4 md:w-5 text-muted-foreground" />
         <Input
           placeholder={t('users.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10"
+          className="pl-10 md:pl-12 h-10 md:h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10"
         />
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="clients" className="space-y-6">
-        <TabsList className="bg-muted rounded-lg p-1">
+        <TabsList className="bg-muted rounded-lg p-1 flex overflow-x-auto">
           <TabsTrigger
             value="clients"
-            className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground"
+            className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground shrink-0"
           >
             <Users className="h-4 w-4 mr-2" />
             {t('users.tabs.clients')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(clients).length}</span>
           </TabsTrigger>
           <TabsTrigger
             value="partners"
-            className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground"
+            className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground shrink-0"
           >
             <Users className="h-4 w-4 mr-2" />
             {t('users.tabs.partners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(partners).length}</span>

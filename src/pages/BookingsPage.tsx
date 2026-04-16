@@ -292,10 +292,10 @@ export default function BookingsPage() {
       <div className="h-full flex flex-col">
         {/* Header */}
         <div className="border-b bg-background">
-          <div className="p-6">
-            <div className="flex items-center justify-between">
+          <div className="p-4 md:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">{t('bookings.title')}</h1>
+                <h1 className="text-xl md:text-2xl font-bold">{t('bookings.title')}</h1>
                 <p className="text-sm text-muted-foreground mt-1">
                   {t('bookings.subtitle')}
                 </p>
@@ -307,16 +307,16 @@ export default function BookingsPage() {
                 disabled={isFetching}
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-                {t('common.refresh')}
+                <span className="hidden sm:inline">{t('common.refresh')}</span>
               </Button>
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="border-b bg-background p-4 space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex-1 min-w-[240px] relative">
+        <div className="border-b bg-background p-3 md:p-4 space-y-3">
+          <div className="flex flex-col gap-3">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={t('bookings.searchPlaceholder')}
@@ -325,37 +325,39 @@ export default function BookingsPage() {
                 className="pl-9"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-muted-foreground">{t('bookings.region')}</label>
-              <select
-                value={regionFilter}
-                onChange={(e) => handleRegionChange(e.target.value)}
-                className="h-9 rounded-md border border-border px-2 text-sm bg-card text-foreground"
-              >
-                <option value="all">{t('bookings.allRegions')}</option>
-                {regions.map((region) => (
-                  <option key={region.guid} value={region.guid}>
-                    {region.title}
-                  </option>
-                ))}
-              </select>
+            <div className="flex flex-wrap items-center gap-2 md:gap-4">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-muted-foreground whitespace-nowrap">{t('bookings.region')}</label>
+                <select
+                  value={regionFilter}
+                  onChange={(e) => handleRegionChange(e.target.value)}
+                  className="h-9 rounded-md border border-border px-2 text-sm bg-card text-foreground min-w-[120px]"
+                >
+                  <option value="all">{t('bookings.allRegions')}</option>
+                  {regions.map((region) => (
+                    <option key={region.guid} value={region.guid}>
+                      {region.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <label className="text-xs text-muted-foreground whitespace-nowrap">{t('bookings.date')}</label>
+                <Input type="date" value={dateFrom} onChange={(e) => handleDateFromChange(e.target.value)} className="w-28 md:w-36 h-9" />
+                <span className="text-muted-foreground hidden sm:inline">→</span>
+                <Input type="date" value={dateTo} onChange={(e) => handleDateToChange(e.target.value)} className="w-28 md:w-36 h-9" />
+              </div>
+              <Button variant="outline" size="sm" onClick={handleOrderingToggle}>
+                {ordering === '-check_in' ? t('bookings.sortDesc') : t('bookings.sortAsc')}
+              </Button>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <label className="text-xs text-muted-foreground">{t('bookings.date')}</label>
-              <Input type="date" value={dateFrom} onChange={(e) => handleDateFromChange(e.target.value)} className="w-36" />
-              <span className="text-muted-foreground">→</span>
-              <Input type="date" value={dateTo} onChange={(e) => handleDateToChange(e.target.value)} className="w-36" />
-            </div>
-            <Button variant="outline" size="sm" onClick={handleOrderingToggle}>
-              {ordering === '-check_in' ? t('bookings.sortDesc') : t('bookings.sortAsc')}
-            </Button>
           </div>
           <Tabs value={statusFilter} onValueChange={handleStatusChange}>
-            <TabsList className="flex flex-wrap">
+            <TabsList className="flex w-full overflow-x-auto">
               {tabs.map((tab) => {
                 const count = getTabCount(tab.value)
                 return (
-                  <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2">
+                  <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2 shrink-0">
                     <span className={tab.accent}>{tab.label}</span>
                     {typeof count === 'number' && (
                       <Badge variant="secondary" className="text-xs px-2 py-0.5">
@@ -524,11 +526,11 @@ export default function BookingsPage() {
 
             {/* Pagination */}
             {bookingsData && bookingsData.results.length > 0 && (
-              <div className="flex items-center justify-between mt-6 pt-4 border-t">
-                <p className="text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t">
+                <p className="text-sm text-muted-foreground order-2 sm:order-1">
                   {t('bookings.info.showing', { count: bookingsData.results.length, total: bookingsData.count })}
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 order-1 sm:order-2">
                   <Button
                     variant="outline"
                     size="sm"
