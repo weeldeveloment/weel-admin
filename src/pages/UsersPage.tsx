@@ -187,7 +187,7 @@ export default function UsersPage() {
                     <tr 
                       key={user.id} 
                       className="hover:bg-accent/40 transition-colors duration-150 group"
-                      onClick={() => navigate(`/partner/${user.id}`)}
+                      onClick={() =>  type === 'partner' ? navigate(`/partner/${user.id}`) : null}
                     >
                       <td className="px-4 md:px-6 py-3 md:py-4">
                         <div className="flex items-center gap-3">
@@ -227,7 +227,10 @@ export default function UsersPage() {
                         <Button 
                           size="sm" 
                           variant="ghost"
-                          onClick={() => navigate(`/chat/${user.id}?role=${type}`)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(`/chat/${user.id}?role=${type}`)}
+                          }
                           title={t('users.chat.open')}
                           className="rounded-lg"
                         >
