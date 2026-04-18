@@ -8,6 +8,8 @@ import UsersPage from './pages/UsersPage'
 import ChatPage from './pages/ChatPage'
 import BookingsPage from './pages/BookingsPage'
 import Partner from './pages/Partner'
+import PropertiesPage from './pages/PropertiesPage'
+import PropertyDetailsPage from './pages/PropertyDetailsPage'
 
 function App() {
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore()
@@ -47,6 +49,8 @@ function App() {
         <Route path="chat" element={<ChatPage />} />
         <Route path="chat/:partnerId" element={<ChatPage />} />
         <Route path="partner/:partnerId" element={<Partner />} />
+        <Route path="properties" element={<PropertiesPage />} />
+        <Route path="properties/:propertyType/:propertyId" element={<PropertyDetailsPage />} />
       </Route>
     </Routes>
   )

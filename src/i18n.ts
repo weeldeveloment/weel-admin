@@ -31,6 +31,7 @@ const resources = {
       nav: {
         users: 'Users',
         bookings: 'Bookings',
+        properties: 'Properties',
         chat: 'Chat',
       },
       auth: {
@@ -218,6 +219,7 @@ const resources = {
       nav: {
         users: 'Пользователи',
         bookings: 'Бронирования',
+        properties: 'Объекты',
         chat: 'Чат',
       },
       auth: {
@@ -405,6 +407,7 @@ const resources = {
       nav: {
         users: 'Foydalanuvchilar',
         bookings: 'Bronlar',
+        properties: 'Obyektlar',
         chat: 'Chat',
       },
       auth: {
