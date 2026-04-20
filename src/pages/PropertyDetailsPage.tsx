@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { AlertCircle, Archive, CheckCircle, AlertTriangle, ChevronsUpDown, Check, Copy } from 'lucide-react'
+import { AlertCircle, Archive, CheckCircle, AlertTriangle, ChevronsUpDown, Check, Copy, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -129,6 +129,92 @@ const mapLocationOptions = (payload: unknown): LocationOption[] => {
     .filter((item): item is LocationOption => item !== null)
 }
 
+const sanitizePatchPayload = (payload: Record<string, unknown>): PropertyRecord => {
+  const entries = Object.entries(payload).filter(([, value]) => {
+    if (value === undefined || value === null) return false
+    if (typeof value === 'string') return value.trim().length > 0
+    if (typeof value === 'number') return Number.isFinite(value)
+    return true
+  })
+
+  return Object.fromEntries(entries)
+}
+
+const clampDecimalPlaces = (value: unknown, maxDecimals = 8): unknown => {
+  if (typeof value !== 'string') return value
+
+  const trimmed = value.trim()
+  if (!trimmed) return trimmed
+
+  const isNegative = trimmed.startsWith('-')
+  const raw = isNegative ? trimmed.slice(1) : trimmed
+  const [intPart, fractionPart = ''] = raw.split('.')
+
+  if (!/^\d+$/.test(intPart)) return trimmed
+  if (fractionPart && !/^\d+$/.test(fractionPart)) return trimmed
+
+  const clampedFraction = fractionPart.slice(0, maxDecimals)
+  return `${isNegative ? '-' : ''}${intPart}${clampedFraction ? `.${clampedFraction}` : ''}`
+}
+
+const buildPatchPayload = (
+  type: PropertyType,
+  formData: ApartmentAdminUpdate & CottageAdminUpdate,
+): PropertyRecord => {
+  if (type === 'apartments') {
+    return sanitizePatchPayload({
+      title: formData.title,
+      price: formData.price,
+      currency: formData.currency,
+      minimum_weekend_day_stay: formData.minimum_weekend_day_stay,
+      weekend_only_sunday_inclusive: formData.weekend_only_sunday_inclusive,
+      latitude: clampDecimalPlaces(formData.latitude, 8),
+      longitude: clampDecimalPlaces(formData.longitude, 8),
+      country: formData.country,
+      city: formData.city,
+      apartment_number: formData.apartment_number,
+      home_number: formData.home_number,
+      entrance_number: formData.entrance_number,
+      floor_number: formData.floor_number,
+      pass_code: formData.pass_code,
+      is_verified: formData.is_verified,
+      is_archived: formData.is_archived,
+      is_recommended: formData.is_recommended,
+      verification_status: formData.verification_status,
+      verified_by_user_id: formData.verified_by_user_id,
+      region_id: formData.region_id,
+      district_id: formData.district_id,
+      prefecture_id: formData.prefecture_id,
+    })
+  }
+
+  return sanitizePatchPayload({
+    title: formData.title,
+    price_per_person: formData.price_per_person,
+    price_on_working_days: formData.price_on_working_days,
+    price_on_weekends: formData.price_on_weekends,
+    currency: formData.currency,
+    minimum_weekend_day_stay: formData.minimum_weekend_day_stay,
+    weekend_only_sunday_inclusive: formData.weekend_only_sunday_inclusive,
+    latitude: clampDecimalPlaces(formData.latitude, 8),
+    longitude: clampDecimalPlaces(formData.longitude, 8),
+    country: formData.country,
+    city: formData.city,
+    guests: formData.guests,
+    rooms: formData.rooms,
+    beds: formData.beds,
+    bathrooms: formData.bathrooms,
+    is_verified: formData.is_verified,
+    is_archived: formData.is_archived,
+    is_recommended: formData.is_recommended,
+    verification_status: formData.verification_status,
+    verified_by_user_id: formData.verified_by_user_id,
+    region_id: formData.region_id,
+    district_id: formData.district_id,
+    prefecture_id: formData.prefecture_id,
+  })
+}
+
 type SearchableSelectProps = {
   value: string
   onChange: (value: string) => void
@@ -209,6 +295,8 @@ export default function PropertyDetailsPage() {
   const [message, setMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isRawCopied, setIsRawCopied] = useState(false)
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
+  const [selectedImagePreview, setSelectedImagePreview] = useState<string>('')
 
   const selectedRegionId = formData.region_id ? String(formData.region_id) : ''
   const selectedDistrictId = formData.district_id ? String(formData.district_id) : ''
@@ -227,7 +315,10 @@ export default function PropertyDetailsPage() {
     queryKey: ['property-summary', resolvedType],
     queryFn: async () => {
       if (!resolvedType) return []
-      const response = await api.get(`/property/admin/${resolvedType}/`)
+      const propertyTypeValue = resolvedType === 'apartments' ? 'apartment' : 'cottage'
+      const response = await api.get('/property/admin/all/', {
+        params: { property_type: propertyTypeValue, limit: 100 },
+      })
       return extractArray(response.data) as PropertySummary[]
     },
     enabled: Boolean(resolvedType),
@@ -267,6 +358,20 @@ export default function PropertyDetailsPage() {
     const data = detailsQuery.data
     if (!data) return
 
+    const propertyLocation = isRecord(data.property_location) ? (data.property_location as PropertyRecord) : null
+    const nestedRegion = propertyLocation && isRecord(propertyLocation.region)
+      ? (propertyLocation.region as PropertyRecord)
+      : null
+    const nestedDistrict = propertyLocation && isRecord(propertyLocation.district)
+      ? (propertyLocation.district as PropertyRecord)
+      : null
+
+    const regionIdValue =
+      data.region_id ?? (isRecord(data.region) ? (data.region as PropertyRecord).id : undefined) ?? nestedRegion?.id
+    const districtIdValue =
+      data.district_id ?? (isRecord(data.district) ? (data.district as PropertyRecord).id : undefined) ?? nestedDistrict?.id
+    const prefectureIdValue = data.prefecture_id
+
     const initialData: ApartmentAdminUpdate & CottageAdminUpdate = {
       title: typeof data.title === 'string' ? data.title : '',
       price: resolvedType === 'apartments' && typeof data.price === 'string' ? data.price : '',
@@ -301,15 +406,40 @@ export default function PropertyDetailsPage() {
       rooms: resolvedType === 'cottages' && typeof data.rooms === 'number' ? data.rooms : 0,
       beds: resolvedType === 'cottages' && typeof data.beds === 'number' ? data.beds : 0,
       bathrooms: resolvedType === 'cottages' && typeof data.bathrooms === 'number' ? data.bathrooms : 0,
+      region_id: regionIdValue != null ? String(regionIdValue) : '',
+      district_id: districtIdValue != null ? String(districtIdValue) : '',
+      prefecture_id: prefectureIdValue != null ? String(prefectureIdValue) : '',
     }
 
     setFormData(initialData)
   }, [detailsQuery.data, resolvedType])
 
+  useEffect(() => {
+    if (!selectedImageFile) {
+      setSelectedImagePreview('')
+      return
+    }
+
+    const nextPreview = URL.createObjectURL(selectedImageFile)
+    setSelectedImagePreview(nextPreview)
+
+    return () => {
+      URL.revokeObjectURL(nextPreview)
+    }
+  }, [selectedImageFile])
+
   const updateMutation = useMutation({
     mutationFn: async () => {
       if (!resolvedType || !propertyId) throw new Error('Invalid property route params')
-      const response = await api.patch(`/property/admin/${resolvedType}/${propertyId}/`, formData)
+      if (!formData.region_id || String(formData.region_id).trim().length === 0) {
+        throw new Error(
+          t('propertyDetails.messages.regionRequired', {
+            defaultValue: 'Region is required.',
+          }),
+        )
+      }
+      const payload = buildPatchPayload(resolvedType, formData)
+      const response = await api.patch(`/property/admin/${resolvedType}/${propertyId}/`, payload)
       return isRecord(response.data) ? response.data : null
     },
     onSuccess: async (updatedData) => {
@@ -351,6 +481,45 @@ export default function PropertyDetailsPage() {
     },
   })
 
+  const imageUpdateMutation = useMutation({
+    mutationFn: async (file: File) => {
+      if (!resolvedType || !propertyId) throw new Error('Invalid property route params')
+
+      const formData = new FormData()
+      formData.append('image', file)
+
+      const response = await api.post(`/property/${resolvedType}/${propertyId}/images/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      return response.data
+    },
+    onSuccess: async () => {
+      setErrorMessage(null)
+      setMessage(
+        t('propertyDetails.messages.imageUpdateSuccess', {
+          defaultValue: 'Property image updated successfully.',
+        }),
+      )
+      setSelectedImageFile(null)
+
+      await queryClient.invalidateQueries({ queryKey: ['property-details', resolvedType, propertyId] })
+      await queryClient.invalidateQueries({ queryKey: ['property-summary', resolvedType] })
+      await queryClient.invalidateQueries({ queryKey: ['properties'] })
+      await queryClient.invalidateQueries({ queryKey: ['partner-properties'] })
+    },
+    onError: (error) => {
+      setMessage(null)
+      setErrorMessage(
+        t('propertyDetails.messages.imageUpdateFailed', {
+          defaultValue: `Failed to update image: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        }),
+      )
+    },
+  })
+
   const rawPreview = useMemo(() => {
     if (!detailsQuery.data) return ''
     return JSON.stringify(detailsQuery.data, null, 2)
@@ -381,7 +550,11 @@ export default function PropertyDetailsPage() {
   const summaryImage = summary?.img?.[0] ?? null
   const heroImage = resolveImageUrl(String(detailsImage || summaryImage || ''))
 
-  const locationLabel = summary?.city || summary?.country || t('propertyDetails.labels.noLocation', { defaultValue: 'No location' })
+  const detailsCity = typeof detailsQuery.data?.city === 'string' ? detailsQuery.data.city : null
+  const detailsCountry = typeof detailsQuery.data?.country === 'string' ? detailsQuery.data.country : null
+  const locationLabel =
+    detailsCity || detailsCountry || summary?.city || summary?.country ||
+    t('propertyDetails.labels.noLocation', { defaultValue: 'No location' })
   const heroTitle =
     typeof detailsQuery.data?.title === 'string'
       ? detailsQuery.data.title
@@ -527,6 +700,72 @@ export default function PropertyDetailsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <section className="space-y-4">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                {t('propertyDetails.sections.imageUpdater', { defaultValue: 'Image Updater' })}
+              </h3>
+
+              <div className="grid gap-4 md:grid-cols-[300px_1fr]">
+                <div className="overflow-hidden rounded-md border bg-muted/40">
+                  <div className="aspect-[4/3] w-full">
+                    <img
+                      src={selectedImagePreview || heroImage || FALLBACK_IMAGE}
+                      alt={heroTitle}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label htmlFor="property-image-file">
+                    {t('propertyDetails.fields.imageFile', { defaultValue: 'Upload New Image' })}
+                  </Label>
+                  <Input
+                    id="property-image-file"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] ?? null
+                      setSelectedImageFile(file)
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {selectedImageFile
+                      ? selectedImageFile.name
+                      : t('propertyDetails.placeholders.imageFile', {
+                          defaultValue: 'Choose an image file to replace the current property image.',
+                        })}
+                  </p>
+                  <Button
+                    type="button"
+                    className="gap-2"
+                    disabled={imageUpdateMutation.isPending}
+                    onClick={() => {
+                      if (!selectedImageFile) {
+                        setMessage(null)
+                        setErrorMessage(
+                          t('propertyDetails.messages.imageSelectRequired', {
+                            defaultValue: 'Please choose an image file first.',
+                          }),
+                        )
+                        return
+                      }
+                      setMessage(null)
+                      setErrorMessage(null)
+                      imageUpdateMutation.mutate(selectedImageFile)
+                    }}
+                  >
+                    <Upload className="h-4 w-4" />
+                    {imageUpdateMutation.isPending
+                      ? t('propertyDetails.actions.updatingImage', { defaultValue: 'Updating image...' })
+                      : t('propertyDetails.actions.updateImage', { defaultValue: 'Update Image' })}
+                  </Button>
+                </div>
+              </div>
+            </section>
+
+            <Separator />
+
             <section className="space-y-4">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 {t('propertyDetails.sections.basic', { defaultValue: 'Basic Information' })}

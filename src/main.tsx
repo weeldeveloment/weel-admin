@@ -6,6 +6,7 @@ import './index.css'
 import './i18n'
 import App from './App'
 import { ThemeProvider } from './components/theme-provider'
+import { registerSW } from 'virtual:pwa-register'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,6 +15,10 @@ const queryClient = new QueryClient({
       retry: 1,
     },
   },
+})
+
+registerSW({
+  immediate: true,
 })
 
 createRoot(document.getElementById('root')!).render(

@@ -212,7 +212,11 @@ const resources = {
           loadFailed: 'Failed to load property details.',
           updateSuccess: 'Property updated successfully.',
           updateFailed: 'Failed to update property.',
+          imageUpdateSuccess: 'Property image updated successfully.',
+          imageUpdateFailed: 'Failed to update image.',
+          imageSelectRequired: 'Please choose an image file first.',
           deleteFailed: 'Failed to delete property.',
+          regionRequired: 'Region is required.',
           deleteConfirm: 'Are you sure you want to delete this property?',
         },
         actions: {
@@ -220,6 +224,8 @@ const resources = {
           description: 'Manage this property',
           delete: 'Delete Property',
           deleting: 'Deleting...',
+          updateImage: 'Update Image',
+          updatingImage: 'Updating image...',
           saveChanges: 'Save Changes',
           saving: 'Saving...',
         },
@@ -228,6 +234,7 @@ const resources = {
           description: 'Update property information below and save changes.',
         },
         sections: {
+          imageUpdater: 'Image Updater',
           basic: 'Basic Information',
           pricing: 'Pricing',
           location: 'Location',
@@ -237,6 +244,7 @@ const resources = {
         },
         fields: {
           title: 'Title',
+          imageFile: 'Upload New Image',
           currency: 'Currency',
           pricePerNight: 'Price per Night',
           pricePerPerson: 'Price per Person',
@@ -269,6 +277,7 @@ const resources = {
         },
         placeholders: {
           title: 'Property title',
+          imageFile: 'Choose an image file to replace the current property image.',
           price: 'Enter price',
           pricePerPerson: 'Price per person',
           priceOnWorkingDays: 'Working days price',
@@ -517,7 +526,11 @@ const resources = {
           loadFailed: 'Не удалось загрузить детали объекта.',
           updateSuccess: 'Объект успешно обновлён.',
           updateFailed: 'Не удалось обновить объект.',
+          imageUpdateSuccess: 'Изображение объекта успешно обновлено.',
+          imageUpdateFailed: 'Не удалось обновить изображение.',
+          imageSelectRequired: 'Сначала выберите файл изображения.',
           deleteFailed: 'Не удалось удалить объект.',
+          regionRequired: 'Поле «Регион» обязательно.',
           deleteConfirm: 'Вы уверены, что хотите удалить этот объект?',
         },
         actions: {
@@ -525,6 +538,8 @@ const resources = {
           description: 'Управление объектом',
           delete: 'Удалить объект',
           deleting: 'Удаление...',
+          updateImage: 'Обновить изображение',
+          updatingImage: 'Обновление изображения...',
           saveChanges: 'Сохранить изменения',
           saving: 'Сохранение...',
         },
@@ -533,6 +548,7 @@ const resources = {
           description: 'Обновите данные объекта и сохраните изменения.',
         },
         sections: {
+          imageUpdater: 'Обновление изображения',
           basic: 'Основная информация',
           pricing: 'Цены',
           location: 'Локация',
@@ -542,6 +558,7 @@ const resources = {
         },
         fields: {
           title: 'Название',
+          imageFile: 'Загрузить новое изображение',
           currency: 'Валюта',
           pricePerNight: 'Цена за ночь',
           pricePerPerson: 'Цена за человека',
@@ -574,6 +591,7 @@ const resources = {
         },
         placeholders: {
           title: 'Название объекта',
+          imageFile: 'Выберите файл изображения, чтобы заменить текущее изображение объекта.',
           price: 'Введите цену',
           pricePerPerson: 'Цена за человека',
           priceOnWorkingDays: 'Цена в будни',
@@ -822,7 +840,11 @@ const resources = {
           loadFailed: 'Obyekt tafsilotlarini yuklab bo‘lmadi.',
           updateSuccess: 'Obyekt muvaffaqiyatli yangilandi.',
           updateFailed: 'Obyektni yangilab bo‘lmadi.',
+          imageUpdateSuccess: 'Obyekt rasmi muvaffaqiyatli yangilandi.',
+          imageUpdateFailed: 'Rasmni yangilab bo‘lmadi.',
+          imageSelectRequired: 'Avval rasm faylini tanlang.',
           deleteFailed: 'Obyektni o‘chirib bo‘lmadi.',
+          regionRequired: 'Hudud maydoni majburiy.',
           deleteConfirm: 'Ushbu obyektni o‘chirishni xohlaysizmi?',
         },
         actions: {
@@ -830,6 +852,8 @@ const resources = {
           description: 'Ushbu obyektni boshqarish',
           delete: 'Obyektni o‘chirish',
           deleting: 'O‘chirilmoqda...',
+          updateImage: 'Rasmni yangilash',
+          updatingImage: 'Rasm yangilanmoqda...',
           saveChanges: 'O‘zgarishlarni saqlash',
           saving: 'Saqlanmoqda...',
         },
@@ -838,6 +862,7 @@ const resources = {
           description: 'Quyidagi ma’lumotlarni yangilang va saqlang.',
         },
         sections: {
+          imageUpdater: 'Rasm yangilash',
           basic: 'Asosiy ma’lumotlar',
           pricing: 'Narxlar',
           location: 'Lokatsiya',
@@ -847,6 +872,7 @@ const resources = {
         },
         fields: {
           title: 'Sarlavha',
+          imageFile: 'Yangi rasm yuklash',
           currency: 'Valyuta',
           pricePerNight: 'Bir kecha narxi',
           pricePerPerson: 'Bir kishi narxi',
@@ -879,6 +905,7 @@ const resources = {
         },
         placeholders: {
           title: 'Obyekt sarlavhasi',
+          imageFile: 'Joriy obyekt rasmini almashtirish uchun rasm faylini tanlang.',
           price: 'Narxni kiriting',
           pricePerPerson: 'Bir kishi narxi',
           priceOnWorkingDays: 'Ish kunlari narxi',
