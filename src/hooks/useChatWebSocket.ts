@@ -156,6 +156,21 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
     return true
   }, [])
 
+  const sendMessage = useCallback((receiverId: number, receiverType: 'partner' | 'client', content: string): void => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      return
+    }
+
+    wsRef.current.send(JSON.stringify({
+      type: 'message',
+      data: {
+        receiver_id: receiverId,
+        receiver_type: receiverType,
+        content,
+      },
+    }))
+  }, [])
+
   useEffect(() => {
     return () => {
       disconnect()
@@ -166,6 +181,7 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
     connect,
     disconnect,
     sendRead,
+    sendMessage,
     isConnected,
   }
 }

@@ -263,7 +263,7 @@ export default function ChatPage() {
     },
     [queryClient]
   );
-  const { connect, disconnect } = useChatWebSocket({
+  const { connect, disconnect, sendMessage: sendMessageViaWs } = useChatWebSocket({
     onMessage: (incoming) => {
       const normalizedIncoming = incoming as ChatMessage;
       const incomingPartnerId = getCounterpartIdFromMessage(normalizedIncoming, counterpartRole);
@@ -371,30 +371,15 @@ export default function ChatPage() {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSendMessage = useCallback(async () => {
+  const handleSendMessage = useCallback(() => {
     if (!messageInput.trim() || !partnerId || isSending) return;
 
     setIsSending(true);
-    try {
-      const response = await api.post('/chat/send/', {
-        receiver_id: parseInt(partnerId),
-        receiver_type: counterpartRole,
-        content: messageInput.trim(),
-      });
-
-      queryClient.setQueryData(['messages', partnerId, counterpartRole], (old: ChatMessage[] = []) =>
-        mergeChatMessage(old, response.data)
-      );
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
-
-      setMessageInput('');
-      scrollToBottom();
-    } catch (error) {
-      console.error('Failed to send message:', error);
-    } finally {
-      setIsSending(false);
-    }
-  }, [messageInput, partnerId, isSending, queryClient, counterpartRole]);
+    sendMessageViaWs(parseInt(partnerId), counterpartRole, messageInput.trim());
+    setMessageInput('');
+    scrollToBottom();
+    setIsSending(false);
+  }, [messageInput, partnerId, isSending, counterpartRole, sendMessageViaWs]);
 
   const filteredConversations = conversations.filter((conv) =>
     conv.counterpart.full_name.toLowerCase().includes(searchQuery.toLowerCase())
