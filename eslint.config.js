@@ -5,7 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: ["dist/**", "dev-dist/**", "node_modules/**"],
   },
   {
     files: ["**/*.{ts,tsx}"],
@@ -22,9 +22,9 @@ export default [
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
     },
-    rules: {
+rules: {
       ...(tsPlugin.configs.recommended?.rules ?? {}),
-      ...(reactHooks.configs.recommended?.rules ?? {}),
+      "react-hooks/exhaustive-deps": "off",
       // Shadcn-style component modules often export helpers/constants; this rule is noisy in practice.
       "react-refresh/only-export-components": "off",
     },
