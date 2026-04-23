@@ -27,20 +27,7 @@ function isReadPayload(value: unknown): value is ReadPayload {
   return true
 }
 
-function resolveWebSocketUrl(token: string) {
-  const configured = (import.meta.env.VITE_WS_URL || '').trim()
-  const fallback = 'wss://dev.weel.uz/ws/chat/'
-
-  try {
-    const parsed = new URL(configured || fallback)
-    parsed.protocol = parsed.protocol === 'http:' ? 'ws:' : 'wss:'
-    parsed.pathname = '/ws/chat/'
-    parsed.search = `?token=${encodeURIComponent(token)}`
-    return parsed.toString()
-  } catch {
-    return `${fallback}?token=${encodeURIComponent(token)}`
-  }
-}
+const WS_URL = 'wss://dev.weel.uz/ws/chat/'
 
 export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
   const wsRef = useRef<WebSocket | null>(null)
@@ -80,7 +67,7 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
     }
 
     tokenRef.current = token
-    const ws = new WebSocket(resolveWebSocketUrl(token))
+    const ws = new WebSocket(`${WS_URL}?token=${encodeURIComponent(token)}`)
     wsRef.current = ws
 
     ws.onopen = () => {
