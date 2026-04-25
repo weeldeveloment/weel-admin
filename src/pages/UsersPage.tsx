@@ -37,7 +37,7 @@ const fetchAllPages = async <T,>(endpoint: string): Promise<T[]> => {
     }
 
     const { results, next } = response.data
-    allItems.push(...results)
+    allItems.push(...(results ?? []))
 
     if (!next) break
     page += 1

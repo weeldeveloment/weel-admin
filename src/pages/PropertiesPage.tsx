@@ -24,10 +24,10 @@ const extractListResult = (payload: unknown): PropertyListResult => {
   if (payload && typeof payload === 'object' && Array.isArray((payload as PaginatedResponse<PropertyItem>).results)) {
     const parsed = payload as PaginatedResponse<PropertyItem>
     return {
-      items: parsed.results,
-      count: typeof parsed.count === 'number' ? parsed.count : parsed.results?.length,
-      next: parsed.next,
-      previous: parsed.previous,
+      items: parsed.results ?? [],
+      count: typeof parsed.count === 'number' ? parsed.count : (parsed.results?.length ?? 0),
+      next: parsed.next ?? null,
+      previous: parsed.previous ?? null,
     }
   }
 
@@ -99,12 +99,12 @@ export default function PropertiesPage() {
   })
 
   const cottageItems = useMemo(
-    () => cottagesQuery.data?.pages.flatMap((page) => page.items),
+    () => cottagesQuery.data?.pages.flatMap((page) => page.items) ?? [],
     [cottagesQuery.data]
   )
 
   const apartmentItems = useMemo(
-    () => apartmentsQuery.data?.pages.flatMap((page) => page.items),
+    () => apartmentsQuery.data?.pages.flatMap((page) => page.items) ?? [],
     [apartmentsQuery.data]
   )
 

@@ -265,16 +265,16 @@ export default function ChatPage() {
   const {
     data: conversations = [],
     isLoading: isLoadingConversations,
-  } = useQuery<ChatConversation[]>({
+  } = useQuery({
     queryKey: ['conversations'],
-    queryFn: async () => {
+    queryFn: async (): Promise<ChatConversation[]> => {
       const response = await api.get('/chat/conversations/');
       const items = response.data as ChatConversationApi[];
       return items.map((conv) => ({
-        conversation_id: conv.conversation_id as number,
-        counterpart: conv.counterpart as Actor,
+        conversation_id: conv.conversation_id ?? 0,
+        counterpart: conv.counterpart ?? conv.partner ?? ({} as Actor),
         last_message: conv.last_message,
-        unread_count: conv.unread_count,
+        unread_count: conv.unread_count ?? 0,
       }));
     },
     refetchInterval: 30000,
@@ -430,15 +430,15 @@ export default function ChatPage() {
                   </Button>
                   <Avatar className="h-10 w-10">
                     <AvatarImage
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${activeCounterpartName}`}
+                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${activeCounterpartName ?? ''}`}
                     />
                     <AvatarFallback>
-                      {activeCounterpartName.slice(0, 2).toUpperCase()}
+                      {(activeCounterpartName ?? '').slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
                     <div className="flex min-w-0 items-center gap-2">
-                      <h3 className="truncate font-semibold">{activeCounterpartName}</h3>
+                      <h3 className="truncate font-semibold">{activeCounterpartName ?? ''}</h3>
                       <Badge
                         variant="secondary"
                         className="text-xs h-5 px-1.5 capitalize"

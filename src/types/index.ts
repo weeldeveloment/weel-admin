@@ -337,7 +337,7 @@ export const mapLocationOptions = (payload: unknown): LocationOption[] => {
 export const extractArray = <T = unknown>(payload: unknown): T[] => {
   if (Array.isArray(payload)) return payload as T[]
   if (typeof payload === 'object' && payload !== null && Array.isArray((payload as { results?: T[] }).results)) {
-    return (payload as { results?: T[] }).results
+    return (payload as { results?: T[] }).results ?? []
   }
   return []
 }
