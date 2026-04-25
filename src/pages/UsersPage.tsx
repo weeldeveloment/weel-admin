@@ -37,7 +37,7 @@ const fetchAllPages = async <T,>(endpoint: string): Promise<T[]> => {
     }
 
     const { results, next } = response.data
-    allItems.push(...(results || []))
+    allItems.push(...results)
 
     if (!next) break
     page += 1
@@ -76,7 +76,7 @@ export default function UsersPage() {
       setClients(clientsData)
     } catch (err: unknown) {
       console.error('Error fetching users:', err)
-      setError(getApiErrorMessage(err) || t('users.error'))
+      setError(getApiErrorMessage(err))
     } finally {
       setLoading(false)
     }
@@ -158,62 +158,63 @@ export default function UsersPage() {
                     </td>
                   </tr>
                 ) : (
-                  paginatedUsers.map((user) => (
-                    <tr 
-                      key={user.id} 
-                      className="hover:bg-accent/40 transition-colors duration-150 group"
-                      onClick={() =>  type === 'partner' ? navigate(`/partner/${user.id}`) : null}
-                    >
-                      <td className="px-4 md:px-6 py-3 md:py-4">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-9 md:h-10 w-9 md:w-10 ring-2 ring-border flex-shrink-0">
-                            <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.phone_number || user.id}`} />
-                            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-semibold">
-                              {((user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.phone_number || `User ${user.id}`) || '')
-                                .split(' ')
-                                .map(n => n[0])
-                                .join('')
-                                .toUpperCase()
-                                .slice(0, 2)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0">
-                            <p className="font-semibold text-foreground text-sm truncate">
-                              {user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.phone_number || `User #${user.id}`}
-                            </p>
-                            <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : t('users.type.partner')}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 md:px-6 py-3 md:py-4">
-                        {user.phone_number ? (
-                          <a
-                            href={getPhoneHref(user.phone_number)}
-                            className="text-sm font-medium text-foreground underline-offset-2 hover:underline"
-                            aria-label={`Call ${user.phone_number}`}
-                          >
-                            {user.phone_number}
-                          </a>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 md:px-6 py-3 md:py-4 text-center">
-                        <Button 
-                          size="sm" 
-                          variant="ghost"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            navigate(`/chat/${user.id}?role=${type}`)}
-                          }
-                          title={t('users.chat.open')}
-                          className="rounded-lg"
+                    paginatedUsers.map((user) => {
+                      console.log('Rendering user:', JSON.stringify(user, null, 2)) // Debug log to check user data
+                      return (
+                        <tr
+                          key={user.id}
+                          className="hover:bg-accent/40 transition-colors duration-150 group"
+                          onClick={() => type === 'partner' ? navigate(`/partner/${user.id}`) : null}
                         >
-                          <MessageSquare className="h-4 w-4 text-blue-600" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
+                          <td className="px-4 md:px-6 py-3 md:py-4">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-9 md:h-10 w-9 md:w-10 ring-2 ring-border flex-shrink-0">
+                                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.first_name}`} />
+                                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-semibold">
+                                  {(user.first_name ?? '')[0]?.toUpperCase() ?? ''}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-foreground text-sm truncate">
+                                  {user.first_name}
+                                </p>
+                                <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : t('users.type.partner')}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 md:px-6 py-3 md:py-4">
+                            {user.phone_number ? (
+                              <a
+                                href={getPhoneHref(user.phone_number)}
+                                className="text-sm font-medium text-foreground underline-offset-2 hover:underline"
+                                aria-label={`Call ${user.phone_number}`}
+                              >
+                                {user.phone_number}
+                              </a>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 md:px-6 py-3 md:py-4 text-center">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                navigate(`/chat/${user.id}?role=${type}`)
+                              }
+                              }
+                              title={t('users.chat.open')}
+                              className="rounded-lg"
+                            >
+                              <MessageSquare className="h-4 w-4 text-blue-600" />
+                            </Button>
+                          </td>
+                        </tr>
+                      )
+                    }
+                    
+                    )
                 )}
               </tbody>
             </table>

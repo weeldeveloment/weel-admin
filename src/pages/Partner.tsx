@@ -55,7 +55,7 @@ export default function Partner() {
       <div className="space-y-4">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-foreground md:text-3xl">Partner Details</h1>
-          <p className="text-sm text-muted-foreground md:text-base">Partner ID: {partnerId || '-'}</p>
+          <p className="text-sm text-muted-foreground md:text-base">Partner ID: {partnerId}</p>
         </div>
 
         {isLoading && (
@@ -99,16 +99,16 @@ export default function Partner() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
-                <p><span className="font-medium">ID:</span> {partner.id ?? '-'}</p>
-                <p><span className="font-medium">GUID:</span> {partner.guid || '-'}</p>
-                <p><span className="font-medium">Username:</span> {partner.username || '-'}</p>
-                <p><span className="font-medium">Email:</span> {partner.email || '-'}</p>
-                <p><span className="font-medium">First name:</span> {partner.first_name || '-'}</p>
-                <p><span className="font-medium">Last name:</span> {partner.last_name || '-'}</p>
-                <p><span className="font-medium">Phone:</span> {partner.phone_number || '-'}</p>
-                <p><span className="font-medium">Properties count:</span> {partner.properties_count ?? '-'}</p>
+                <p><span className="font-medium">ID:</span> {partner.id}</p>
+                <p><span className="font-medium">GUID:</span> {partner.guid}</p>
+                <p><span className="font-medium">Username:</span> {partner.username}</p>
+                <p><span className="font-medium">Email:</span> {partner.email}</p>
+                <p><span className="font-medium">First name:</span> {partner.first_name}</p>
+                <p><span className="font-medium">Last name:</span> {partner.last_name}</p>
+                <p><span className="font-medium">Phone:</span> {partner.phone_number}</p>
+                <p><span className="font-medium">Properties count:</span> {partner.properties_count}</p>
                 <p><span className="font-medium">Created at:</span> {formatDateTime(partner.created_at)}</p>
-                <p><span className="font-medium">Avatar:</span> {partner.avatar || '-'}</p>
+                <p><span className="font-medium">Avatar:</span> {partner.avatar}</p>
               </div>
 
               {extraFields.length > 0 && (

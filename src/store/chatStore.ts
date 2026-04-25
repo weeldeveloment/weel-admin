@@ -31,9 +31,9 @@ export const useChatStore = create<ChatState>((set) => ({
       // Keep the store idempotent because the same event may arrive via REST refresh and socket.
       messages: {
         ...state.messages,
-        [partnerId]: (state.messages[partnerId] || []).some((entry) => entry.id === message.id)
-          ? state.messages[partnerId] || []
-          : [...(state.messages[partnerId] || []), message],
+        [partnerId]: state.messages[partnerId].some((entry) => entry.id === message.id)
+          ? state.messages[partnerId]
+          : [...state.messages[partnerId], message],
       },
     })),
 
@@ -45,7 +45,7 @@ export const useChatStore = create<ChatState>((set) => ({
 
   markAsRead: (partnerId, messageIds) =>
     set((state) => {
-      const partnerMessages = state.messages[partnerId] || []
+      const partnerMessages = state.messages[partnerId]
       return {
         messages: {
           ...state.messages,

@@ -55,7 +55,7 @@ export default function BookingsPage() {
     const loadRegions = async () => {
       try {
         const response = await api.get<Region[]>('/property/regions/')
-        setRegions(response.data || [])
+        setRegions(response.data)
       } catch (error) {
         console.error('Failed to load regions', error)
       }
@@ -206,15 +206,15 @@ export default function BookingsPage() {
     if (!counts) return undefined
     switch (tabValue) {
       case 'new':
-        return counts['pending'] || 0
+        return counts['pending']
       case 'active':
-        return (counts['confirmed'] || 0) + (counts['checked_in'] || 0)
+        return counts['confirmed'] + counts['checked_in']
       case 'cancelled':
-        return counts['cancelled'] || 0
+        return counts['cancelled']
       case 'completed':
-        return counts['completed'] || 0
+        return counts['completed']
       case 'no_show':
-        return counts['no_show'] || 0
+        return counts['no_show']
       default:
         return undefined
     }
@@ -327,7 +327,7 @@ export default function BookingsPage() {
                 <Home className="h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">{t('bookings.empty.title')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {searchQuery || statusFilter !== 'all'
+                  {searchQuery
                     ? t('bookings.empty.adjust')
                     : t('bookings.empty.description')}
                 </p>

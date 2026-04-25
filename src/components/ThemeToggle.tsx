@@ -13,7 +13,7 @@ export function ThemeToggle() {
     else setTheme('light')
   }
 
-  const current = theme ?? 'system'
+  const current = theme
   const Icon = current === 'dark' ? Moon : current === 'system' ? Laptop : Sun
 
   return (

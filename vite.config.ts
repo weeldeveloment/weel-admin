@@ -57,11 +57,11 @@ export default defineConfig({
     port: 3001,
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'https://dev.weel.uz',
+        target: "https://dev.weel.uz",
         changeOrigin: true,
       },
       '/ws': {
-        target: process.env.VITE_WS_URL || 'wss://dev.weel.uz',
+        target: "wss://dev.weel.uz",
         ws: true,
         changeOrigin: true,
       },

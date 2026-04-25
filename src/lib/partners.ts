@@ -80,5 +80,5 @@ export const fetchAllPartners = async (): Promise<PartnerDetails[]> => {
 
 export const fetchPartnerById = async (partnerId: string): Promise<PartnerDetails | null> => {
   const partners = await fetchAllPartners()
-  return partners.find((partner) => String(partner.id) === partnerId) ?? null
+  return partners.find((partner) => String(partner.id) === partnerId)
 }

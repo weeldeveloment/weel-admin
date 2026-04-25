@@ -23,7 +23,7 @@ export default [
       "react-refresh": reactRefresh,
     },
 rules: {
-      ...(tsPlugin.configs.recommended?.rules ?? {}),
+      ...tsPlugin.configs.recommended.rules,
       "react-hooks/exhaustive-deps": "off",
       // Shadcn-style component modules often export helpers/constants; this rule is noisy in practice.
       "react-refresh/only-export-components": "off",

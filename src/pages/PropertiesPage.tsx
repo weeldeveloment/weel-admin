@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Image } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useTranslation } from 'react-i18next'
 import { PropertyItem, PropertyListResult, PaginatedResponse } from '@/types'
@@ -23,10 +24,10 @@ const extractListResult = (payload: unknown): PropertyListResult => {
   if (payload && typeof payload === 'object' && Array.isArray((payload as PaginatedResponse<PropertyItem>).results)) {
     const parsed = payload as PaginatedResponse<PropertyItem>
     return {
-      items: parsed.results ?? [],
-      count: typeof parsed.count === 'number' ? parsed.count : (parsed.results?.length ?? 0),
-      next: parsed.next ?? null,
-      previous: parsed.previous ?? null,
+      items: parsed.results,
+      count: typeof parsed.count === 'number' ? parsed.count : parsed.results?.length,
+      next: parsed.next,
+      previous: parsed.previous,
     }
   }
 
@@ -50,7 +51,7 @@ const fetchPropertiesByType = async (
       page,
       page_size: 12,
       property_type: propertyTypeValue,
-      search: search || undefined,
+      search: search,
     },
   })
   return extractListResult(response.data)
@@ -80,7 +81,6 @@ export default function PropertiesPage() {
   const [apartmentsSearch, setApartmentsSearch] = useState('')
   const cottagesLoadMoreRef = useRef<HTMLDivElement | null>(null)
   const apartmentsLoadMoreRef = useRef<HTMLDivElement | null>(null)
-  const FALLBACK_IMAGE = 'https://sites.duke.edu/dek23/category/all-posts/'
 
   const cottagesQuery = useInfiniteQuery({
     queryKey: ['properties', 'cottages', cottagesSearch],
@@ -99,12 +99,12 @@ export default function PropertiesPage() {
   })
 
   const cottageItems = useMemo(
-    () => cottagesQuery.data?.pages.flatMap((page) => page.items) ?? [],
+    () => cottagesQuery.data?.pages.flatMap((page) => page.items),
     [cottagesQuery.data]
   )
 
   const apartmentItems = useMemo(
-    () => apartmentsQuery.data?.pages.flatMap((page) => page.items) ?? [],
+    () => apartmentsQuery.data?.pages.flatMap((page) => page.items),
     [apartmentsQuery.data]
   )
 
@@ -161,19 +161,19 @@ export default function PropertiesPage() {
             className="max-w-sm"
           />
           {cottagesQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.cottages') })}</p> : null}
-          {cottagesQuery.error ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.cottages') })}</p> : null}
-          {!cottagesQuery.isLoading && cottageItems.length === 0 ? (
+          {cottagesQuery.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.cottages') })}</p> : null}
+          {cottagesQuery.isSuccess && cottageItems.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.cottages') })}</p>
           ) : null}
-          {cottageItems.length > 0 ? (
+          {cottagesQuery.isSuccess && cottageItems.length > 0 ? (
             <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {cottageItems.map((item) => (
-                <li key={item.guid || String(item.id)}>
+                <li key={item.guid}>
                   <button
                     type="button"
                     className="group w-full overflow-hidden rounded-xl border text-left text-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
                     onClick={() => {
-                      const propertyId = item.guid || item.id?.toString()
+                      const propertyId = item.guid
                       if (!propertyId) return
                       navigate(`/properties/cottages/${propertyId}`)
                     }}
@@ -182,17 +182,19 @@ export default function PropertiesPage() {
                       {item.img?.[0] ? (
                         <img
                           src={item.img[0]}
-                          alt={item.title || 'Untitled'}
+                          alt={item.title}
                           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                         />
                       ) : (
-                        <img src={FALLBACK_IMAGE} alt={item.title || 'Untitled'} className="h-full w-full object-cover" />
+                        <div className="flex h-full w-full items-center justify-center bg-muted">
+                          <Image className="h-10 w-10 text-muted-foreground" />
+                        </div>
                       )}
                     </div>
                     <Card className="rounded-none border-0 border-t shadow-none">
                       <CardContent className="space-y-1 p-4">
-                        <p className="line-clamp-1 font-semibold">{item.title || 'Untitled'}</p>
-                        <p className="text-xs text-muted-foreground">{item.city || item.country || t('properties.noLocation')}</p>
+                        <p className="line-clamp-1 font-semibold">{item.title}</p>
+                        <p className="text-xs text-muted-foreground">{item.city}</p>
                       </CardContent>
                     </Card>
                   </button>
@@ -213,19 +215,19 @@ export default function PropertiesPage() {
             className="max-w-sm"
           />
           {apartmentsQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.apartments') })}</p> : null}
-          {apartmentsQuery.error ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.apartments') })}</p> : null}
-          {!apartmentsQuery.isLoading && apartmentItems.length === 0 ? (
+          {apartmentsQuery.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.apartments') })}</p> : null}
+          {apartmentsQuery.isSuccess && apartmentItems.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.apartments') })}</p>
           ) : null}
-          {apartmentItems.length > 0 ? (
+          {apartmentsQuery.isSuccess && apartmentItems.length > 0 ? (
             <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {apartmentItems.map((item) => (
-                <li key={item.guid || String(item.id)}>
+                <li key={item.guid}>
                   <button
                     type="button"
                     className="group w-full overflow-hidden rounded-xl border text-left text-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
                     onClick={() => {
-                      const propertyId = item.guid || item.id?.toString()
+                      const propertyId = item.guid
                       if (!propertyId) return
                       navigate(`/properties/apartments/${propertyId}`)
                     }}
@@ -234,17 +236,19 @@ export default function PropertiesPage() {
                       {item.img?.[0] ? (
                         <img
                           src={item.img[0]}
-                          alt={item.title || 'Untitled'}
+                          alt={item.title}
                           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                         />
                       ) : (
-                        <img src={FALLBACK_IMAGE} alt={item.title || 'Untitled'} className="h-full w-full object-cover" />
+                        <div className="flex h-full w-full items-center justify-center bg-muted">
+                          <Image className="h-10 w-10 text-muted-foreground" />
+                        </div>
                       )}
                     </div>
                     <Card className="rounded-none border-0 border-t shadow-none">
                       <CardContent className="space-y-1 p-4">
-                        <p className="line-clamp-1 font-semibold">{item.title || 'Untitled'}</p>
-                        <p className="text-xs text-muted-foreground">{item.city || item.country || t('properties.noLocation')}</p>
+                        <p className="line-clamp-1 font-semibold">{item.title}</p>
+                        <p className="text-xs text-muted-foreground">{item.city}</p>
                       </CardContent>
                     </Card>
                   </button>

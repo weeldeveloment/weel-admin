@@ -480,6 +480,503 @@ export interface ApartmentPropertyLocationOutput {
   prefecture: ApartmentPropertyLocationPrefectureOutput;
 }
 
+export type ApartmentPartnerUser = {
+  /** Id */
+  id: number;
+  /** Role */
+  role?: string | null;
+  /** First name */
+  first_name?: string | null;
+  /** Last name */
+  last_name?: string | null;
+  /** Phone number */
+  phone_number?: string | null;
+  /** Email */
+  email?: string | null;
+  /** Username */
+  username?: string | null;
+  /** Avatar */
+  avatar?: string | null;
+  /** Is active */
+  is_active: boolean;
+  /** Is verified */
+  is_verified: boolean;
+};
+
+export interface ApartmentAdminList {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  img: string[];
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string | null;
+  /** Currency */
+  currency?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  property_location?: ApartmentPropertyLocationOutput;
+  services: (string | null)[];
+  /** Region id */
+  region_id?: number | null;
+  /** District id */
+  district_id?: number | null;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Average rating */
+  average_rating?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Property type id
+   * @format uuid
+   */
+  property_type_id: string;
+  /** Property type */
+  property_type: Record<string, string | null>;
+  /** Verification status */
+  verification_status?: string | null;
+  /** Is verified */
+  is_verified?: boolean;
+  /** Is archived */
+  is_archived?: boolean;
+  partner_user?: ApartmentPartnerUser;
+}
+
+export type ApartmentPartnerUserUpdate = {
+  /** Id */
+  id?: number | null;
+  /** Role */
+  role?: string | null;
+  /** First name */
+  first_name?: string | null;
+  /** Last name */
+  last_name?: string | null;
+  /** Phone number */
+  phone_number?: string | null;
+  /** Email */
+  email?: string | null;
+  /** Username */
+  username?: string | null;
+  /** Avatar */
+  avatar?: string | null;
+  /** Is active */
+  is_active?: boolean;
+  /** Is verified */
+  is_verified?: boolean;
+};
+
+export interface ApartmentAdminUpdate {
+  /** Title */
+  title?: string;
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string;
+  /** Currency */
+  currency?: "USD" | "UZS";
+  /**
+   * Minimum weekend day stay
+   * @default false
+   */
+  minimum_weekend_day_stay?: boolean;
+  /**
+   * Weekend only sunday inclusive
+   * @default false
+   */
+  weekend_only_sunday_inclusive?: boolean;
+  /**
+   * Latitude
+   * @format decimal
+   */
+  latitude?: string | null;
+  /**
+   * Longitude
+   * @format decimal
+   */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  services?: (string | null)[];
+  /** Region id */
+  region_id?: string | null;
+  /** District id */
+  district_id?: string | null;
+  /**
+   * Prefecture id
+   * @format uuid
+   */
+  prefecture_id?: string | null;
+  /** Img */
+  img?: object;
+  /** Apartment number */
+  apartment_number?: string | null;
+  /** Home number */
+  home_number?: string | null;
+  /** Entrance number */
+  entrance_number?: string | null;
+  /** Floor number */
+  floor_number?: string | null;
+  /** Pass code */
+  pass_code?: string | null;
+  /** Is verified */
+  is_verified?: boolean;
+  /**
+   * Verified at
+   * @format date-time
+   */
+  verified_at?: string | null;
+  /** Verification status */
+  verification_status?: string | null;
+  /** Is archived */
+  is_archived?: boolean;
+  /** Is recommended */
+  is_recommended?: boolean;
+  partner_user?: ApartmentPartnerUserUpdate;
+  /** Verified by user id */
+  verified_by_user_id?: number | null;
+  /**
+   * Comment count
+   * @min 0
+   */
+  comment_count?: number;
+  /** Legacy property id */
+  legacy_property_id?: number | null;
+}
+
+export type CottagePropertyLocationRegionOutput = {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export type CottagePropertyLocationDistrictOutput = {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export type CottagePropertyLocationPrefectureOutput = {
+  /** Id */
+  id?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export interface CottagePropertyLocationOutput {
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  region: CottagePropertyLocationRegionOutput;
+  district: CottagePropertyLocationDistrictOutput;
+  prefecture: CottagePropertyLocationPrefectureOutput;
+}
+
+export type RawRegion = {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  /** Img */
+  img?: string | null;
+};
+
+export type RawDistrict = {
+  /** Id */
+  id?: number | null;
+  /** Region id */
+  region_id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  region: RawRegion;
+};
+
+export type CottagePartnerUser = {
+  /** Id */
+  id: number;
+  /** Role */
+  role?: string | null;
+  /** First name */
+  first_name?: string | null;
+  /** Last name */
+  last_name?: string | null;
+  /** Phone number */
+  phone_number?: string | null;
+  /** Email */
+  email?: string | null;
+  /** Username */
+  username?: string | null;
+  /** Avatar */
+  avatar?: string | null;
+  /** Is active */
+  is_active: boolean;
+  /** Is verified */
+  is_verified: boolean;
+};
+
+export interface CottageAdminList {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  img: string[];
+  /**
+   * Price per person
+   * @format decimal
+   */
+  price_per_person?: string | null;
+  /**
+   * Price on working days
+   * @format decimal
+   */
+  price_on_working_days?: string | null;
+  /**
+   * Price on weekends
+   * @format decimal
+   */
+  price_on_weekends?: string | null;
+  /** Currency */
+  currency?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  property_location?: CottagePropertyLocationOutput;
+  services: (string | null)[];
+  region: RawRegion;
+  district: RawDistrict;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Average rating */
+  average_rating?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Property type id
+   * @format uuid
+   */
+  property_type_id: string;
+  /** Property type */
+  property_type: Record<string, string | null>;
+  /** Verification status */
+  verification_status?: string | null;
+  /** Is verified */
+  is_verified?: boolean;
+  /** Is archived */
+  is_archived?: boolean;
+  partner_user?: CottagePartnerUser;
+}
+
+export type CottagePartnerUserUpdate = {
+  /** Id */
+  id?: number | null;
+  /** Role */
+  role?: string | null;
+  /** First name */
+  first_name?: string | null;
+  /** Last name */
+  last_name?: string | null;
+  /** Phone number */
+  phone_number?: string | null;
+  /** Email */
+  email?: string | null;
+  /** Username */
+  username?: string | null;
+  /** Avatar */
+  avatar?: string | null;
+  /** Is active */
+  is_active?: boolean;
+  /** Is verified */
+  is_verified?: boolean;
+};
+
+export interface CottageAdminUpdate {
+  /** Title */
+  title?: string;
+  /**
+   * Price per person
+   * @format decimal
+   */
+  price_per_person?: string;
+  /**
+   * Price on working days
+   * @format decimal
+   */
+  price_on_working_days?: string;
+  /**
+   * Price on weekends
+   * @format decimal
+   */
+  price_on_weekends?: string;
+  /** Currency */
+  currency?: "USD" | "UZS";
+  /**
+   * Minimum weekend day stay
+   * @default false
+   */
+  minimum_weekend_day_stay?: boolean;
+  /**
+   * Weekend only sunday inclusive
+   * @default false
+   */
+  weekend_only_sunday_inclusive?: boolean;
+  price?: (string | null)[];
+  /** Property room */
+  property_room?: Record<string, string | null>;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Region */
+  region?: string | null;
+  /** District */
+  district?: string | null;
+  /** Region id */
+  region_id?: string | null;
+  /** District id */
+  district_id?: string | null;
+  /**
+   * Prefecture id
+   * @format uuid
+   */
+  prefecture_id?: string | null;
+  img?: string[];
+  /** Is verified */
+  is_verified?: boolean;
+  /**
+   * Verified at
+   * @format date-time
+   */
+  verified_at?: string | null;
+  /** Verification status */
+  verification_status?: string | null;
+  /** Is archived */
+  is_archived?: boolean;
+  /** Is recommended */
+  is_recommended?: boolean;
+  services?: (string | null)[];
+  partner_user?: CottagePartnerUserUpdate;
+  /** Verified by user id */
+  verified_by_user_id?: number | null;
+  /**
+   * Comment count
+   * @min 0
+   */
+  comment_count?: number;
+  /** Legacy property id */
+  legacy_property_id?: number | null;
+}
+
+export interface DistrictList {
+  /** Id */
+  id?: number | null;
+  /** Region id */
+  region_id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  region: RawRegion;
+}
+
+export interface RegionList {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  /** Img */
+  img?: string | null;
+}
+
 export interface ApartmentList {
   /**
    * Guid
@@ -578,7 +1075,6 @@ export interface ApartmentCreate {
   /** City */
   city?: string | null;
   services?: (string | null)[];
-  property_services?: (string | null)[];
   /** Region id */
   region_id?: string | null;
   /** District id */
@@ -616,80 +1112,6 @@ export interface ApartmentCreate {
    */
   pass_code: string;
 }
-
-export type CottagePropertyLocationRegionOutput = {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export type CottagePropertyLocationDistrictOutput = {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export type CottagePropertyLocationPrefectureOutput = {
-  /** Id */
-  id?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export interface CottagePropertyLocationOutput {
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  region: CottagePropertyLocationRegionOutput;
-  district: CottagePropertyLocationDistrictOutput;
-  prefecture: CottagePropertyLocationPrefectureOutput;
-}
-
-export type RawRegion = {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  /** Img */
-  img?: string | null;
-};
-
-export type RawDistrict = {
-  /** Id */
-  id?: number | null;
-  /** Region id */
-  region_id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  region: RawRegion;
-};
 
 export interface CottageList {
   /**
@@ -819,21 +1241,6 @@ export interface CottageCreate {
   prefecture_id?: string | null;
   /** Img */
   img?: object;
-}
-
-export interface DistrictList {
-  /** Id */
-  id?: number | null;
-  /** Region id */
-  region_id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  region: RawRegion;
 }
 
 export interface LocationPrefecture {
@@ -1013,20 +1420,6 @@ export interface CottagePartnerList {
   property_type: Record<string, string | null>;
   /** Verification status */
   verification_status?: string | null;
-}
-
-export interface RegionList {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  /** Img */
-  img?: string | null;
 }
 
 export interface PropertyServiceList {
@@ -1371,6 +1764,49 @@ export type NotificationPartnerReadCreateData = any;
 
 export type PropertyListData = PrefectureList[];
 
+export type PropertyAdminAllListData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export type PropertyAdminApartmentsReadData = ApartmentAdminList;
+
+export type PropertyAdminApartmentsPartialUpdateData = ApartmentAdminList;
+
+export type PropertyAdminCottagesReadData = CottageAdminList;
+
+export type PropertyAdminCottagesPartialUpdateData = CottageAdminList;
+
+export type PropertyAdminDistrictsListData = DistrictList[];
+
+export type PropertyAdminPrefecturesListData = PrefectureList[];
+
+export type PropertyAdminRegionsListData = RegionList[];
+
 export type PropertyApartmentListData = ApartmentList[];
 
 export interface PropertyApartmentCreateData {
@@ -1422,10 +1858,6 @@ export type PropertyApartmentsUpdateData = any;
 export type PropertyApartmentsPartialUpdateData = any;
 
 export type PropertyApartmentsDeleteData = any;
-
-export type PropertyApartmentsFavoriteCreateData = any;
-
-export type PropertyApartmentsFavoriteDeleteData = any;
 
 export type PropertyApartmentsImagesCreateData = any;
 
@@ -1488,10 +1920,6 @@ export type PropertyCottagesPartialUpdateData = any;
 
 export type PropertyCottagesDeleteData = any;
 
-export type PropertyCottagesFavoriteCreateData = any;
-
-export type PropertyCottagesFavoriteDeleteData = any;
-
 export type PropertyCottagesImagesCreateData = any;
 
 export type PropertyCottagesImagesPartialUpdateData = any;
@@ -1507,6 +1935,35 @@ export type PropertyCottagesReviewsCreateData = any;
 export type PropertyDistrictsListData = DistrictList[];
 
 export type PropertyLocationListData = RegionsResponse;
+
+export type PropertyPartnerAllListData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
 
 export type PropertyPartnerApartmentsListData = ApartmentPartnerList[];
 
@@ -1674,6 +2131,10 @@ export type PropertyServicesListData = PropertyServiceList[];
 
 export type PropertyTypesListData = any;
 
+export type PropertyFavoriteCreateData = any;
+
+export type PropertyFavoriteDeleteData = any;
+
 export type StoryPartnerStoriesListData = Story[];
 
 export type StoryPublicStoriesListData = Story[];
@@ -1695,6 +2156,8 @@ export type UserClientCardsListData = any;
 export interface UserClientCardsCreateData {
   card_number: string;
   expire_date: string;
+  /** Optional. If not provided, uses user's saved phone number */
+  phone_number?: string;
 }
 
 export type UserClientCardsResendOtpData = any;
@@ -2422,6 +2885,176 @@ export namespace Property {
   }
 
   /**
+   * @description Returns every apartment and cottage in the database, including unverified and archived. Supports the same filters as public list (search, region, price, sort, limit, etc.).
+   * @tags Admin / Property
+   * @name PropertyAdminAllList
+   * @summary List all properties (admin)
+   * @request GET:/property/admin/all/
+   * @secure
+   */
+  export namespace PropertyAdminAllList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      search?: string;
+      region_id?: number;
+      district_id?: number;
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      /** Optional. Omit to return apartments and cottages together. */
+      property_type?: "apartment" | "cottage" | "apartments" | "cottages";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminAllListData;
+  }
+
+  /**
+   * @description Returns the full admin view of an apartment by its guid.
+   * @tags Admin / Property
+   * @name PropertyAdminApartmentsRead
+   * @summary Retrieve apartment (admin)
+   * @request GET:/property/admin/apartments/{apartment_id}/
+   * @secure
+   */
+  export namespace PropertyAdminApartmentsRead {
+    export type RequestParams = {
+      apartmentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminApartmentsReadData;
+  }
+
+  /**
+   * @description Admin-only partial update for every writable field on the apartment table, including verification/archival/recommendation flags and owner reassignment. Unlike the partner endpoint, this does NOT auto-reset verification on save.
+   * @tags Admin / Property
+   * @name PropertyAdminApartmentsPartialUpdate
+   * @summary Patch apartment (admin)
+   * @request PATCH:/property/admin/apartments/{apartment_id}/
+   * @secure
+   */
+  export namespace PropertyAdminApartmentsPartialUpdate {
+    export type RequestParams = {
+      apartmentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = ApartmentAdminUpdate;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminApartmentsPartialUpdateData;
+  }
+
+  /**
+   * @description Returns the full admin view of a cottage by its guid.
+   * @tags Admin / Property
+   * @name PropertyAdminCottagesRead
+   * @summary Retrieve cottage (admin)
+   * @request GET:/property/admin/cottages/{cottage_id}/
+   * @secure
+   */
+  export namespace PropertyAdminCottagesRead {
+    export type RequestParams = {
+      cottageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminCottagesReadData;
+  }
+
+  /**
+   * @description Admin-only partial update for every writable field on the cottage table, including verification/archival/recommendation flags and owner reassignment. Unlike the partner endpoint, this does NOT auto-reset verification on save.
+   * @tags Admin / Property
+   * @name PropertyAdminCottagesPartialUpdate
+   * @summary Patch cottage (admin)
+   * @request PATCH:/property/admin/cottages/{cottage_id}/
+   * @secure
+   */
+  export namespace PropertyAdminCottagesPartialUpdate {
+    export type RequestParams = {
+      cottageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = CottageAdminUpdate;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminCottagesPartialUpdateData;
+  }
+
+  /**
+   * @description Returns districts, optionally filtered by region_id or region guid.
+   * @tags Admin / Property
+   * @name PropertyAdminDistrictsList
+   * @summary List districts (admin)
+   * @request GET:/property/admin/districts/
+   * @secure
+   */
+  export namespace PropertyAdminDistrictsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Optional region id (integer) or region guid. */
+      region_id?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminDistrictsListData;
+  }
+
+  /**
+   * @description Returns prefectures, optionally filtered by district_id or district_guid.
+   * @tags Admin / Property
+   * @name PropertyAdminPrefecturesList
+   * @summary List prefectures (admin)
+   * @request GET:/property/admin/prefectures/
+   * @secure
+   */
+  export namespace PropertyAdminPrefecturesList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Optional district id filter. */
+      district_id?: number;
+      /** Optional district guid filter. */
+      district_guid?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminPrefecturesListData;
+  }
+
+  /**
+   * @description Returns all regions without caching (admin access).
+   * @tags Admin / Property
+   * @name PropertyAdminRegionsList
+   * @summary List regions (admin)
+   * @request GET:/property/admin/regions/
+   * @secure
+   */
+  export namespace PropertyAdminRegionsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminRegionsListData;
+  }
+
+  /**
    * No description
    * @tags property
    * @name PropertyApartmentList
@@ -2453,6 +3086,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
     };
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -2506,6 +3140,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
     };
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -2593,40 +3228,6 @@ export namespace Property {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = PropertyApartmentsDeleteData;
-  }
-
-  /**
-   * No description
-   * @tags property
-   * @name PropertyApartmentsFavoriteCreate
-   * @request POST:/property/apartments/{property_id}/favorite/
-   * @secure
-   */
-  export namespace PropertyApartmentsFavoriteCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyApartmentsFavoriteCreateData;
-  }
-
-  /**
-   * No description
-   * @tags property
-   * @name PropertyApartmentsFavoriteDelete
-   * @request DELETE:/property/apartments/{property_id}/favorite/
-   * @secure
-   */
-  export namespace PropertyApartmentsFavoriteDelete {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyApartmentsFavoriteDeleteData;
   }
 
   /**
@@ -2814,6 +3415,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
     };
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -2901,40 +3503,6 @@ export namespace Property {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = PropertyCottagesDeleteData;
-  }
-
-  /**
-   * No description
-   * @tags property
-   * @name PropertyCottagesFavoriteCreate
-   * @request POST:/property/cottages/{property_id}/favorite/
-   * @secure
-   */
-  export namespace PropertyCottagesFavoriteCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyCottagesFavoriteCreateData;
-  }
-
-  /**
-   * No description
-   * @tags property
-   * @name PropertyCottagesFavoriteDelete
-   * @request DELETE:/property/cottages/{property_id}/favorite/
-   * @secure
-   */
-  export namespace PropertyCottagesFavoriteDelete {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyCottagesFavoriteDeleteData;
   }
 
   /**
@@ -3076,6 +3644,24 @@ export namespace Property {
   /**
    * No description
    * @tags property
+   * @name PropertyPartnerAllList
+   * @request GET:/property/partner/all/
+   * @secure
+   */
+  export namespace PropertyPartnerAllList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Admin only: target partner user id. Partners ignore this and always use the JWT subject. */
+      partner_id?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyPartnerAllListData;
+  }
+
+  /**
+   * No description
+   * @tags property
    * @name PropertyPartnerApartmentsList
    * @request GET:/property/partner/apartments/
    * @secure
@@ -3105,6 +3691,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
     };
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -3143,6 +3730,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
     };
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -3181,6 +3769,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
       property_type?: string;
     };
     export type RequestBody = never;
@@ -3257,6 +3846,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
     };
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -3343,6 +3933,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
       kind?: "property" | "apartment" | "cottage";
       type?: "featured" | "best-by-reviews" | "most-booked";
     };
@@ -3400,6 +3991,7 @@ export namespace Property {
       /** @format date */
       from_date?: string;
       limit?: number;
+      page?: number;
     };
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -3434,6 +4026,40 @@ export namespace Property {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = PropertyTypesListData;
+  }
+
+  /**
+   * No description
+   * @tags property
+   * @name PropertyFavoriteCreate
+   * @request POST:/property/{property_id}/favorite/
+   * @secure
+   */
+  export namespace PropertyFavoriteCreate {
+    export type RequestParams = {
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyFavoriteCreateData;
+  }
+
+  /**
+   * No description
+   * @tags property
+   * @name PropertyFavoriteDelete
+   * @request DELETE:/property/{property_id}/favorite/
+   * @secure
+   */
+  export namespace PropertyFavoriteDelete {
+    export type RequestParams = {
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyFavoriteDeleteData;
   }
 }
 
@@ -3644,6 +4270,8 @@ export namespace User {
     export type RequestBody = {
       card_number: string;
       expire_date: string;
+      /** Optional. If not provided, uses user's saved phone number */
+      phone_number?: string;
     };
     export type RequestHeaders = {};
     export type ResponseBody = UserClientCardsCreateData;

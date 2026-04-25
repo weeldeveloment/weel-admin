@@ -1,3 +1,5 @@
+export type PropertyRecord = Record<string, unknown>
+
 export interface User {
   id: number
   email: string
@@ -321,8 +323,8 @@ export const mapLocationOptions = (payload: unknown): LocationOption[] => {
     .map((item) => {
       if (!item || typeof item !== 'object') return null
       const record = item as Record<string, unknown>
-      const rawId = record.id ?? record.guid
-      const rawLabel = record.title ?? record.name
+      const rawId = record.id
+      const rawLabel = record.title
       if (!rawId || !rawLabel) return null
       return {
         id: String(rawId),
@@ -335,7 +337,7 @@ export const mapLocationOptions = (payload: unknown): LocationOption[] => {
 export const extractArray = <T = unknown>(payload: unknown): T[] => {
   if (Array.isArray(payload)) return payload as T[]
   if (typeof payload === 'object' && payload !== null && Array.isArray((payload as { results?: T[] }).results)) {
-    return (payload as { results?: T[] }).results ?? []
+    return (payload as { results?: T[] }).results
   }
   return []
 }

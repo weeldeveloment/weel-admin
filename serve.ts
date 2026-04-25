@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 const distDir = join(import.meta.dir, "dist");
-const port = Number(process.env.PORT || 3000);
+const port = Number(process.env.PORT);
 
 function contentType(pathname: string): string | undefined {
   if (pathname.endsWith(".html")) return "text/html; charset=utf-8";

@@ -75,7 +75,7 @@ export default function LoginPage() {
               />
             </div>
             {error && (
-              <div className="text-sm text-destructive">{error || t('auth.error')}</div>
+              <div className="text-sm text-destructive">{error}</div>
             )}
             <Button type="submit" className="w-full h-10" disabled={isLoading}>
               {isLoading ? t('auth.signingIn') : t('auth.signIn')}

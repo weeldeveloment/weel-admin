@@ -8,7 +8,7 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation()
-  const currentLang = i18n.resolvedLanguage ?? i18n.language
+  const currentLang = i18n.resolvedLanguage
   const languages = [
     { code: 'en', label: t('common.languages.en') },
     { code: 'ru', label: t('common.languages.ru') },

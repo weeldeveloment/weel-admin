@@ -59,9 +59,9 @@ const ConversationItem = memo(
     const { t } = useTranslation();
     const counterpart = conversation.counterpart;
     if (!counterpart) return null;
-    const role = counterpart.role || 'partner';
-    const fullName = counterpart.full_name || '';
-    const fallbackInitials = fullName.slice(0, 2).toUpperCase() || '??';
+    const role = counterpart.role;
+    const fullName = counterpart.full_name;
+    const fallbackInitials = fullName.slice(0, 2).toUpperCase();
     return (
       <button
         onClick={onClick}
@@ -73,7 +73,7 @@ const ConversationItem = memo(
           <div className="relative flex-shrink-0">
             <Avatar className="h-12 w-12">
               <AvatarImage
-                src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName || 'unknown'}`}
+                src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`}
               />
               <AvatarFallback>
                 {fallbackInitials}
@@ -98,7 +98,7 @@ const ConversationItem = memo(
               </Badge>
             </div>
             <p className="truncate text-sm mt-1 text-muted-foreground">
-              {conversation.last_message?.content || t('chat.noMessages')}
+              {conversation.last_message?.content}
             </p>
             {conversation.counterpart.phone_number && (
               <p className="truncate text-xs text-muted-foreground mt-1">
@@ -199,7 +199,7 @@ export default function ChatPage() {
   const [mobileShowChat, setMobileShowChat] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
-  const requestedRole = (searchParams.get('role') || '').toLowerCase();
+  const requestedRole = searchParams.get('role')?.toLowerCase() ?? 'partner';
   const counterpartRole: 'partner' | 'client' = requestedRole === 'client' ? 'client' : 'partner';
   const activePartnerId = partnerId ? Number(partnerId) : null;
 
@@ -270,12 +270,12 @@ export default function ChatPage() {
     queryKey: ['conversations'],
     queryFn: async () => {
       const response = await api.get('/chat/conversations/');
-      const items = (response.data ?? []) as ChatConversationApi[];
+      const items = response.data as ChatConversationApi[];
       return items.map((conv) => ({
-        conversation_id: (conv.conversation_id ?? conv.id ?? 0) as number,
-        counterpart: (conv.counterpart ?? conv.partner) as Actor,
+        conversation_id: conv.conversation_id as number,
+        counterpart: conv.counterpart as Actor,
         last_message: conv.last_message,
-        unread_count: conv.unread_count ?? 0,
+        unread_count: conv.unread_count,
       }));
     },
     refetchInterval: 30000,
@@ -348,11 +348,11 @@ export default function ChatPage() {
   const selectedConversation = conversations.find(
     (conv) =>
       conv.counterpart.id.toString() === partnerId &&
-      (conv.counterpart.role || 'partner') === counterpartRole
+      conv.counterpart.role === counterpartRole
   );
   const activeCounterpart = selectedConversation?.counterpart;
   const activeCounterpartName =
-    activeCounterpart?.full_name || `${counterpartRole === 'client' ? 'Client' : 'Partner'} #${partnerId}`;
+    activeCounterpart?.full_name;
 
   return (
     <div className="flex h-full min-h-0 bg-background">
@@ -393,10 +393,10 @@ export default function ChatPage() {
                   conversation={conv}
                   isActive={
                     conv.counterpart.id.toString() === partnerId &&
-                    (conv.counterpart.role || 'partner') === counterpartRole
+                    conv.counterpart.role === counterpartRole
                   }
                   onClick={() => {
-                    navigate(`/chat/${conv.counterpart.id}?role=${conv.counterpart.role || 'partner'}`)
+                    navigate(`/chat/${conv.counterpart.id}?role=${conv.counterpart.role}`)
                     setMobileShowChat(true)
                   }}
                 />
