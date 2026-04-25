@@ -7,32 +7,7 @@ import { MessageSquare, Search, ChevronLeft, ChevronRight, Users } from 'lucide-
 import { useNavigate } from 'react-router-dom'
 import api from '@/lib/api'
 import { useTranslation } from 'react-i18next'
-
-interface User {
-  id: string | number
-  first_name?: string
-  last_name?: string
-  full_name?: string
-  phone_number?: string
-  created_at?: string
-}
-
-interface Partner extends User {
-  username: string
-  properties_count?: number
-  is_verified?: boolean
-}
-
-interface Client extends User {
-  phone_number: string
-}
-
-interface PaginatedResponse<T> {
-  count: number
-  next: string | null
-  previous: string | null
-  results: T[]
-}
+import { AdminClient, AdminPartner, PaginatedResponse } from '@/types'
 
 const getApiErrorMessage = (err: unknown): string | null => {
   if (
@@ -74,8 +49,8 @@ const fetchAllPages = async <T,>(endpoint: string): Promise<T[]> => {
 export default function UsersPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const [clients, setClients] = useState<Client[]>([])
-  const [partners, setPartners] = useState<Partner[]>([])
+  const [clients, setClients] = useState<AdminClient[]>([])
+  const [partners, setPartners] = useState<AdminPartner[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -94,8 +69,8 @@ export default function UsersPage() {
       setError(null)
 
       const [partnersData, clientsData] = await Promise.all([
-        fetchAllPages<Partner>('/admin-auth/users/partners/'),
-        fetchAllPages<Client>('/admin-auth/users/clients/'),
+        fetchAllPages<AdminPartner>('/admin-auth/users/partners/'),
+        fetchAllPages<AdminClient>('/admin-auth/users/clients/'),
       ])
       setPartners(partnersData)
       setClients(clientsData)
@@ -111,7 +86,7 @@ export default function UsersPage() {
     void fetchUsers()
   }, [fetchUsers])
 
-  const filterUsers = (users: User[]) => {
+  const filterUsers = (users: AdminClient[] | AdminPartner[]) => {
     if (!searchQuery.trim()) return users
     return users.filter(
       (user) =>
@@ -122,14 +97,14 @@ export default function UsersPage() {
     )
   }
 
-  const getPaginatedUsers = (users: User[], page: number) => {
+  const getPaginatedUsers = (users: AdminClient[] | AdminPartner[], page: number) => {
     const filtered = filterUsers(users)
     const startIdx = (page - 1) * ITEMS_PER_PAGE
     const endIdx = startIdx + ITEMS_PER_PAGE
     return filtered.slice(startIdx, endIdx)
   }
 
-  const getTotalPages = (users: User[]) => {
+  const getTotalPages = (users: AdminClient[] | AdminPartner[]) => {
     const filtered = filterUsers(users)
     return Math.ceil(filtered.length / ITEMS_PER_PAGE)
   }
@@ -146,7 +121,7 @@ export default function UsersPage() {
     page, 
     onPageChange 
   }: { 
-    users: User[] | Partner[]
+    users: AdminClient[] | AdminPartner[]
     type: 'client' | 'partner'
     page: number
     onPageChange: (page: number) => void

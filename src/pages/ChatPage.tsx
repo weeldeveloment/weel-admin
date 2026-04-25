@@ -19,58 +19,18 @@ import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useChatWebSocket } from '@/hooks/useChatWebSocket';
 import { useTranslation } from 'react-i18next';
-
-interface Actor {
-  id: number;
-  role?: 'admin' | 'partner' | 'client';
-  full_name: string;
-  email?: string;
-  username?: string;
-  phone_number?: string;
-}
-
-interface ChatMessage {
-  id: number;
-  conversation?: number;
-  conversation_id?: number;
-  sender?: Actor;
-  receiver?: Actor;
-  sender_type?: 'admin' | 'partner' | 'client';
-  receiver_type?: 'admin' | 'partner' | 'client';
-  sender_id?: number;
-  receiver_id?: number;
-  content: string;
-  is_read: boolean;
-  created_at: string;
-  updated_at?: string;
-}
-
-interface Conversation {
-  conversation_id: number;
-  counterpart: Actor;
-  last_message?: ChatMessage;
-  unread_count: number;
-}
-
-type ConversationApi = {
-  conversation_id?: number;
-  id?: number;
-  counterpart?: Actor;
-  partner?: Actor;
-  last_message?: ChatMessage;
-  unread_count?: number;
-};
+import { Actor, ChatMessage, ChatConversation, ChatConversationApi } from '@/types';
 
 function getCounterpartIdFromMessage(message: ChatMessage, counterpartRole: 'partner' | 'client') {
-  const senderType = message.sender?.role ?? message.sender_type;
-  const receiverType = message.receiver?.role ?? message.receiver_type;
+  const senderType = message.sender_type;
+  const receiverType = message.receiver_type;
 
   if (senderType === counterpartRole) {
-    return Number(message.sender?.id ?? message.sender_id);
+    return Number(message.sender_id);
   }
 
   if (receiverType === counterpartRole) {
-    return Number(message.receiver?.id ?? message.receiver_id);
+    return Number(message.receiver_id);
   }
 
   return null;
@@ -92,7 +52,7 @@ const ConversationItem = memo(
     isActive,
     onClick,
   }: {
-    conversation: Conversation;
+    conversation: ChatConversation;
     isActive: boolean;
     onClick: () => void;
   }) => {
@@ -155,7 +115,7 @@ const ConversationItem = memo(
 ConversationItem.displayName = 'ConversationItem';
 
 const MessageBubble = memo(({ message }: { message: ChatMessage }) => {
-  const senderRole = message.sender?.role ?? message.sender_type;
+  const senderRole = message.sender_type;
   const isAdmin = senderRole === 'admin';
 
   const formatTime = (dateString: string) => {
@@ -306,11 +266,11 @@ export default function ChatPage() {
   const {
     data: conversations = [],
     isLoading: isLoadingConversations,
-  } = useQuery<Conversation[]>({
+  } = useQuery<ChatConversation[]>({
     queryKey: ['conversations'],
     queryFn: async () => {
       const response = await api.get('/chat/conversations/');
-      const items = (response.data ?? []) as ConversationApi[];
+      const items = (response.data ?? []) as ChatConversationApi[];
       return items.map((conv) => ({
         conversation_id: (conv.conversation_id ?? conv.id ?? 0) as number,
         counterpart: (conv.counterpart ?? conv.partner) as Actor,

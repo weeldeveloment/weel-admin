@@ -83,7 +83,7 @@ export default function Partner() {
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <CardTitle className="text-xl">
-                  {partner.full_name || `${partner.first_name || ''} ${partner.last_name || ''}`.trim() || partner.username || 'Partner'}
+                  {partner.full_name}
                 </CardTitle>
                 <div className="flex items-center gap-2">
                   <Badge variant={partner.is_active ? 'default' : 'secondary'}>

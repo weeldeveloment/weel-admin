@@ -21,64 +21,7 @@ import {
 import { api } from '@/lib/api'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
-
-interface BookingClient {
-  id: number
-  email: string
-  first_name: string
-  last_name: string
-  phone_number: string
-}
-
-interface BookingProperty {
-  guid: string
-  title: string
-  property_type: string
-}
-
-interface BookingPrice {
-  guid: string
-  subtotal: number
-  hold_amount: number
-  charge_amount: number
-  service_fee: number
-}
-
-interface Booking {
-  guid: string
-  booking_number: string
-  check_in: string
-  check_out: string
-  adults: number
-  children: number
-  babies: number
-  status: 'pending' | 'confirmed' | 'checked_in' | 'cancelled' | 'completed' | 'no_show'
-  cancellation_reason?: string
-  confirmed_at?: string
-  checked_in_at?: string
-  no_show_at?: string
-  cancelled_at?: string
-  completed_at?: string
-  created_at: string
-  conflict_flag?: boolean
-  is_overdue?: boolean
-  client: BookingClient
-  property: BookingProperty
-  booking_price?: BookingPrice
-}
-
-interface PaginatedBookings {
-  count: number
-  next: string | null
-  previous: string | null
-  results: Booking[]
-  queue_counts?: Record<string, number>
-}
-
-interface RegionOption {
-  guid: string
-  title: string
-}
+import { Booking, PaginatedBookings, Region } from '@/types'
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500 text-yellow-50',
@@ -97,7 +40,7 @@ export default function BookingsPage() {
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [ordering, setOrdering] = useState<'-check_in' | 'check_in'>('-check_in')
-  const [regions, setRegions] = useState<RegionOption[]>([])
+  const [regions, setRegions] = useState<Region[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const statusLabels: Record<string, string> = {
     pending: t('bookings.statuses.pending'),
@@ -111,7 +54,7 @@ export default function BookingsPage() {
   useEffect(() => {
     const loadRegions = async () => {
       try {
-        const response = await api.get<RegionOption[]>('/property/regions/')
+        const response = await api.get<Region[]>('/property/regions/')
         setRegions(response.data || [])
       } catch (error) {
         console.error('Failed to load regions', error)

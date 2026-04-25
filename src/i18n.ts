@@ -145,6 +145,19 @@ const resources = {
           completed: 'Completed',
         },
       },
+      properties: {
+        title: 'Properties',
+        searchPlaceholder: 'Search {{type}}...',
+        loading: 'Loading {{type}}...',
+        loadFailed: 'Failed to load {{type}}.',
+        noFound: 'No {{type}} found.',
+        loadMore: 'Loading more {{type}}...',
+        tabs: {
+          cottages: 'Cottages',
+          apartments: 'Apartments',
+        },
+        noLocation: 'No location',
+      },
       chat: {
         title: 'Messages',
         searchPlaceholder: 'Search conversations...',
@@ -459,6 +472,19 @@ const resources = {
           completed: 'Завершено',
         },
       },
+      properties: {
+        title: 'Объекты',
+        searchPlaceholder: 'Поиск {{type}}...',
+        loading: 'Загрузка {{type}}...',
+        loadFailed: 'Не удалось загрузить {{type}}.',
+        noFound: '{{type}} не найдены.',
+        loadMore: 'Загрузка ещё {{type}}...',
+        tabs: {
+          cottages: 'Коттеджи',
+          apartments: 'Квартиры',
+        },
+        noLocation: 'Локация не указана',
+      },
       chat: {
         title: 'Сообщения',
         searchPlaceholder: 'Поиск по диалогам...',
@@ -772,6 +798,19 @@ const resources = {
           no_show: 'Kelmagan',
           completed: 'Tugallangan',
         },
+      },
+      properties: {
+        title: 'Obyektlar',
+        searchPlaceholder: '{{type}} qidirish...',
+        loading: '{{type}} yuklanmoqda...',
+        loadFailed: '{{type}}ni yuklab bo\'lmadi.',
+        noFound: '{{type}} topilmadi.',
+        loadMore: 'Yana {{type}} yuklanmoqda...',
+        tabs: {
+          cottages: 'Kottejlar',
+          apartments: 'Kvartiralar',
+        },
+        noLocation: 'Manzil ko\'rsatilmagan',
       },
       chat: {
         title: 'Xabarlar',

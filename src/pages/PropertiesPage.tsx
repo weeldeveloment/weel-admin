@@ -5,36 +5,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { api } from '@/lib/api'
-
-const API_URL = (import.meta.env.VITE_API_URL || 'https://dev.weel.uz').replace(/\/$/, '')
-const FALLBACK_IMAGE =
-  'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 600%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22%3E%3Cstop offset=%220%25%22 stop-color=%22%231f2937%22/%3E%3Cstop offset=%22100%25%22 stop-color=%22%23374151%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%22800%22 height=%22600%22 fill=%22url(%23g)%22/%3E%3Ccircle cx=%22390%22 cy=%22240%22 r=%2280%22 fill=%22%239ca3af%22 fill-opacity=%220.18%22/%3E%3Cpath d=%22M160 470l120-130 90 90 70-80 200 220H160z%22 fill=%22%23e5e7eb%22 fill-opacity=%220.18%22/%3E%3Ctext x=%22400%22 y=%22350%22 text-anchor=%22middle%22 font-family=%22Arial, sans-serif%22 font-size=%2232%22 fill=%22%23e5e7eb%22 fill-opacity=%220.8%22%3ENo image%3C/text%3E%3C/svg%3E'
+import { useTranslation } from 'react-i18next'
+import { PropertyItem, PropertyListResult, PaginatedResponse } from '@/types'
 
 type PropertyTab = 'cottages' | 'apartments'
-
-interface PropertyItem {
-  id?: number
-  guid?: string
-  title?: string
-  property_type?: string
-  img?: string[]
-  city?: string | null
-  country?: string | null
-}
-
-interface PaginatedResponse<T> {
-  count?: number
-  next?: string | null
-  previous?: string | null
-  results?: T[]
-}
-
-interface PropertyListResult {
-  items: PropertyItem[]
-  count: number
-  next: string | null
-  previous: string | null
-}
 
 const extractListResult = (payload: unknown): PropertyListResult => {
   if (Array.isArray(payload)) {
@@ -97,20 +71,16 @@ const getNextPageFromUrl = (nextUrl: string | null): number | undefined => {
   }
 }
 
-const resolveImageUrl = (value?: string) => {
-  if (!value) return ''
-  if (value.startsWith('http://') || value.startsWith('https://')) return value
-  if (value.startsWith('/')) return `${API_URL}${value}`
-  return `${API_URL}/${value}`
-}
 
 export default function PropertiesPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<PropertyTab>('cottages')
   const [cottagesSearch, setCottagesSearch] = useState('')
   const [apartmentsSearch, setApartmentsSearch] = useState('')
   const cottagesLoadMoreRef = useRef<HTMLDivElement | null>(null)
   const apartmentsLoadMoreRef = useRef<HTMLDivElement | null>(null)
+  const FALLBACK_IMAGE = 'https://sites.duke.edu/dek23/category/all-posts/'
 
   const cottagesQuery = useInfiniteQuery({
     queryKey: ['properties', 'cottages', cottagesSearch],
@@ -178,22 +148,22 @@ export default function PropertiesPage() {
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as PropertyTab)} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="cottages">Cottages</TabsTrigger>
-          <TabsTrigger value="apartments">Apartments</TabsTrigger>
+          <TabsTrigger value="cottages">{t('properties.tabs.cottages')}</TabsTrigger>
+          <TabsTrigger value="apartments">{t('properties.tabs.apartments')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="cottages" className="space-y-4">
           <Input
             type="text"
-            placeholder="Search cottages..."
+            placeholder={t('properties.searchPlaceholder', { type: t('properties.tabs.cottages') })}
             value={cottagesSearch}
             onChange={(e) => setCottagesSearch(e.target.value)}
             className="max-w-sm"
           />
-          {cottagesQuery.isLoading ? <p className="text-sm text-muted-foreground">Loading cottages...</p> : null}
-          {cottagesQuery.error ? <p className="text-sm text-red-600">Failed to load cottages.</p> : null}
+          {cottagesQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.cottages') })}</p> : null}
+          {cottagesQuery.error ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.cottages') })}</p> : null}
           {!cottagesQuery.isLoading && cottageItems.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No cottages found.</p>
+            <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.cottages') })}</p>
           ) : null}
           {cottageItems.length > 0 ? (
             <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -211,7 +181,7 @@ export default function PropertiesPage() {
                     <div className="aspect-[4/3] w-full bg-muted">
                       {item.img?.[0] ? (
                         <img
-                          src={resolveImageUrl(item.img[0])}
+                          src={item.img[0]}
                           alt={item.title || 'Untitled'}
                           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                         />
@@ -222,7 +192,7 @@ export default function PropertiesPage() {
                     <Card className="rounded-none border-0 border-t shadow-none">
                       <CardContent className="space-y-1 p-4">
                         <p className="line-clamp-1 font-semibold">{item.title || 'Untitled'}</p>
-                        <p className="text-xs text-muted-foreground">{item.city || item.country || 'No location'}</p>
+                        <p className="text-xs text-muted-foreground">{item.city || item.country || t('properties.noLocation')}</p>
                       </CardContent>
                     </Card>
                   </button>
@@ -231,21 +201,21 @@ export default function PropertiesPage() {
             </ul>
           ) : null}
           <div ref={cottagesLoadMoreRef} className="h-4" />
-          {cottagesQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">Loading more cottages...</p> : null}
+          {cottagesQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.cottages') })}</p> : null}
         </TabsContent>
 
         <TabsContent value="apartments" className="space-y-4">
           <Input
             type="text"
-            placeholder="Search apartments..."
+            placeholder={t('properties.searchPlaceholder', { type: t('properties.tabs.apartments') })}
             value={apartmentsSearch}
             onChange={(e) => setApartmentsSearch(e.target.value)}
             className="max-w-sm"
           />
-          {apartmentsQuery.isLoading ? <p className="text-sm text-muted-foreground">Loading apartments...</p> : null}
-          {apartmentsQuery.error ? <p className="text-sm text-red-600">Failed to load apartments.</p> : null}
+          {apartmentsQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.apartments') })}</p> : null}
+          {apartmentsQuery.error ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.apartments') })}</p> : null}
           {!apartmentsQuery.isLoading && apartmentItems.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No apartments found.</p>
+            <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.apartments') })}</p>
           ) : null}
           {apartmentItems.length > 0 ? (
             <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -263,7 +233,7 @@ export default function PropertiesPage() {
                     <div className="aspect-[4/3] w-full bg-muted">
                       {item.img?.[0] ? (
                         <img
-                          src={resolveImageUrl(item.img[0])}
+                          src={item.img[0]}
                           alt={item.title || 'Untitled'}
                           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                         />
@@ -274,7 +244,7 @@ export default function PropertiesPage() {
                     <Card className="rounded-none border-0 border-t shadow-none">
                       <CardContent className="space-y-1 p-4">
                         <p className="line-clamp-1 font-semibold">{item.title || 'Untitled'}</p>
-                        <p className="text-xs text-muted-foreground">{item.city || item.country || 'No location'}</p>
+                        <p className="text-xs text-muted-foreground">{item.city || item.country || t('properties.noLocation')}</p>
                       </CardContent>
                     </Card>
                   </button>
@@ -283,7 +253,7 @@ export default function PropertiesPage() {
             </ul>
           ) : null}
           <div ref={apartmentsLoadMoreRef} className="h-4" />
-          {apartmentsQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">Loading more apartments...</p> : null}
+          {apartmentsQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.apartments') })}</p> : null}
         </TabsContent>
       </Tabs>
     </div>
