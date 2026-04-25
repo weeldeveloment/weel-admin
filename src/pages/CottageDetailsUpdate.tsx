@@ -72,9 +72,7 @@ const MAX_IMAGES = 10
 
 const fetchCottage = async (id: string): Promise<CottageAdminList> => {
   const response = await api.get<CottageAdminList>(`/property/admin/cottages/${id}/`)
-  // eslint-disable-next-line no-console
   console.log('[CottageDetailsUpdate] API response:', response.data)
-  // eslint-disable-next-line no-console
   console.log('[CottageDetailsUpdate] guests:', response.data.guests, 'rooms:', response.data.rooms, 'beds:', response.data.beds, 'bathrooms:', response.data.bathrooms)
   return response.data
 }
@@ -162,7 +160,6 @@ export default function CottageDetailsUpdate() {
 
   useEffect(() => {
     if (!cottage) return
-    // eslint-disable-next-line no-console
     console.log('[CottageDetailsUpdate] Initializing form from cottage:', {
       guests: cottage.guests,
       rooms: cottage.rooms,
@@ -194,7 +191,6 @@ export default function CottageDetailsUpdate() {
       is_archived: cottage.is_archived ?? false,
       is_recommended: false,
     } as CottageAdminUpdate
-    // eslint-disable-next-line no-console
     console.log('[CottageDetailsUpdate] Form initialized:', nextForm)
     setForm(nextForm)
   }, [cottage])
@@ -258,14 +254,12 @@ export default function CottageDetailsUpdate() {
   const handleNumberChange = (key: keyof CottageAdminUpdate, value: string) => {
     const trimmed = value.trim()
     if (trimmed === '') {
-      // eslint-disable-next-line no-console
       console.log(`[CottageDetailsUpdate] ${key} cleared`)
       handleChange(key, null)
       return
     }
     const num = Number(trimmed)
     const final = Number.isFinite(num) ? num : null
-    // eslint-disable-next-line no-console
     console.log(`[CottageDetailsUpdate] ${key} changed:`, final)
     handleChange(key, final)
   }
@@ -273,7 +267,6 @@ export default function CottageDetailsUpdate() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!propertyId) return
-    // eslint-disable-next-line no-console
     console.log('[CottageDetailsUpdate] Submitting form payload:', form)
     updateMutation.mutate(form)
   }

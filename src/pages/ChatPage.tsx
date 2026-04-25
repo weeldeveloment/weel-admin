@@ -56,7 +56,6 @@ const ConversationItem = memo(
     isActive: boolean;
     onClick: () => void;
   }) => {
-    const { t } = useTranslation();
     const counterpart = conversation.counterpart;
     if (!counterpart) return null;
     const role = counterpart.role;
