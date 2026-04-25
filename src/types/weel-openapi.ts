@@ -542,6 +542,20 @@ export interface ApartmentAdminList {
   guests?: number | null;
   /** Rooms */
   rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Apartment number */
+  apartment_number?: string | null;
+  /** Home number */
+  home_number?: string | null;
+  /** Entrance number */
+  entrance_number?: string | null;
+  /** Floor number */
+  floor_number?: string | null;
+  /** Pass code */
+  pass_code?: string | null;
   /** Average rating */
   average_rating?: number | null;
   /** Is favorite */
@@ -636,6 +650,14 @@ export interface ApartmentAdminUpdate {
    * @format uuid
    */
   prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
   /** Img */
   img?: object;
   /** Apartment number */
@@ -817,6 +839,10 @@ export interface CottageAdminList {
   guests?: number | null;
   /** Rooms */
   rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
   /** Average rating */
   average_rating?: number | null;
   /** Is favorite */
@@ -1016,6 +1042,20 @@ export interface ApartmentList {
   guests?: number | null;
   /** Rooms */
   rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Apartment number */
+  apartment_number?: string | null;
+  /** Home number */
+  home_number?: string | null;
+  /** Entrance number */
+  entrance_number?: string | null;
+  /** Floor number */
+  floor_number?: string | null;
+  /** Pass code */
+  pass_code?: string | null;
   /** Average rating */
   average_rating?: number | null;
   /** Is favorite */
@@ -1084,6 +1124,14 @@ export interface ApartmentCreate {
    * @format uuid
    */
   prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
   /** Img */
   img?: object;
   /**
@@ -1160,6 +1208,10 @@ export interface CottageList {
   guests?: number | null;
   /** Rooms */
   rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
   /** Average rating */
   average_rating?: number | null;
   /** Is favorite */
@@ -1331,6 +1383,20 @@ export interface ApartmentPartnerList {
   guests?: number | null;
   /** Rooms */
   rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Apartment number */
+  apartment_number?: string | null;
+  /** Home number */
+  home_number?: string | null;
+  /** Entrance number */
+  entrance_number?: string | null;
+  /** Floor number */
+  floor_number?: string | null;
+  /** Pass code */
+  pass_code?: string | null;
   /** Average rating */
   average_rating?: number | null;
   /** Is favorite */
@@ -1400,6 +1466,10 @@ export interface CottagePartnerList {
   guests?: number | null;
   /** Rooms */
   rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
   /** Average rating */
   average_rating?: number | null;
   /** Is favorite */

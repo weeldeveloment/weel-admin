@@ -29,22 +29,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Save, GripVertical, Trash2, Plus, Loader2, Copy, Check, Phone } from 'lucide-react'
 
-/** Extended response type to cover fields returned by the API but missing from generated types */
-type ApartmentAdminListExtended = ApartmentAdminList & {
-  apartment_number?: string | null
-  home_number?: string | null
-  entrance_number?: string | null
-  floor_number?: string | null
-  pass_code?: string | null
-  beds?: number | null
-  bathrooms?: number | null
-}
-
-/** Narrowed update payload for image reordering */
-type ApartmentAdminUpdateImages = Omit<ApartmentAdminUpdate, 'img'> & {
-  img?: string[]
-}
-
 type LocationOption = {
   id: string
   label: string
@@ -86,8 +70,8 @@ function CopyBlock({ label, data }: { label: string; data: unknown }) {
 
 const MAX_IMAGES = 10
 
-const fetchApartment = async (id: string): Promise<ApartmentAdminListExtended> => {
-  const response = await api.get<ApartmentAdminListExtended>(`/property/admin/apartments/${id}/`)
+const fetchApartment = async (id: string): Promise<ApartmentAdminList> => {
+  const response = await api.get<ApartmentAdminList>(`/property/admin/apartments/${id}/`)
   return response.data
 }
 
@@ -222,12 +206,11 @@ export default function ApartmentDetailsUpdate() {
   })
 
   const imagesUpdateMutation = useMutation({
-    mutationFn: (updatedImages: string[]) =>
-      updateApartment(propertyId!, { img: updatedImages } as ApartmentAdminUpdateImages),
+    mutationFn: (updatedImages: string[]) => updateApartment(propertyId!, { img: updatedImages }),
     onMutate: async (updatedImages) => {
       await queryClient.cancelQueries({ queryKey: ['apartment', propertyId] })
-      const previous = queryClient.getQueryData<ApartmentAdminListExtended>(['apartment', propertyId])
-      queryClient.setQueryData(['apartment', propertyId], (old: ApartmentAdminListExtended | undefined) => {
+      const previous = queryClient.getQueryData<ApartmentAdminList>(['apartment', propertyId])
+      queryClient.setQueryData(['apartment', propertyId], (old: ApartmentAdminList | undefined) => {
         if (!old) return old
         return { ...old, img: updatedImages }
       })

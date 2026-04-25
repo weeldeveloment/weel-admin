@@ -29,23 +29,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Save, GripVertical, Trash2, Plus, Loader2, Copy, Check, Phone } from 'lucide-react'
 
-/** Extended response type to cover fields returned by the API but missing from generated types */
-type CottageAdminListExtended = CottageAdminList & {
-  beds?: number | null
-  bathrooms?: number | null
-  property_room?: Record<string, string | null>
-}
-
-/** Extended update payload to cover fields sent to the API but missing from generated types */
-type CottageAdminUpdateExtended = CottageAdminUpdate & {
-  property_location?: {
-    country?: string | null
-    city?: string | null
-    latitude?: string | null
-    longitude?: string | null
-  }
-}
-
 type LocationOption = {
   id: string
   label: string
@@ -87,8 +70,8 @@ function CopyBlock({ label, data }: { label: string; data: unknown }) {
 
 const MAX_IMAGES = 10
 
-const fetchCottage = async (id: string): Promise<CottageAdminListExtended> => {
-  const response = await api.get<CottageAdminListExtended>(`/property/admin/cottages/${id}/`)
+const fetchCottage = async (id: string): Promise<CottageAdminList> => {
+  const response = await api.get<CottageAdminList>(`/property/admin/cottages/${id}/`)
   // eslint-disable-next-line no-console
   console.log('[CottageDetailsUpdate] API response:', response.data)
   // eslint-disable-next-line no-console
@@ -147,7 +130,7 @@ export default function CottageDetailsUpdate() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const [form, setForm] = useState<CottageAdminUpdateExtended>({})
+  const [form, setForm] = useState<CottageAdminUpdate>({})
   const [savedMessage, setSavedMessage] = useState<string | null>(null)
   const [imageMessage, setImageMessage] = useState<string | null>(null)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
@@ -185,10 +168,9 @@ export default function CottageDetailsUpdate() {
       rooms: cottage.rooms,
       beds: cottage.beds,
       bathrooms: cottage.bathrooms,
-      property_room: cottage.property_room,
       full: cottage,
     })
-    const nextForm: CottageAdminUpdateExtended = {
+    const nextForm = {
       title: cottage.title ?? '',
       price_per_person: cottage.price_per_person ?? '',
       price_on_working_days: cottage.price_on_working_days ?? '',
@@ -200,12 +182,10 @@ export default function CottageDetailsUpdate() {
       rooms: cottage.rooms ?? null,
       beds: cottage.beds ?? null,
       bathrooms: cottage.bathrooms ?? null,
-      property_location: {
-        country: cottage.country ?? null,
-        city: cottage.city ?? null,
-        latitude: cottage.latitude ?? null,
-        longitude: cottage.longitude ?? null,
-      },
+      country: cottage.country ?? null,
+      city: cottage.city ?? null,
+      latitude: cottage.latitude ?? null,
+      longitude: cottage.longitude ?? null,
       region_id: cottage.region?.id ? String(cottage.region.id) : null,
       district_id: cottage.district?.id ? String(cottage.district.id) : null,
       prefecture_id: cottage.prefecture_id ?? null,
@@ -213,7 +193,7 @@ export default function CottageDetailsUpdate() {
       verification_status: cottage.verification_status ?? null,
       is_archived: cottage.is_archived ?? false,
       is_recommended: false,
-    }
+    } as CottageAdminUpdate
     // eslint-disable-next-line no-console
     console.log('[CottageDetailsUpdate] Form initialized:', nextForm)
     setForm(nextForm)
@@ -288,13 +268,6 @@ export default function CottageDetailsUpdate() {
     // eslint-disable-next-line no-console
     console.log(`[CottageDetailsUpdate] ${key} changed:`, final)
     handleChange(key, final)
-  }
-
-  const handleLocationChange = (key: string, value: string | null) => {
-    setForm((prev) => ({
-      ...prev,
-      property_location: { ...prev.property_location, [key]: value },
-    }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -570,8 +543,8 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="country">{t('properties.country')}</Label>
                   <Input
                     id="country"
-                    value={form.property_location?.country ?? ''}
-                    onChange={(e) => handleLocationChange('country', e.target.value || null)}
+                    value={((form as unknown) as Record<string, string | null>).country ?? ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, country: e.target.value || null }) as CottageAdminUpdate)}
                   />
                 </div>
 
@@ -579,8 +552,8 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="city">{t('properties.city')}</Label>
                   <Input
                     id="city"
-                    value={form.property_location?.city ?? ''}
-                    onChange={(e) => handleLocationChange('city', e.target.value || null)}
+                    value={((form as unknown) as Record<string, string | null>).city ?? ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value || null }) as CottageAdminUpdate)}
                   />
                 </div>
 
@@ -588,8 +561,8 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="latitude">{t('properties.latitude')}</Label>
                   <Input
                     id="latitude"
-                    value={form.property_location?.latitude ?? ''}
-                    onChange={(e) => handleLocationChange('latitude', e.target.value || null)}
+                    value={((form as unknown) as Record<string, string | null>).latitude ?? ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, latitude: e.target.value || null }) as CottageAdminUpdate)}
                   />
                 </div>
 
@@ -597,8 +570,8 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="longitude">{t('properties.longitude')}</Label>
                   <Input
                     id="longitude"
-                    value={form.property_location?.longitude ?? ''}
-                    onChange={(e) => handleLocationChange('longitude', e.target.value || null)}
+                    value={((form as unknown) as Record<string, string | null>).longitude ?? ''}
+                    onChange={(e) => setForm((prev) => ({ ...prev, longitude: e.target.value || null }) as CottageAdminUpdate)}
                   />
                 </div>
 
