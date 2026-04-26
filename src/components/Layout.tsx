@@ -12,7 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Users, MessageSquare, LogOut, Home, Menu, Building2 } from 'lucide-react'
+import { Users, MessageSquare, LogOut, Home, Menu, Building2, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
@@ -28,6 +28,7 @@ export default function Layout() {
     { icon: Users, label: t('nav.users'), path: '/users' },
     { icon: Home, label: t('nav.bookings'), path: '/bookings' },
     { icon: Building2, label: t('nav.properties'), path: '/properties' },
+    { icon: BookOpen, label: t('nav.stories'), path: '/stories' },
     { icon: MessageSquare, label: t('nav.chat'), path: '/chat' },
   ]
 
