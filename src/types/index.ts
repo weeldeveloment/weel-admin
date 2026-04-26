@@ -140,6 +140,30 @@ export interface AdminPartner {
   is_verified?: boolean
 }
 
+export interface StoryMedia {
+  guid: string
+  media_type: string
+  media_url: string | null
+}
+
+export interface AdminStory {
+  guid: string
+  property_id: string | null
+  property_title: string | null
+  property_kind: string | null
+  property_img: string | null
+  partner_user_id: number | null
+  is_verified: boolean
+  verified_by_user_id: number | null
+  verified_at: string | null
+  created_at: string
+  updated_at: string
+  expires_at: string | null
+  uploaded_at: string | null
+  views: number
+  media: StoryMedia[]
+}
+
 export interface Actor {
   id: number
   role?: 'admin' | 'partner' | 'client'

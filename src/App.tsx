@@ -11,6 +11,7 @@ import Partner from './pages/Partner'
 import PropertiesPage from './pages/PropertiesPage'
 import CottageDetailsUpdate from './pages/CottageDetailsUpdate'
 import ApartmentDetailsUpdate from './pages/ApartmentDetailsUpdate'
+import StoriesModerationPage from './pages/StoriesModerationPage'
 
 function App() {
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore()
@@ -54,6 +55,7 @@ function App() {
         <Route path="properties/cottages/:propertyId" element={<CottageDetailsUpdate />} />
         <Route path="properties/apartments/:propertyId" element={<ApartmentDetailsUpdate />} />
         <Route path="properties/:propertyType/:propertyId" element={<Navigate to="/properties" replace />} />
+        <Route path="stories" element={<StoriesModerationPage />} />
       </Route>
     </Routes>
   )

@@ -37,6 +37,7 @@ const resources = {
         users: 'Users',
         bookings: 'Bookings',
         properties: 'Properties',
+        stories: 'Stories',
         chat: 'Chat',
       },
       auth: {
@@ -228,6 +229,56 @@ const resources = {
         selectSubtitle: 'Choose a partner from the list to start chatting',
         noMessages: 'No messages yet. Start the conversation!',
         inputPlaceholder: 'Type a message...',
+      },
+      stories: {
+        title: 'Story Moderation',
+        subtitle: 'Review and moderate partner stories',
+        loading: 'Loading stories...',
+        error: 'Failed to load stories',
+        moderateError: 'Failed to moderate story',
+        deleteError: 'Failed to delete story',
+        searchPlaceholder: 'Search by title, partner ID, or GUID...',
+        sort: {
+          newest: 'Newest first',
+          oldest: 'Oldest first',
+          expiresSoon: 'Expires soon',
+          mostViewed: 'Most viewed',
+        },
+        tabs: {
+          all: 'All',
+          pending: 'Pending',
+          approved: 'Approved',
+        },
+        status: {
+          pending: 'Pending',
+          approved: 'Approved',
+        },
+        type: {
+          apartment: 'Apartment',
+          cottage: 'Cottage',
+        },
+        views: '{{count}} views',
+        created: 'Created',
+        expires: 'Expires',
+        partner: 'Partner',
+        noTitle: 'Untitled property',
+        actions: {
+          preview: 'Preview',
+          approve: 'Approve',
+          reject: 'Reject',
+        },
+        preview: {
+          title: 'Story Preview',
+        },
+        deleteDialog: {
+          title: 'Delete Story',
+          description: 'Are you sure you want to delete this story? This action cannot be undone.',
+          confirm: 'Delete',
+        },
+        empty: {
+          title: 'No stories found',
+          description: 'Stories will appear here when partners upload them',
+        },
       },
       dashboard: {
         title: 'Dashboard',
@@ -425,6 +476,7 @@ const resources = {
         users: 'Пользователи',
         bookings: 'Бронирования',
         properties: 'Объекты',
+        stories: 'Истории',
         chat: 'Чат',
       },
       auth: {
@@ -616,6 +668,56 @@ const resources = {
         selectSubtitle: 'Выберите партнёра из списка, чтобы начать чат',
         noMessages: 'Сообщений пока нет. Начните переписку!',
         inputPlaceholder: 'Введите сообщение...',
+      },
+      stories: {
+        title: 'Модерация историй',
+        subtitle: 'Просмотр и модерация историй партнёров',
+        loading: 'Загрузка историй...',
+        error: 'Не удалось загрузить истории',
+        moderateError: 'Не удалось изменить статус истории',
+        deleteError: 'Не удалось удалить историю',
+        searchPlaceholder: 'Поиск по названию, ID партнёра или GUID...',
+        sort: {
+          newest: 'Сначала новые',
+          oldest: 'Сначала старые',
+          expiresSoon: 'Скоро истекает',
+          mostViewed: 'Больше просмотров',
+        },
+        tabs: {
+          all: 'Все',
+          pending: 'На проверке',
+          approved: 'Одобренные',
+        },
+        status: {
+          pending: 'На проверке',
+          approved: 'Одобрено',
+        },
+        type: {
+          apartment: 'Квартира',
+          cottage: 'Коттедж',
+        },
+        views: '{{count}} просмотров',
+        created: 'Создано',
+        expires: 'Истекает',
+        partner: 'Партнёр',
+        noTitle: 'Без названия',
+        actions: {
+          preview: 'Просмотр',
+          approve: 'Одобрить',
+          reject: 'Отклонить',
+        },
+        preview: {
+          title: 'Просмотр истории',
+        },
+        deleteDialog: {
+          title: 'Удалить историю',
+          description: 'Вы уверены, что хотите удалить эту историю? Это действие нельзя отменить.',
+          confirm: 'Удалить',
+        },
+        empty: {
+          title: 'Истории не найдены',
+          description: 'Истории появятся здесь, когда партнёры их загрузят',
+        },
       },
       dashboard: {
         title: 'Дашборд',
@@ -813,6 +915,7 @@ const resources = {
         users: 'Foydalanuvchilar',
         bookings: 'Bronlar',
         properties: 'Obyektlar',
+        stories: 'Hikoyalar',
         chat: 'Chat',
       },
       auth: {
@@ -1004,6 +1107,56 @@ const resources = {
         selectSubtitle: 'Chatni boshlash uchun hamkorni tanlang',
         noMessages: 'Hali xabarlar yo‘q. Suhbatni boshlang!',
         inputPlaceholder: 'Xabar yozing...',
+      },
+      stories: {
+        title: 'Hikoyalarni tekshirish',
+        subtitle: 'Hamkor hikoyalarini ko‘rib chiqish va tasdiqlash',
+        loading: 'Hikoyalar yuklanmoqda...',
+        error: 'Hikoyalarni yuklab bo‘lmadi',
+        moderateError: 'Hikoya holatini o‘zgartirib bo‘lmadi',
+        deleteError: 'Hikoyani o‘chirib bo‘lmadi',
+        searchPlaceholder: 'Sarlavha, hamkor ID yoki GUID bo‘yicha qidiring...',
+        sort: {
+          newest: 'Avval yangilar',
+          oldest: 'Avval eskilari',
+          expiresSoon: 'Tezda tugaydi',
+          mostViewed: 'Eng ko‘p ko‘rilgan',
+        },
+        tabs: {
+          all: 'Barchasi',
+          pending: 'Kutilmoqda',
+          approved: 'Tasdiqlangan',
+        },
+        status: {
+          pending: 'Kutilmoqda',
+          approved: 'Tasdiqlangan',
+        },
+        type: {
+          apartment: 'Kvartira',
+          cottage: 'Kottej',
+        },
+        views: '{{count}} marta ko‘rilgan',
+        created: 'Yaratilgan',
+        expires: 'Tugaydi',
+        partner: 'Hamkor',
+        noTitle: 'Nomsiz obyekt',
+        actions: {
+          preview: 'Ko‘rish',
+          approve: 'Tasdiqlash',
+          reject: 'Rad etish',
+        },
+        preview: {
+          title: 'Hikoyani ko‘rish',
+        },
+        deleteDialog: {
+          title: 'Hikoyani o‘chirish',
+          description: 'Bu hikoyani o‘chirishni xohlaysizmi? Bu harakatni qaytarib bo‘lmaydi.',
+          confirm: 'O‘chirish',
+        },
+        empty: {
+          title: 'Hikoyalar topilmadi',
+          description: 'Hamkorlar hikoya yuklaganda ular shu yerda paydo bo‘ladi',
+        },
       },
       dashboard: {
         title: 'Boshqaruv',
