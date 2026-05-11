@@ -36,6 +36,13 @@ type LocationOption = {
   district_guid?: string
 }
 
+type CottageForm = CottageAdminUpdate & {
+  country?: string | null
+  city?: string | null
+  latitude?: string | null
+  longitude?: string | null
+}
+
 function CopyBlock({ label, data }: { label: string; data: unknown }) {
   const [copied, setCopied] = useState(false)
   const json = JSON.stringify(data, null, 2)
@@ -85,7 +92,7 @@ const updateCottage = async (id: string, payload: CottageAdminUpdate): Promise<C
 const uploadCottageImage = async (id: string, file: File): Promise<unknown> => {
   const formData = new FormData()
   formData.append('image', file)
-  const response = await api.post(`/property/cottages/${id}/images/`, formData)
+  const response = await api.post(`/property/admin/cottages/${id}/images/`, formData)
   return response.data
 }
 
@@ -128,7 +135,8 @@ export default function CottageDetailsUpdate() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const [form, setForm] = useState<CottageAdminUpdate>({})
+  const [form, setForm] = useState<CottageForm>({})
+  const [dirtyFields, setDirtyFields] = useState<Set<string>>(new Set())
   const [savedMessage, setSavedMessage] = useState<string | null>(null)
   const [imageMessage, setImageMessage] = useState<string | null>(null)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
@@ -167,14 +175,13 @@ export default function CottageDetailsUpdate() {
       bathrooms: cottage.bathrooms,
       full: cottage,
     })
-    const nextForm = {
+    const nextForm: CottageForm = {
       title: cottage.title ?? '',
       price_per_person: cottage.price_per_person ?? '',
       price_on_working_days: cottage.price_on_working_days ?? '',
       price_on_weekends: cottage.price_on_weekends ?? '',
       currency: (cottage.currency as 'USD' | 'UZS') ?? undefined,
-      minimum_weekend_day_stay: false,
-      weekend_only_sunday_inclusive: false,
+      weekend_only_sunday_inclusive: (cottage as unknown as { weekend_only_sunday_inclusive?: boolean }).weekend_only_sunday_inclusive ?? false,
       guests: cottage.guests ?? null,
       rooms: cottage.rooms ?? null,
       beds: cottage.beds ?? null,
@@ -189,11 +196,12 @@ export default function CottageDetailsUpdate() {
       is_verified: cottage.is_verified ?? false,
       verification_status: cottage.verification_status ?? null,
       is_archived: cottage.is_archived ?? false,
-      is_recommended: false,
-    } as CottageAdminUpdate
+      is_recommended: (cottage as unknown as { is_recommended?: boolean }).is_recommended ?? false,
+    }
     console.log('[CottageDetailsUpdate] Form initialized:', nextForm)
     setForm(nextForm)
-  }, [cottage])
+    setDirtyFields(new Set())
+  }, [cottage?.guid])
 
   const updateMutation = useMutation({
     mutationFn: (payload: CottageAdminUpdate) => updateCottage(propertyId!, payload),
@@ -201,6 +209,7 @@ export default function CottageDetailsUpdate() {
       queryClient.setQueryData(['cottage', propertyId], data)
       setSavedMessage(t('common.saved') ?? 'Saved successfully')
       setTimeout(() => setSavedMessage(null), 3000)
+      setDirtyFields(new Set())
     },
   })
 
@@ -236,7 +245,19 @@ export default function CottageDetailsUpdate() {
     },
   })
 
-  const handleChange = <K extends keyof CottageAdminUpdate>(key: K, value: CottageAdminUpdate[K]) => {
+  const handleChange = <K extends keyof CottageForm>(key: K, value: CottageForm[K]) => {
+    setDirtyFields((prev) => {
+      const next = new Set(prev)
+      next.add(key as string)
+      if (key === 'region_id') {
+        next.add('district_id')
+        next.add('prefecture_id')
+      }
+      if (key === 'district_id') {
+        next.add('prefecture_id')
+      }
+      return next
+    })
     setForm((prev) => {
       const next = { ...prev, [key]: value }
       // Cascade clear child selections when parent changes
@@ -251,7 +272,7 @@ export default function CottageDetailsUpdate() {
     })
   }
 
-  const handleNumberChange = (key: keyof CottageAdminUpdate, value: string) => {
+  const handleNumberChange = (key: keyof CottageForm, value: string) => {
     const trimmed = value.trim()
     if (trimmed === '') {
       console.log(`[CottageDetailsUpdate] ${key} cleared`)
@@ -267,8 +288,12 @@ export default function CottageDetailsUpdate() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!propertyId) return
-    console.log('[CottageDetailsUpdate] Submitting form payload:', form)
-    updateMutation.mutate(form)
+    const payload: Partial<CottageForm> = {}
+    dirtyFields.forEach((key) => {
+      ;(payload as Record<string, unknown>)[key] = form[key as keyof CottageForm]
+    })
+    console.log('[CottageDetailsUpdate] Submitting dirty payload:', payload)
+    updateMutation.mutate(payload as CottageAdminUpdate)
   }
 
   const currentImageCount = cottage?.img?.length ?? 0
@@ -462,6 +487,9 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="price_per_person">{t('properties.pricePerPerson')}</Label>
                   <Input
                     id="price_per_person"
+                    type="number"
+                    min="0"
+                    step="0.01"
                     value={form.price_per_person ?? ''}
                     onChange={(e) => handleChange('price_per_person', e.target.value)}
                   />
@@ -471,6 +499,9 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="price_on_working_days">{t('properties.priceWorkingDays')}</Label>
                   <Input
                     id="price_on_working_days"
+                    type="number"
+                    min="0"
+                    step="0.01"
                     value={form.price_on_working_days ?? ''}
                     onChange={(e) => handleChange('price_on_working_days', e.target.value)}
                   />
@@ -480,6 +511,9 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="price_on_weekends">{t('properties.priceWeekends')}</Label>
                   <Input
                     id="price_on_weekends"
+                    type="number"
+                    min="0"
+                    step="0.01"
                     value={form.price_on_weekends ?? ''}
                     onChange={(e) => handleChange('price_on_weekends', e.target.value)}
                   />
@@ -499,17 +533,6 @@ export default function CottageDetailsUpdate() {
                       <SelectItem value="UZS">UZS</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="flex items-center gap-2 md:col-span-2">
-                  <Checkbox
-                    id="minimum_weekend_day_stay"
-                    checked={form.minimum_weekend_day_stay ?? false}
-                    onCheckedChange={(v) => handleChange('minimum_weekend_day_stay', Boolean(v))}
-                  />
-                  <Label htmlFor="minimum_weekend_day_stay" className="cursor-pointer">
-                    {t('properties.minimumWeekendStay')}
-                  </Label>
                 </div>
 
                 <div className="flex items-center gap-2 md:col-span-2">
@@ -536,8 +559,8 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="country">{t('properties.country')}</Label>
                   <Input
                     id="country"
-                    value={((form as unknown) as Record<string, string | null>).country ?? ''}
-                    onChange={(e) => setForm((prev) => ({ ...prev, country: e.target.value || null }) as CottageAdminUpdate)}
+                    value={form.country ?? ''}
+                    onChange={(e) => handleChange('country', e.target.value || null)}
                   />
                 </div>
 
@@ -545,8 +568,8 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="city">{t('properties.city')}</Label>
                   <Input
                     id="city"
-                    value={((form as unknown) as Record<string, string | null>).city ?? ''}
-                    onChange={(e) => setForm((prev) => ({ ...prev, city: e.target.value || null }) as CottageAdminUpdate)}
+                    value={form.city ?? ''}
+                    onChange={(e) => handleChange('city', e.target.value || null)}
                   />
                 </div>
 
@@ -554,8 +577,8 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="latitude">{t('properties.latitude')}</Label>
                   <Input
                     id="latitude"
-                    value={((form as unknown) as Record<string, string | null>).latitude ?? ''}
-                    onChange={(e) => setForm((prev) => ({ ...prev, latitude: e.target.value || null }) as CottageAdminUpdate)}
+                    value={form.latitude ?? ''}
+                    onChange={(e) => handleChange('latitude', e.target.value || null)}
                   />
                 </div>
 
@@ -563,8 +586,8 @@ export default function CottageDetailsUpdate() {
                   <Label htmlFor="longitude">{t('properties.longitude')}</Label>
                   <Input
                     id="longitude"
-                    value={((form as unknown) as Record<string, string | null>).longitude ?? ''}
-                    onChange={(e) => setForm((prev) => ({ ...prev, longitude: e.target.value || null }) as CottageAdminUpdate)}
+                    value={form.longitude ?? ''}
+                    onChange={(e) => handleChange('longitude', e.target.value || null)}
                   />
                 </div>
 
@@ -660,7 +683,7 @@ export default function CottageDetailsUpdate() {
 
                     return (
                       <div
-                        key={src}
+                        key={`${src}-${index}`}
                         draggable
                         onDragStart={(e) => handleDragStart(e, index)}
                         onDragOver={(e) => handleDragOver(e, index)}
@@ -876,9 +899,13 @@ export default function CottageDetailsUpdate() {
                       <SelectValue placeholder={t('properties.selectVerificationStatus')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {(['pending', 'approved', 'rejected', 'underReview'] as const).map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {t(`propertyDetails.status.${status}`)}
+                      {([
+                        { value: 'waiting', label: t('propertyDetails.status.pending') ?? 'Waiting' },
+                        { value: 'accepted', label: t('propertyDetails.status.approved') ?? 'Accepted' },
+                        { value: 'rejected', label: t('propertyDetails.status.rejected') ?? 'Rejected' },
+                      ]).map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {status.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -910,7 +937,7 @@ export default function CottageDetailsUpdate() {
         </Tabs>
 
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={updateMutation.isPending}>
+          <Button type="submit" disabled={updateMutation.isPending || dirtyFields.size === 0}>
             <Save className="mr-2 h-4 w-4" />
             {updateMutation.isPending ? t('common.saving') : t('common.save')}
           </Button>
