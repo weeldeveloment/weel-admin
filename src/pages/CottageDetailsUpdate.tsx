@@ -181,7 +181,7 @@ export default function CottageDetailsUpdate() {
       price_on_working_days: cottage.price_on_working_days ?? '',
       price_on_weekends: cottage.price_on_weekends ?? '',
       currency: (cottage.currency as 'USD' | 'UZS') ?? undefined,
-      weekend_only_sunday_inclusive: (cottage as any).weekend_only_sunday_inclusive ?? false,
+      weekend_only_sunday_inclusive: (cottage as unknown as { weekend_only_sunday_inclusive?: boolean }).weekend_only_sunday_inclusive ?? false,
       guests: cottage.guests ?? null,
       rooms: cottage.rooms ?? null,
       beds: cottage.beds ?? null,
@@ -196,7 +196,7 @@ export default function CottageDetailsUpdate() {
       is_verified: cottage.is_verified ?? false,
       verification_status: cottage.verification_status ?? null,
       is_archived: cottage.is_archived ?? false,
-      is_recommended: (cottage as any).is_recommended ?? false,
+      is_recommended: (cottage as unknown as { is_recommended?: boolean }).is_recommended ?? false,
     }
     console.log('[CottageDetailsUpdate] Form initialized:', nextForm)
     setForm(nextForm)
@@ -290,7 +290,8 @@ export default function CottageDetailsUpdate() {
     if (!propertyId) return
     const payload: Partial<CottageForm> = {}
     dirtyFields.forEach((key) => {
-      payload[key as keyof CottageForm] = form[key as keyof CottageForm] as any
+      const k = key as keyof CottageForm
+      payload[k] = form[k]
     })
     console.log('[CottageDetailsUpdate] Submitting dirty payload:', payload)
     updateMutation.mutate(payload as CottageAdminUpdate)
