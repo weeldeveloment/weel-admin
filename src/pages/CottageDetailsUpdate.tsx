@@ -290,8 +290,7 @@ export default function CottageDetailsUpdate() {
     if (!propertyId) return
     const payload: Partial<CottageForm> = {}
     dirtyFields.forEach((key) => {
-      const k = key as keyof CottageForm
-      payload[k] = form[k]
+      ;(payload as Record<string, unknown>)[key] = form[key as keyof CottageForm]
     })
     console.log('[CottageDetailsUpdate] Submitting dirty payload:', payload)
     updateMutation.mutate(payload as CottageAdminUpdate)
