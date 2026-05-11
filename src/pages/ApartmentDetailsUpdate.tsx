@@ -83,7 +83,7 @@ const updateApartment = async (id: string, payload: ApartmentAdminUpdate): Promi
 const uploadApartmentImage = async (id: string, file: File): Promise<unknown> => {
   const formData = new FormData()
   formData.append('image', file)
-  const response = await api.post(`/property/apartments/${id}/images/`, formData)
+  const response = await api.post(`/property/admin/apartments/${id}/images/`, formData)
   return response.data
 }
 
@@ -629,7 +629,7 @@ export default function ApartmentDetailsUpdate() {
 
                     return (
                       <div
-                        key={src}
+                        key={`${src}-${index}`}
                         draggable
                         onDragStart={(e) => handleDragStart(e, index)}
                         onDragOver={(e) => handleDragOver(e, index)}
