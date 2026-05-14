@@ -6,7 +6,7 @@ import {
   useReducer,
   useState,
 } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api";
@@ -37,6 +37,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Save,
   GripVertical,
@@ -465,6 +473,10 @@ const updateCottage = async (
   return response.data;
 };
 
+const deleteCottage = async (id: string): Promise<void> => {
+  await api.delete(`/property/admin/cottages/${id}/`);
+};
+
 const uploadCottageImage = async (id: string, file: File): Promise<unknown> => {
   const formData = new FormData();
   formData.append("image", file);
@@ -527,6 +539,7 @@ export default function CottageDetailsUpdate() {
   const { propertyId } = useParams<{ propertyId: string }>();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
@@ -535,6 +548,7 @@ export default function CottageDetailsUpdate() {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const cottageQuery = useQuery({
@@ -591,6 +605,19 @@ export default function CottageDetailsUpdate() {
       console.error("Update failed:", error);
       setErrorMessage(
         getMutationErrorMessage(error, t("common.saveFailed") ?? "Save failed"),
+      );
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteCottage(propertyId!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cottages"] });
+      navigate("/properties");
+    },
+    onError: (error) => {
+      setErrorMessage(
+        getMutationErrorMessage(error, t("properties.deleteFailed")),
       );
     },
   });
@@ -1817,8 +1844,58 @@ export default function CottageDetailsUpdate() {
                       "-"}
                   </p>
                 </div>
+
+                <Separator className="md:col-span-2" />
+
+                <div className="md:col-span-2">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {deleteMutation.isPending
+                      ? t("properties.deleting")
+                      : t("properties.deleteCottage")}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
+
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {t("properties.deleteConfirmTitle")}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {t("properties.deleteConfirmDescription", {
+                      title: cottage.title,
+                    })}
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setDeleteDialogOpen(false)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    {t("common.cancel")}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => deleteMutation.mutate()}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {deleteMutation.isPending
+                      ? t("properties.deleting")
+                      : t("properties.confirmDelete")}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
         </Tabs>
 
