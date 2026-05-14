@@ -13,6 +13,7 @@ import type {
 } from '@/types/weel-openapi'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PriceInput } from '@/components/ui/price-input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -415,10 +416,11 @@ export default function ApartmentDetailsUpdate() {
               <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="price">{t('propertyDetails.fields.pricePerNight')}</Label>
-                  <Input
+                  <PriceInput
                     id="price"
+                    currency={form.currency ?? 'USD'}
                     value={form.price ?? ''}
-                    onChange={(e) => handleChange('price', e.target.value)}
+                    onChange={(value) => handleChange('price', value)}
                   />
                 </div>
 

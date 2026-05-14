@@ -847,17 +847,37 @@ export interface CottageAdminList {
   average_rating?: number | null;
   /** Is favorite */
   is_favorite: boolean;
-  /** Is allowed corporate */
+/** Is allowed corporate */
   is_allowed_corporate: boolean;
+  /** Is allowed alcohol */
+  is_allowed_alcohol?: boolean;
+  /** Is allowed pets */
+  is_allowed_pets?: boolean;
+  /** Is quiet hours */
+  is_quiet_hours?: boolean;
+  /** Minimum weekend day stay */
+  minimum_weekend_day_stay?: boolean;
+  /** Property detail */
+  property_detail?: {
+    description_ru?: string | null;
+    description_uz?: string | null;
+    description_en?: string | null;
+    check_in?: string | null;
+    check_out?: string | null;
+    is_allowed_alcohol?: boolean;
+    is_allowed_corporate?: boolean;
+    is_allowed_pets?: boolean;
+    is_quiet_hours?: boolean;
+  } | null;
   /**
-   * Created at
-   * @format date-time
-   */
+    * Created at
+    * @format date-time
+    */
   created_at: string;
   /**
-   * Property type id
-   * @format uuid
-   */
+    * Property type id
+    * @format uuid
+    */
   property_type_id: string;
   /** Property type */
   property_type: Record<string, string | null>;
@@ -962,6 +982,21 @@ export interface CottageAdminUpdate {
   /** Is recommended */
   is_recommended?: boolean;
   services?: (string | null)[];
+  property_detail?: {
+    description_ru?: string | null;
+    description_uz?: string | null;
+    description_en?: string | null;
+    check_in?: string | null;
+    check_out?: string | null;
+    is_allowed_alcohol?: boolean;
+    is_allowed_corporate?: boolean;
+    is_allowed_pets?: boolean;
+    is_quiet_hours?: boolean;
+  };
+  country?: string | null;
+  city?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
   partner_user?: CottagePartnerUserUpdate;
   /** Verified by user id */
   verified_by_user_id?: number | null;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -21,7 +21,7 @@ import {
 import { api } from '@/lib/api'
 import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
-import { Booking, PaginatedBookings, Region } from '@/types'
+import { Booking, PaginatedBookings } from '@/types'
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500 text-yellow-50',
@@ -35,12 +35,8 @@ const statusColors: Record<string, string> = {
 export default function BookingsPage() {
   const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [regionFilter, setRegionFilter] = useState<string>('all')
-  const [dateFrom, setDateFrom] = useState('')
-  const [dateTo, setDateTo] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('booked')
   const [ordering, setOrdering] = useState<'-check_in' | 'check_in'>('-check_in')
-  const [regions, setRegions] = useState<Region[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const statusLabels: Record<string, string> = {
     pending: t('bookings.statuses.pending'),
@@ -50,18 +46,6 @@ export default function BookingsPage() {
     completed: t('bookings.statuses.completed'),
     no_show: t('bookings.statuses.no_show'),
   }
-
-  useEffect(() => {
-    const loadRegions = async () => {
-      try {
-        const response = await api.get<Region[]>('/property/regions/')
-        setRegions(response.data)
-      } catch (error) {
-        console.error('Failed to load regions', error)
-      }
-    }
-    void loadRegions()
-  }, [])
 
   const fetchBookings = async () => {
     const params: Record<string, string> = {
@@ -74,43 +58,15 @@ export default function BookingsPage() {
       params.search = searchQuery
     }
 
-    if (regionFilter !== 'all') {
-      params.region = regionFilter
-    }
-
-    if (dateFrom) {
-      params.date_from = dateFrom
-    }
-
-    if (dateTo) {
-      params.date_to = dateTo
-    }
-
     switch (statusFilter) {
-      case 'new':
+      case 'negotiation':
         params.status = 'pending'
         break
-      case 'confirmed':
-        params.status = 'confirmed'
-        break
-      case 'checked_in':
-        params.status = 'checked_in'
+      case 'booked':
+        params.status_in = 'confirmed,checked_in'
         break
       case 'cancelled':
         params.status = 'cancelled'
-        break
-      case 'completed':
-        params.status = 'completed'
-        break
-      case 'no_show':
-        params.status = 'no_show'
-        break
-      case 'active':
-        params.status_in = 'confirmed,checked_in'
-        break
-      case 'overdue':
-        params.overdue = 'true'
-        params.status_in = 'pending,confirmed'
         break
       default:
         break
@@ -126,7 +82,7 @@ export default function BookingsPage() {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ['bookings', currentPage, searchQuery, statusFilter, regionFilter, dateFrom, dateTo, ordering],
+    queryKey: ['bookings', currentPage, searchQuery, statusFilter, ordering],
     queryFn: fetchBookings,
     refetchInterval: 5000,
   })
@@ -138,21 +94,6 @@ export default function BookingsPage() {
 
   const handleStatusChange = (value: string) => {
     setStatusFilter(value)
-    setCurrentPage(1)
-  }
-
-  const handleRegionChange = (value: string) => {
-    setRegionFilter(value)
-    setCurrentPage(1)
-  }
-
-  const handleDateFromChange = (value: string) => {
-    setDateFrom(value)
-    setCurrentPage(1)
-  }
-
-  const handleDateToChange = (value: string) => {
-    setDateTo(value)
     setCurrentPage(1)
   }
 
@@ -205,29 +146,21 @@ export default function BookingsPage() {
     const counts = bookingsData?.queue_counts
     if (!counts) return undefined
     switch (tabValue) {
-      case 'new':
+      case 'negotiation':
         return counts['pending']
-      case 'active':
+      case 'booked':
         return counts['confirmed'] + counts['checked_in']
       case 'cancelled':
         return counts['cancelled']
-      case 'completed':
-        return counts['completed']
-      case 'no_show':
-        return counts['no_show']
       default:
         return undefined
     }
   }
 
   const tabs = [
-    { value: 'all', label: t('bookings.tabs.all') },
-    { value: 'new', label: t('bookings.tabs.new'), accent: 'text-yellow-600' },
-    { value: 'overdue', label: t('bookings.tabs.overdue'), accent: 'text-red-600' },
-    { value: 'active', label: t('bookings.tabs.active'), accent: 'text-emerald-600' },
-    { value: 'cancelled', label: t('bookings.tabs.cancelled'), accent: 'text-red-600' },
-    { value: 'no_show', label: t('bookings.tabs.no_show'), accent: 'text-orange-600' },
-    { value: 'completed', label: t('bookings.tabs.completed'), accent: 'text-blue-600' },
+    { value: 'booked', label: t('bookings.tabs.booked') },
+    { value: 'negotiation', label: t('bookings.tabs.negotiation') },
+    { value: 'cancelled', label: t('bookings.tabs.cancelled') },
   ]
 
   return (
@@ -269,39 +202,18 @@ export default function BookingsPage() {
               />
             </div>
             <div className="flex flex-wrap items-center gap-2 md:gap-4">
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-muted-foreground whitespace-nowrap">{t('bookings.region')}</label>
-                <select
-                  value={regionFilter}
-                  onChange={(e) => handleRegionChange(e.target.value)}
-                  className="h-9 rounded-md border border-border px-2 text-sm bg-card text-foreground min-w-[120px]"
-                >
-                  <option value="all">{t('bookings.allRegions')}</option>
-                  {regions.map((region) => (
-                    <option key={region.guid} value={region.guid}>
-                      {region.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <label className="text-xs text-muted-foreground whitespace-nowrap">{t('bookings.date')}</label>
-                <Input type="date" value={dateFrom} onChange={(e) => handleDateFromChange(e.target.value)} className="w-28 md:w-36 h-9" />
-                <span className="text-muted-foreground hidden sm:inline">→</span>
-                <Input type="date" value={dateTo} onChange={(e) => handleDateToChange(e.target.value)} className="w-28 md:w-36 h-9" />
-              </div>
               <Button variant="outline" size="sm" onClick={handleOrderingToggle}>
                 {ordering === '-check_in' ? t('bookings.sortDesc') : t('bookings.sortAsc')}
               </Button>
             </div>
           </div>
           <Tabs value={statusFilter} onValueChange={handleStatusChange}>
-            <TabsList className="flex w-full overflow-x-auto">
+            <TabsList className="inline-flex overflow-x-auto">
               {tabs.map((tab) => {
                 const count = getTabCount(tab.value)
                 return (
                   <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2 shrink-0">
-                    <span className={tab.accent}>{tab.label}</span>
+                    <span>{tab.label}</span>
                     {typeof count === 'number' && (
                       <Badge variant="secondary" className="text-xs px-2 py-0.5">
                         {count}
