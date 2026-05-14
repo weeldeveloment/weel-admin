@@ -170,7 +170,7 @@ function extractScalarPrices(priceItems: PriceItem[]) {
 }
 
 function getMutationErrorMessage(error: unknown, fallback: string): string {
-  const anyError = error as any;
+  const anyError = error as { response?: { data?: { errors?: Array<{ detail?: string }>; detail?: string } } };
   if (anyError?.response?.data?.errors?.[0]?.detail) {
     return anyError.response.data.errors[0].detail;
   }
@@ -295,8 +295,8 @@ function reducer(state: State, action: Action): State {
       const workValue = normalizePriceValue(merged.price_on_working_days);
       const weekendValue = normalizePriceValue(merged.price_on_weekends);
 
-      const existingPrices = Array.isArray((merged as any).price)
-        ? ((merged as any).price as PriceItem[])
+      const existingPrices = Array.isArray((merged as { price?: unknown }).price)
+        ? ((merged as { price?: PriceItem[] }).price as PriceItem[])
         : [];
 
       const now = new Date();
@@ -365,20 +365,17 @@ function reducer(state: State, action: Action): State {
           ),
           country: merged.property_location?.country ?? merged.country ?? "",
           city: merged.property_location?.city ?? merged.city ?? "",
-          region_id: (merged.property_location as any)?.region_id
-            ? String((merged.property_location as any).region_id)
+          region_id: (merged.property_location as { region_id?: string | number | null })?.region_id
+            ? String((merged.property_location as { region_id?: string | number | null }).region_id)
             : merged.region?.id
               ? String(merged.region.id)
               : null,
-          district_id: (merged.property_location as any)?.district_id
-            ? String((merged.property_location as any).district_id)
+          district_id: (merged.property_location as { district_id?: string | number | null })?.district_id
+            ? String((merged.property_location as { district_id?: string | number | null }).district_id)
             : merged.district?.id
               ? String(merged.district.id)
               : null,
-          prefecture_id:
-            (merged.property_location as any)?.prefecture_id ??
-            merged.prefecture_id ??
-            null,
+        prefecture_id: merged.property_location?.prefecture.id!
         },
         quietHours: detail.is_quiet_hours ? "yes" : "no",
         checkTimes: {
