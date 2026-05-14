@@ -170,12 +170,21 @@ function extractScalarPrices(priceItems: PriceItem[]) {
 }
 
 function getMutationErrorMessage(error: unknown, fallback: string): string {
-  const anyError = error as { response?: { data?: { errors?: Array<{ detail?: string }>; detail?: string } } };
-  if (anyError?.response?.data?.errors?.[0]?.detail) {
-    return anyError.response.data.errors[0].detail;
+  const maybeAxiosLikeError = error as {
+    response?: {
+      data?: {
+        errors?: Array<{ detail?: string | null }> | null;
+        detail?: string | null;
+      };
+    };
+  };
+  const firstErrorDetail = maybeAxiosLikeError.response?.data?.errors?.[0]?.detail;
+  if (firstErrorDetail) {
+    return firstErrorDetail;
   }
-  if (anyError?.response?.data?.detail) {
-    return anyError.response.data.detail;
+  const responseDetail = maybeAxiosLikeError.response?.data?.detail;
+  if (responseDetail) {
+    return responseDetail;
   }
   if (error instanceof Error && error.message) {
     return error.message;
@@ -192,6 +201,10 @@ type PriceItem = {
   price_per_person: string | number;
   price_on_working_days: string | number;
   price_on_weekends: string | number;
+};
+
+type CottageAdminListWithPrices = CottageAdminList & {
+  price?: PriceItem[] | null;
 };
 
 type State = {
@@ -287,17 +300,14 @@ const initialState: State = {
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "HYDRATE_FROM_API": {
-      const merged = action.payload;
+      const merged = action.payload as CottageAdminListWithPrices;
       const detail = merged.property_detail || {};
       const currentRange = getMonthRange(0);
       const nextRange = getMonthRange(1);
       const currency = (merged.currency as "USD" | "UZS") || "USD";
       const workValue = normalizePriceValue(merged.price_on_working_days);
       const weekendValue = normalizePriceValue(merged.price_on_weekends);
-
-      const existingPrices = Array.isArray((merged as { price?: unknown }).price)
-        ? ((merged as { price?: PriceItem[] }).price as PriceItem[])
-        : [];
+      const existingPrices = Array.isArray(merged.price) ? merged.price : [];
 
       const now = new Date();
       const currentMonth = now.getMonth();
@@ -365,17 +375,23 @@ function reducer(state: State, action: Action): State {
           ),
           country: merged.property_location?.country ?? merged.country ?? "",
           city: merged.property_location?.city ?? merged.city ?? "",
-          region_id: (merged.property_location as { region_id?: string | number | null })?.region_id
-            ? String((merged.property_location as { region_id?: string | number | null }).region_id)
-            : merged.region?.id
-              ? String(merged.region.id)
-              : null,
-          district_id: (merged.property_location as { district_id?: string | number | null })?.district_id
-            ? String((merged.property_location as { district_id?: string | number | null }).district_id)
-            : merged.district?.id
-              ? String(merged.district.id)
-              : null,
-        prefecture_id: merged.property_location?.prefecture.id!
+          region_id:
+            merged.property_location?.region?.id != null
+              ? String(merged.property_location.region.id)
+              : merged.region?.id != null
+                ? String(merged.region.id)
+                : null,
+          district_id:
+            merged.property_location?.district?.id != null
+              ? String(merged.property_location.district.id)
+              : merged.district?.id != null
+                ? String(merged.district.id)
+                : null,
+          prefecture_id: (() => {
+            const prefectureId =
+              merged.property_location?.prefecture?.id ?? merged.prefecture_id;
+            return prefectureId != null ? String(prefectureId) : null;
+          })(),
         },
         quietHours: detail.is_quiet_hours ? "yes" : "no",
         checkTimes: {
