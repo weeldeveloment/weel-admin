@@ -562,6 +562,7 @@ export default function CottageDetailsUpdate() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [hasHydrated, setHasHydrated] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const cottageQuery = useQuery({
@@ -896,6 +897,8 @@ export default function CottageDetailsUpdate() {
   }
 
   const cottage = state.data;
+  const deleteTitleToMatch = (cottage.title ?? "").trim();
+  const deleteIsConfirmed = deleteConfirmText.trim() === deleteTitleToMatch;
 
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
@@ -1864,7 +1867,10 @@ export default function CottageDetailsUpdate() {
                   <Button
                     type="button"
                     variant="destructive"
-                    onClick={() => setDeleteDialogOpen(true)}
+                    onClick={() => {
+                      setDeleteConfirmText("");
+                      setDeleteDialogOpen(true);
+                    }}
                     disabled={deleteMutation.isPending}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
@@ -1876,7 +1882,13 @@ export default function CottageDetailsUpdate() {
               </CardContent>
             </Card>
 
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <Dialog
+              open={deleteDialogOpen}
+              onOpenChange={(open) => {
+                setDeleteDialogOpen(open);
+                if (!open) setDeleteConfirmText("");
+              }}
+            >
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>
@@ -1888,6 +1900,23 @@ export default function CottageDetailsUpdate() {
                     })}
                   </DialogDescription>
                 </DialogHeader>
+                <div className="space-y-2">
+                  <Label htmlFor="delete-confirm-input">
+                    {t("properties.deleteTypeToConfirmLabel")}
+                  </Label>
+                  <Input
+                    id="delete-confirm-input"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder={t("properties.deleteTypeToConfirmPlaceholder")}
+                    autoComplete="off"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    {t("properties.deleteTypeToConfirmHint", {
+                      title: cottage.title,
+                    })}
+                  </p>
+                </div>
                 <DialogFooter>
                   <Button
                     variant="outline"
@@ -1899,7 +1928,7 @@ export default function CottageDetailsUpdate() {
                   <Button
                     variant="destructive"
                     onClick={() => deleteMutation.mutate()}
-                    disabled={deleteMutation.isPending}
+                    disabled={deleteMutation.isPending || !deleteIsConfirmed}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     {deleteMutation.isPending

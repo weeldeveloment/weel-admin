@@ -248,6 +248,9 @@ const resources = {
         deleteFailed: 'Failed to delete cottage',
         deleteConfirmTitle: 'Delete cottage',
         deleteConfirmDescription: 'Are you sure you want to delete "{{title}}"? This action cannot be undone.',
+        deleteTypeToConfirmLabel: 'Type the cottage name to confirm',
+        deleteTypeToConfirmPlaceholder: 'Cottage name',
+        deleteTypeToConfirmHint: 'To confirm, type "{{title}}" exactly.',
         confirmDelete: 'Delete',
       },
       chat: {
@@ -716,6 +719,9 @@ const resources = {
         deleteFailed: 'Не удалось удалить коттедж',
         deleteConfirmTitle: 'Удалить коттедж',
         deleteConfirmDescription: 'Вы уверены, что хотите удалить "{{title}}"? Это действие нельзя отменить.',
+        deleteTypeToConfirmLabel: 'Введите название коттеджа для подтверждения',
+        deleteTypeToConfirmPlaceholder: 'Название коттеджа',
+        deleteTypeToConfirmHint: 'Чтобы подтвердить, введите "{{title}}" точно.',
         confirmDelete: 'Удалить',
       },
       chat: {
@@ -1184,6 +1190,9 @@ const resources = {
         deleteFailed: 'Kottejni o\'chirib bo\'lmadi',
         deleteConfirmTitle: 'Kottejni o\'chirish',
         deleteConfirmDescription: '"{{title}}" ni o\'chirishni xohlaysizmi? Bu harakatni qaytarib bo\'lmaydi.',
+        deleteTypeToConfirmLabel: 'Tasdiqlash uchun kottej nomini kiriting',
+        deleteTypeToConfirmPlaceholder: 'Kottej nomi',
+        deleteTypeToConfirmHint: 'Tasdiqlash uchun "{{title}}" ni aynan kiriting.',
         confirmDelete: 'O\'chirish',
       },
       chat: {
