@@ -4,7 +4,6 @@ import {
   useMemo,
   useRef,
   useReducer,
-  useState,
 } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +13,7 @@ import { resolveImageUrl, cn } from "@/lib/utils";
 import type {
   CottageAdminList,
   CottageAdminUpdate,
+  CottageAdminPropertyDetail,
   PropertyServiceList,
   RegionList,
   DistrictList,
@@ -64,7 +64,10 @@ type LocationOption = {
 };
 
 function CopyBlock({ label, data }: { label: string; data: unknown }) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useReducer(
+    (_: boolean, next: boolean) => next,
+    false,
+  );
   const json = JSON.stringify(data, null, 2);
 
   const handleCopy = async () => {
@@ -209,6 +212,7 @@ type CottageAdminListWithPrices = CottageAdminList & {
 
 type State = {
   data: CottageAdminList | null;
+  hasHydrated: boolean;
   title: string;
   descRu: string;
   descUz: string;
@@ -229,7 +233,6 @@ type State = {
   allowedAlcohol: boolean;
   allowedCorp: boolean;
   allowedPets: boolean;
-  minimumWeekendDayStay: boolean;
   guests: number;
   rooms: number;
   beds: number;
@@ -238,10 +241,18 @@ type State = {
   isArchived: boolean;
   isRecommended: boolean;
   verificationStatus: string | null;
+  savedMessage: string | null;
+  errorMessage: string | null;
+  imageMessage: string | null;
+  draggedIndex: number | null;
+  dragOverIndex: number | null;
+  deleteDialogOpen: boolean;
+  deleteConfirmText: string;
 };
 
 type Action =
   | { type: "HYDRATE_FROM_API"; payload: CottageAdminList }
+  | { type: "SET_HAS_HYDRATED"; payload: boolean }
   | { type: "SET_TITLE"; payload: string }
   | { type: "SET_DESC_RU"; payload: string }
   | { type: "SET_DESC_UZ"; payload: string }
@@ -254,7 +265,6 @@ type Action =
   | { type: "SET_ALLOWED_ALCOHOL"; payload: boolean }
   | { type: "SET_ALLOWED_CORP"; payload: boolean }
   | { type: "SET_ALLOWED_PETS"; payload: boolean }
-  | { type: "SET_MINIMUM_WEEKEND_DAY_STAY"; payload: boolean }
   | { type: "SET_GUESTS"; payload: number }
   | { type: "SET_ROOMS"; payload: number }
   | { type: "SET_BEDS"; payload: number }
@@ -262,10 +272,18 @@ type Action =
   | { type: "SET_IS_VERIFIED"; payload: boolean }
   | { type: "SET_IS_ARCHIVED"; payload: boolean }
   | { type: "SET_IS_RECOMMENDED"; payload: boolean }
-  | { type: "SET_VERIFICATION_STATUS"; payload: string | null };
+  | { type: "SET_VERIFICATION_STATUS"; payload: string | null }
+  | { type: "SET_SAVED_MESSAGE"; payload: string | null }
+  | { type: "SET_ERROR_MESSAGE"; payload: string | null }
+  | { type: "SET_IMAGE_MESSAGE"; payload: string | null }
+  | { type: "SET_DRAGGED_INDEX"; payload: number | null }
+  | { type: "SET_DRAG_OVER_INDEX"; payload: number | null }
+  | { type: "SET_DELETE_DIALOG_OPEN"; payload: boolean }
+  | { type: "SET_DELETE_CONFIRM_TEXT"; payload: string };
 
 const initialState: State = {
   data: null,
+  hasHydrated: false,
   title: "",
   descRu: "",
   descUz: "",
@@ -286,7 +304,6 @@ const initialState: State = {
   allowedAlcohol: false,
   allowedCorp: false,
   allowedPets: false,
-  minimumWeekendDayStay: false,
   guests: 1,
   rooms: 1,
   beds: 1,
@@ -295,13 +312,20 @@ const initialState: State = {
   isArchived: false,
   isRecommended: false,
   verificationStatus: null,
+  savedMessage: null,
+  errorMessage: null,
+  imageMessage: null,
+  draggedIndex: null,
+  dragOverIndex: null,
+  deleteDialogOpen: false,
+  deleteConfirmText: "",
 };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "HYDRATE_FROM_API": {
       const merged = action.payload as CottageAdminListWithPrices;
-      const detail = merged.property_detail || {};
+      const detail = (merged.property_detail || {}) as CottageAdminPropertyDetail;
       const currentRange = getMonthRange(0);
       const nextRange = getMonthRange(1);
       const currency = (merged.currency as "USD" | "UZS") || "USD";
@@ -333,6 +357,7 @@ function reducer(state: State, action: Action): State {
       return {
         ...state,
         data: merged,
+        hasHydrated: true,
         title: merged.title || "",
         descRu: detail.description_ru || "",
         descUz: detail.description_uz || "",
@@ -398,24 +423,21 @@ function reducer(state: State, action: Action): State {
           check_in: detail.check_in || "19:00:00",
           check_out: detail.check_out || "17:00:00",
         },
-        allowedAlcohol: Boolean(
-          detail.is_allowed_alcohol ?? merged.is_allowed_alcohol ?? false,
-        ),
-        allowedCorp: Boolean(
-          detail.is_allowed_corporate ?? merged.is_allowed_corporate ?? false,
-        ),
+        allowedAlcohol: Boolean(detail.is_allowed_alcohol ?? false),
+        allowedCorp: Boolean(detail.is_allowed_corporate ?? false),
         allowedPets: Boolean(detail.is_allowed_pets ?? false),
-        minimumWeekendDayStay: merged.minimum_weekend_day_stay ?? false,
         guests: toPositiveNumber(merged.guests),
         rooms: toPositiveNumber(merged.rooms),
         beds: toPositiveNumber(merged.beds),
         bathrooms: toPositiveNumber(merged.bathrooms),
         isVerified: merged.is_verified ?? false,
         isArchived: merged.is_archived ?? false,
-        isRecommended: false,
+        isRecommended: merged.is_recommended ?? false,
         verificationStatus: merged.verification_status ?? null,
       };
     }
+    case "SET_HAS_HYDRATED":
+      return { ...state, hasHydrated: action.payload };
     case "SET_TITLE":
       return { ...state, title: action.payload };
     case "SET_DESC_RU":
@@ -443,8 +465,6 @@ function reducer(state: State, action: Action): State {
       return { ...state, allowedCorp: action.payload };
     case "SET_ALLOWED_PETS":
       return { ...state, allowedPets: action.payload };
-    case "SET_MINIMUM_WEEKEND_DAY_STAY":
-      return { ...state, minimumWeekendDayStay: action.payload };
     case "SET_GUESTS":
       return { ...state, guests: action.payload };
     case "SET_ROOMS":
@@ -461,6 +481,20 @@ function reducer(state: State, action: Action): State {
       return { ...state, isRecommended: action.payload };
     case "SET_VERIFICATION_STATUS":
       return { ...state, verificationStatus: action.payload };
+    case "SET_SAVED_MESSAGE":
+      return { ...state, savedMessage: action.payload };
+    case "SET_ERROR_MESSAGE":
+      return { ...state, errorMessage: action.payload };
+    case "SET_IMAGE_MESSAGE":
+      return { ...state, imageMessage: action.payload };
+    case "SET_DRAGGED_INDEX":
+      return { ...state, draggedIndex: action.payload };
+    case "SET_DRAG_OVER_INDEX":
+      return { ...state, dragOverIndex: action.payload };
+    case "SET_DELETE_DIALOG_OPEN":
+      return { ...state, deleteDialogOpen: action.payload };
+    case "SET_DELETE_CONFIRM_TEXT":
+      return { ...state, deleteConfirmText: action.payload };
     default:
       return state;
   }
@@ -493,11 +527,11 @@ const deleteCottage = async (id: string): Promise<void> => {
 const uploadCottageImage = async (id: string, file: File): Promise<unknown> => {
   const formData = new FormData();
   formData.append("image", file);
-  // NOTE: This uses the public endpoint. If the backend expects an admin token,
-  // it may need to expose /property/admin/cottages/{id}/images/ instead.
-  const response = await api.post(`/property/cottages/${id}/images/`, formData, {
-    headers: { 'Content-Type': undefined },
-  });
+  const response = await api.post(
+    `/property/admin/cottages/${id}/images/`,
+    formData,
+    { headers: { "Content-Type": undefined } },
+  );
   return response.data;
 };
 
@@ -555,15 +589,9 @@ export default function CottageDetailsUpdate() {
   const navigate = useNavigate();
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [savedMessage, setSavedMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [imageMessage, setImageMessage] = useState<string | null>(null);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [hasHydrated, setHasHydrated] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const savedMessageTimerRef = useRef<number | null>(null);
+  const imageMessageTimerRef = useRef<number | null>(null);
 
   const cottageQuery = useQuery({
     queryKey: ["cottage", propertyId],
@@ -594,11 +622,21 @@ export default function CottageDetailsUpdate() {
 
   /* hydrate once from query */
   useEffect(() => {
-    if (cottageQuery.data && !hasHydrated) {
+    if (cottageQuery.data && !state.hasHydrated) {
       dispatch({ type: "HYDRATE_FROM_API", payload: cottageQuery.data });
-      setHasHydrated(true);
     }
-  }, [cottageQuery.data, hasHydrated]);
+  }, [cottageQuery.data, state.hasHydrated]);
+
+  useEffect(() => {
+    return () => {
+      if (savedMessageTimerRef.current) {
+        window.clearTimeout(savedMessageTimerRef.current);
+      }
+      if (imageMessageTimerRef.current) {
+        window.clearTimeout(imageMessageTimerRef.current);
+      }
+    };
+  }, []);
 
   /* ───── mutations ───── */
 
@@ -608,18 +646,30 @@ export default function CottageDetailsUpdate() {
       return result;
     },
     onSuccess: async () => {
-      setSavedMessage(t("common.saved") ?? "Saved successfully");
-      setErrorMessage(null);
-      setTimeout(() => setSavedMessage(null), 3000);
+      dispatch({
+        type: "SET_SAVED_MESSAGE",
+        payload: t("common.saved") ?? "Saved successfully",
+      });
+      dispatch({ type: "SET_ERROR_MESSAGE", payload: null });
+      if (savedMessageTimerRef.current) {
+        window.clearTimeout(savedMessageTimerRef.current);
+      }
+      savedMessageTimerRef.current = window.setTimeout(() => {
+        dispatch({ type: "SET_SAVED_MESSAGE", payload: null });
+      }, 3000);
       const updated = await fetchCottage(propertyId!);
       queryClient.setQueryData(["cottage", propertyId], updated);
       dispatch({ type: "HYDRATE_FROM_API", payload: updated });
     },
     onError: (error) => {
-      console.error("Update failed:", error);
-      setErrorMessage(
-        getMutationErrorMessage(error, t("common.saveFailed") ?? "Save failed"),
-      );
+      console.error("Cottage update failed:", error);
+      dispatch({
+        type: "SET_ERROR_MESSAGE",
+        payload: getMutationErrorMessage(
+          error,
+          t("common.saveFailed") ?? "Save failed",
+        ),
+      });
     },
   });
 
@@ -630,33 +680,47 @@ export default function CottageDetailsUpdate() {
       navigate("/properties");
     },
     onError: (error) => {
-      setErrorMessage(
-        getMutationErrorMessage(error, t("properties.deleteFailed")),
-      );
+      dispatch({
+        type: "SET_ERROR_MESSAGE",
+        payload: getMutationErrorMessage(error, t("properties.deleteFailed")),
+      });
     },
   });
 
   const uploadImageMutation = useMutation({
     mutationFn: (file: File) => uploadCottageImage(propertyId!, file),
     onSuccess: async () => {
-      setImageMessage(
-        t("propertyDetails.messages.imageUpdateSuccess") ??
+      dispatch({
+        type: "SET_IMAGE_MESSAGE",
+        payload:
+          t("propertyDetails.messages.imageUpdateSuccess") ??
           "Image updated successfully",
-      );
-      setTimeout(() => setImageMessage(null), 3000);
+      });
+      if (imageMessageTimerRef.current) {
+        window.clearTimeout(imageMessageTimerRef.current);
+      }
+      imageMessageTimerRef.current = window.setTimeout(() => {
+        dispatch({ type: "SET_IMAGE_MESSAGE", payload: null });
+      }, 3000);
       const updated = await fetchCottage(propertyId!);
       queryClient.setQueryData(["cottage", propertyId], updated);
       dispatch({ type: "HYDRATE_FROM_API", payload: updated });
     },
     onError: (error) => {
-      setImageMessage(
-        getMutationErrorMessage(
+      dispatch({
+        type: "SET_IMAGE_MESSAGE",
+        payload: getMutationErrorMessage(
           error,
           t("propertyDetails.messages.imageUpdateFailed") ??
             "Failed to update image",
         ),
-      );
-      setTimeout(() => setImageMessage(null), 3000);
+      });
+      if (imageMessageTimerRef.current) {
+        window.clearTimeout(imageMessageTimerRef.current);
+      }
+      imageMessageTimerRef.current = window.setTimeout(() => {
+        dispatch({ type: "SET_IMAGE_MESSAGE", payload: null });
+      }, 3000);
     },
   });
 
@@ -664,24 +728,37 @@ export default function CottageDetailsUpdate() {
     mutationFn: (updatedImages: string[]) =>
       updateCottage(propertyId!, { img: updatedImages }),
     onSuccess: async () => {
-      setImageMessage(
-        t("propertyDetails.messages.imageUpdateSuccess") ??
+      dispatch({
+        type: "SET_IMAGE_MESSAGE",
+        payload:
+          t("propertyDetails.messages.imageUpdateSuccess") ??
           "Image updated successfully",
-      );
-      setTimeout(() => setImageMessage(null), 3000);
+      });
+      if (imageMessageTimerRef.current) {
+        window.clearTimeout(imageMessageTimerRef.current);
+      }
+      imageMessageTimerRef.current = window.setTimeout(() => {
+        dispatch({ type: "SET_IMAGE_MESSAGE", payload: null });
+      }, 3000);
       const updated = await fetchCottage(propertyId!);
       queryClient.setQueryData(["cottage", propertyId], updated);
       dispatch({ type: "HYDRATE_FROM_API", payload: updated });
     },
     onError: (error) => {
-      setImageMessage(
-        getMutationErrorMessage(
+      dispatch({
+        type: "SET_IMAGE_MESSAGE",
+        payload: getMutationErrorMessage(
           error,
           t("propertyDetails.messages.imageUpdateFailed") ??
             "Failed to update image",
         ),
-      );
-      setTimeout(() => setImageMessage(null), 3000);
+      });
+      if (imageMessageTimerRef.current) {
+        window.clearTimeout(imageMessageTimerRef.current);
+      }
+      imageMessageTimerRef.current = window.setTimeout(() => {
+        dispatch({ type: "SET_IMAGE_MESSAGE", payload: null });
+      }, 3000);
     },
   });
 
@@ -732,59 +809,52 @@ export default function CottageDetailsUpdate() {
     const normalizedPriceRows = state.price.map((item) => ({
       month_from: item.month_from,
       month_to: item.month_to,
-      price_per_person: state.currency === "USD" ? "10" : "100000",
-      price_on_working_days: item.price_on_working_days || "0",
-      price_on_weekends: item.price_on_weekends || "0",
+      price_per_person: String(
+        item.price_per_person ?? scalarPrices.price_per_person,
+      ),
+      price_on_working_days: String(
+        item.price_on_working_days ?? scalarPrices.price_on_working_days,
+      ),
+      price_on_weekends: String(
+        item.price_on_weekends ?? scalarPrices.price_on_weekends,
+      ),
     }));
 
     if (normalizedPriceRows.length !== 2) {
-      setErrorMessage("Для дачи нужно указать цены на 2 месяца");
+      dispatch({
+        type: "SET_ERROR_MESSAGE",
+        payload: "Для дачи нужно указать цены на 2 месяца",
+      });
       return;
     }
 
-    const payload: Record<string, unknown> = {
+    const payload: CottageAdminUpdate = {
       title: state.title,
-      minimum_weekend_day_stay: state.minimumWeekendDayStay,
-      property_location: {
-        latitude: normalizeCoordinateForApi(state.location.latitude),
-        longitude: normalizeCoordinateForApi(state.location.longitude),
-        country: state.location.country || null,
-        city: state.location.city || null,
-        region_id: state.location.region_id
-          ? Number(state.location.region_id)
-          : null,
-        district_id: state.location.district_id
-          ? Number(state.location.district_id)
-          : null,
-        prefecture_id: state.location.prefecture_id || null,
-      },
-      region_id: state.location.region_id
-        ? Number(state.location.region_id)
-        : null,
-      district_id: state.location.district_id
-        ? Number(state.location.district_id)
-        : null,
+      latitude: normalizeCoordinateForApi(state.location.latitude),
+      longitude: normalizeCoordinateForApi(state.location.longitude),
+      country: state.location.country || null,
+      city: state.location.city || null,
+      region_id: state.location.region_id ? state.location.region_id : null,
+      district_id: state.location.district_id ? state.location.district_id : null,
       prefecture_id: state.location.prefecture_id || null,
       services: state.amenities,
-      property_detail: {
-        description_ru: state.descRu || null,
-        description_uz: state.descUz || null,
-        description_en: state.descRu || state.descUz || null,
-        check_in: state.checkTimes.check_in,
-        check_out: state.checkTimes.check_out,
-        is_quiet_hours: state.quietHours === "yes",
-        is_allowed_alcohol: state.allowedAlcohol,
-        is_allowed_corporate: state.allowedCorp,
-        is_allowed_pets: state.allowedPets,
-      },
+      description_ru: state.descRu || null,
+      description_uz: state.descUz || null,
+      description_en: state.descRu || state.descUz || null,
+      check_in: state.checkTimes.check_in,
+      check_out: state.checkTimes.check_out,
+      is_quiet_hours: state.quietHours === "yes",
+      is_allowed_alcohol: state.allowedAlcohol,
+      is_allowed_corporate: state.allowedCorp,
+      is_allowed_pets: state.allowedPets,
       guests: state.guests,
       rooms: state.rooms,
       beds: state.beds,
       bathrooms: state.bathrooms,
       price: normalizedPriceRows,
-      price_per_person: scalarPrices.price_per_person,
-      price_on_working_days: scalarPrices.price_on_working_days,
-      price_on_weekends: scalarPrices.price_on_weekends,
+      price_per_person: String(scalarPrices.price_per_person),
+      price_on_working_days: String(scalarPrices.price_on_working_days),
+      price_on_weekends: String(scalarPrices.price_on_weekends),
       currency: state.currency,
       is_verified: state.isVerified,
       is_archived: state.isArchived,
@@ -792,8 +862,7 @@ export default function CottageDetailsUpdate() {
       verification_status: state.verificationStatus,
     };
 
-    console.log("Saving cottage payload:", payload);
-    updateMutation.mutate(payload as CottageAdminUpdate);
+    updateMutation.mutate(payload);
   };
 
   /* ───── images ───── */
@@ -805,11 +874,18 @@ export default function CottageDetailsUpdate() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (isMaxImages) {
-      setImageMessage(
-        t("properties.maxImagesReached") ??
+      dispatch({
+        type: "SET_IMAGE_MESSAGE",
+        payload:
+          t("properties.maxImagesReached") ??
           `Maximum ${MAX_IMAGES} images allowed.`,
-      );
-      setTimeout(() => setImageMessage(null), 3000);
+      });
+      if (imageMessageTimerRef.current) {
+        window.clearTimeout(imageMessageTimerRef.current);
+      }
+      imageMessageTimerRef.current = window.setTimeout(() => {
+        dispatch({ type: "SET_IMAGE_MESSAGE", payload: null });
+      }, 3000);
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -818,7 +894,7 @@ export default function CottageDetailsUpdate() {
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index);
+    dispatch({ type: "SET_DRAGGED_INDEX", payload: index });
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", String(index));
   };
@@ -826,8 +902,8 @@ export default function CottageDetailsUpdate() {
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
-    if (draggedIndex !== index) {
-      setDragOverIndex(index);
+    if (state.draggedIndex !== index) {
+      dispatch({ type: "SET_DRAG_OVER_INDEX", payload: index });
     }
   };
 
@@ -835,8 +911,8 @@ export default function CottageDetailsUpdate() {
     e.preventDefault();
     const dragIndex = Number(e.dataTransfer.getData("text/plain"));
     if (dragIndex === dropIndex || Number.isNaN(dragIndex)) {
-      setDraggedIndex(null);
-      setDragOverIndex(null);
+      dispatch({ type: "SET_DRAGGED_INDEX", payload: null });
+      dispatch({ type: "SET_DRAG_OVER_INDEX", payload: null });
       return;
     }
     const currentImages = state.data?.img ?? [];
@@ -844,13 +920,13 @@ export default function CottageDetailsUpdate() {
     const [removed] = newImages.splice(dragIndex, 1);
     newImages.splice(dropIndex, 0, removed);
     imagesUpdateMutation.mutate(newImages);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
+    dispatch({ type: "SET_DRAGGED_INDEX", payload: null });
+    dispatch({ type: "SET_DRAG_OVER_INDEX", payload: null });
   };
 
   const handleDragEnd = () => {
-    setDraggedIndex(null);
-    setDragOverIndex(null);
+    dispatch({ type: "SET_DRAGGED_INDEX", payload: null });
+    dispatch({ type: "SET_DRAG_OVER_INDEX", payload: null });
   };
 
   const handleDeleteImage = (index: number) => {
@@ -898,7 +974,8 @@ export default function CottageDetailsUpdate() {
 
   const cottage = state.data;
   const deleteTitleToMatch = (cottage.title ?? "").trim();
-  const deleteIsConfirmed = deleteConfirmText.trim() === deleteTitleToMatch;
+  const deleteIsConfirmed =
+    state.deleteConfirmText.trim() === deleteTitleToMatch;
 
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
@@ -917,14 +994,14 @@ export default function CottageDetailsUpdate() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {savedMessage && (
+        {state.savedMessage && (
           <div className="rounded-md border bg-green-50 px-4 py-2 text-sm text-green-700">
-            {savedMessage}
+            {state.savedMessage}
           </div>
         )}
-        {errorMessage && (
+        {state.errorMessage && (
           <div className="rounded-md border bg-red-50 px-4 py-2 text-sm text-red-700">
-            {errorMessage}
+            {state.errorMessage}
           </div>
         )}
 
@@ -1297,25 +1374,6 @@ export default function CottageDetailsUpdate() {
                     </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="minimum_weekend_day_stay"
-                    checked={state.minimumWeekendDayStay}
-                    onCheckedChange={(v) =>
-                      dispatch({
-                        type: "SET_MINIMUM_WEEKEND_DAY_STAY",
-                        payload: Boolean(v),
-                      })
-                    }
-                  />
-                  <Label
-                    htmlFor="minimum_weekend_day_stay"
-                    className="cursor-pointer"
-                  >
-                    {t("properties.minimumWeekendStay")}
-                  </Label>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -1523,23 +1581,24 @@ export default function CottageDetailsUpdate() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {imageMessage && (
+                {state.imageMessage && (
                   <div
                     className={`rounded-md border px-4 py-2 text-sm ${
-                      imageMessage.includes("success")
+                      state.imageMessage.includes("success")
                         ? "bg-green-50 text-green-700"
                         : "bg-red-50 text-red-700"
                     }`}
                   >
-                    {imageMessage}
+                    {state.imageMessage}
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
                   {cottage.img?.map((src, index) => {
-                    const isDragged = draggedIndex === index;
+                    const isDragged = state.draggedIndex === index;
                     const isDropTarget =
-                      dragOverIndex === index && draggedIndex !== index;
+                      state.dragOverIndex === index &&
+                      state.draggedIndex !== index;
 
                     return (
                       <div
@@ -1868,8 +1927,14 @@ export default function CottageDetailsUpdate() {
                     type="button"
                     variant="destructive"
                     onClick={() => {
-                      setDeleteConfirmText("");
-                      setDeleteDialogOpen(true);
+                      dispatch({
+                        type: "SET_DELETE_CONFIRM_TEXT",
+                        payload: "",
+                      });
+                      dispatch({
+                        type: "SET_DELETE_DIALOG_OPEN",
+                        payload: true,
+                      });
                     }}
                     disabled={deleteMutation.isPending}
                   >
@@ -1883,10 +1948,12 @@ export default function CottageDetailsUpdate() {
             </Card>
 
             <Dialog
-              open={deleteDialogOpen}
+              open={state.deleteDialogOpen}
               onOpenChange={(open) => {
-                setDeleteDialogOpen(open);
-                if (!open) setDeleteConfirmText("");
+                dispatch({ type: "SET_DELETE_DIALOG_OPEN", payload: open });
+                if (!open) {
+                  dispatch({ type: "SET_DELETE_CONFIRM_TEXT", payload: "" });
+                }
               }}
             >
               <DialogContent>
@@ -1906,8 +1973,13 @@ export default function CottageDetailsUpdate() {
                   </Label>
                   <Input
                     id="delete-confirm-input"
-                    value={deleteConfirmText}
-                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    value={state.deleteConfirmText}
+                    onChange={(e) =>
+                      dispatch({
+                        type: "SET_DELETE_CONFIRM_TEXT",
+                        payload: e.target.value,
+                      })
+                    }
                     placeholder={t("properties.deleteTypeToConfirmPlaceholder")}
                     autoComplete="off"
                   />
@@ -1920,7 +1992,9 @@ export default function CottageDetailsUpdate() {
                 <DialogFooter>
                   <Button
                     variant="outline"
-                    onClick={() => setDeleteDialogOpen(false)}
+                    onClick={() =>
+                      dispatch({ type: "SET_DELETE_DIALOG_OPEN", payload: false })
+                    }
                     disabled={deleteMutation.isPending}
                   >
                     {t("common.cancel")}
@@ -1953,8 +2027,8 @@ export default function CottageDetailsUpdate() {
             {t("propertyDetails.raw.title") ?? "Raw Property Data"} (Debug)
           </summary>
           <div className="space-y-3 p-4 pt-0">
-            <CopyBlock label="API Response (CottageAdminList)" data={cottage} />
-            <CopyBlock label="Current Form State" data={state} />
+            <CopyBlock label="API Response" data={cottage} />
+            <CopyBlock label="Form State" data={state} />
           </div>
         </details>
       </form>

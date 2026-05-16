@@ -41,7 +41,11 @@ const PriceInput = React.forwardRef<HTMLInputElement, PriceInputProps>(
       onChange?.(raw)
     }
 
-    const maskedValue = value ? maskitoTransform(value, options) : ""
+    const normalizedValue =
+      typeof value === "string" ? value : value == null ? "" : String(value)
+    const maskedValue = normalizedValue
+      ? maskitoTransform(normalizedValue, options)
+      : ""
 
     return (
       <div className="relative">
