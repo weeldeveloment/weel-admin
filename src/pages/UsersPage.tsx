@@ -72,6 +72,11 @@ export default function UsersPage() {
         fetchAllPages<AdminPartner>('/admin-auth/users/partners/'),
         fetchAllPages<AdminClient>('/admin-auth/users/clients/'),
       ])
+      console.log('clientsData count:', clientsData?.length, 'partnersData count:', partnersData?.length)
+      if (clientsData?.length === 0) {
+        const check = await api.get('/admin-auth/users/clients/', { params: { page: 1, page_size: 10 } })
+        console.log('clients raw response:', JSON.stringify(check.data))
+      }
       setPartners(partnersData)
       setClients(clientsData)
     } catch (err: unknown) {
@@ -140,6 +145,7 @@ export default function UsersPage() {
                 <tr className="border-b border-border bg-muted/50">
                   <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.name')}</th>
                   <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.phone')}</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.registered')}</th>
                   <th className="px-4 md:px-6 py-3 md:py-4 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('users.table.action')}</th>
                 </tr>
               </thead>
@@ -191,6 +197,21 @@ export default function UsersPage() {
                               >
                                 {user.phone_number}
                               </a>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 md:px-6 py-3 md:py-4">
+                            {user.created_at ? (
+                              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                                {new Date(user.created_at).toLocaleDateString(undefined, {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
                             ) : (
                               <span className="text-sm text-muted-foreground">-</span>
                             )}

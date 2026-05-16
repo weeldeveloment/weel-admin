@@ -61,6 +61,7 @@ const resources = {
         table: {
           name: 'Name',
           phone: 'Phone',
+          registered: 'Registered',
           status: 'Status',
           action: 'Action',
         },
@@ -532,6 +533,7 @@ const resources = {
         table: {
           name: 'Имя',
           phone: 'Телефон',
+          registered: 'Зарегистрирован',
           status: 'Статус',
           action: 'Действие',
         },
@@ -1003,6 +1005,7 @@ const resources = {
         table: {
           name: 'Ism',
           phone: 'Telefon',
+          registered: 'Ro‘yxatdan o‘tgan',
           status: 'Holat',
           action: 'Amal',
         },
