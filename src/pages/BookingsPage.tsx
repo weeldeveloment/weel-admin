@@ -145,7 +145,7 @@ export default function BookingsPage() {
         params.status = 'pending'
         break
       case 'booked':
-        params.status = 'confirmed,checked_in'
+        params.status = 'confirmed'
         break
       case 'cancelled':
         params.status = 'cancelled'

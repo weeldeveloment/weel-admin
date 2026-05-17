@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useReducer, useRef } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api";
 import { resolveImageUrl, cn } from "@/lib/utils";
 import { formatUzbekPhoneNumber, getPhoneHref } from "@/lib/phone";
+import { fetchAllPartners, type PartnerDetails } from "@/lib/partners";
 import type {
   ApartmentAdminList,
   ApartmentAdminUpdate,
@@ -365,6 +366,11 @@ export default function ApartmentDetailsUpdate() {
     draggedIndex: null,
     dragOverIndex: null,
   });
+  const [selectedPartnerId, setSelectedPartnerId] = useState("");
+  const [partnerSearchTerm, setPartnerSearchTerm] = useState("");
+  const [pendingCreateImages, setPendingCreateImages] = useState<
+    Array<{ file: File; previewUrl: string }>
+  >([]);
   const { form, savedMessage, imageMessage, draggedIndex, dragOverIndex } = state;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -389,23 +395,108 @@ export default function ApartmentDetailsUpdate() {
     queryFn: () => fetchPrefectures(form.district_id),
     enabled: Boolean(form.district_id),
   });
+  const partnersQuery = useQuery({
+    queryKey: ["adminPartners"],
+    queryFn: fetchAllPartners,
+  });
+  const partnerOptions = useMemo(
+    () =>
+      (partnersQuery.data ?? [])
+        .filter((partner): partner is PartnerDetails & { id: number } =>
+          typeof partner.id === "number",
+        )
+        .sort((a, b) => {
+          const nameA =
+            a.full_name ||
+            [a.first_name, a.last_name].filter(Boolean).join(" ") ||
+            a.username ||
+            "";
+          const nameB =
+            b.full_name ||
+            [b.first_name, b.last_name].filter(Boolean).join(" ") ||
+            b.username ||
+            "";
+          return nameA.localeCompare(nameB);
+        }),
+    [partnersQuery.data],
+  );
+  const selectedPartner = useMemo(
+    () =>
+      partnerOptions.find((partner) => String(partner.id) === selectedPartnerId) ??
+      null,
+    [partnerOptions, selectedPartnerId],
+  );
+  const filteredPartnerOptions = useMemo(() => {
+    const q = partnerSearchTerm.trim().toLowerCase();
+    if (!q) return partnerOptions;
+    return partnerOptions.filter((partner) => {
+      const fullName =
+        partner.full_name ||
+        [partner.first_name, partner.last_name].filter(Boolean).join(" ") ||
+        "";
+      const haystack = [
+        fullName,
+        partner.username,
+        partner.phone_number,
+        partner.email,
+        String(partner.id),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [partnerOptions, partnerSearchTerm]);
 
-  const apartment = apartmentQuery.data;
+  const apartment =
+    apartmentQuery.data ??
+    ({
+      guid: "",
+      title: form.title,
+      img: [],
+      services: [],
+      is_favorite: false,
+      is_allowed_corporate: false,
+      created_at: "",
+      property_type_id: "",
+      property_type: {},
+      average_rating: null,
+      partner_user: undefined,
+      is_verified: form.is_verified,
+      is_archived: form.is_archived,
+    } as ApartmentAdminList);
 
   useEffect(() => {
-    if (!apartment) return;
-    dispatch({ type: "loadFromApartment", apartment });
-  }, [apartment]);
+    if (!apartmentQuery.data) return;
+    dispatch({ type: "loadFromApartment", apartment: apartmentQuery.data });
+  }, [apartmentQuery.data]);
 
   const updateMutation = useMutation({
     mutationFn: (payload: ApartmentAdminUpdate) => {
       if (isCreateMode) {
-        return createApartment(payload);
+        return createApartment({
+          ...payload,
+          partner_user_id: Number(selectedPartnerId),
+        });
       }
       return updateApartment(propertyId!, payload);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (isCreateMode) {
+        for (const pending of pendingCreateImages) {
+          try {
+            await uploadApartmentImage(data.guid, pending.file);
+          } catch {
+            dispatch({
+              type: "setImageMessage",
+              value:
+                t("propertyDetails.messages.imageUpdateFailed") ??
+                "Failed to update image",
+            });
+          }
+        }
+        pendingCreateImages.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+        setPendingCreateImages([]);
         queryClient.invalidateQueries({ queryKey: ["properties"] });
         navigate(`/properties/apartments/${data.guid}`);
         return;
@@ -507,6 +598,15 @@ export default function ApartmentDetailsUpdate() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!propertyId) return;
+    if (isCreateMode && !selectedPartnerId) {
+      dispatch({
+        type: "setSavedMessage",
+        value:
+          t("properties.partnerSelectRequired") ??
+          "Select a partner before creating a property.",
+      });
+      return;
+    }
     const missing: string[] = [];
     if (!form.title.trim()) missing.push("title");
     if (!form.currency) missing.push("currency");
@@ -561,8 +661,13 @@ export default function ApartmentDetailsUpdate() {
     updateMutation.mutate(payload);
   };
 
-  const currentImageCount = apartment?.img?.length ?? 0;
+  const currentImageCount = isCreateMode
+    ? pendingCreateImages.length
+    : (apartment?.img?.length ?? 0);
   const isMaxImages = currentImageCount >= MAX_IMAGES;
+  const imageItems = isCreateMode
+    ? pendingCreateImages.map((item) => item.previewUrl)
+    : (apartment.img ?? []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -578,7 +683,13 @@ export default function ApartmentDetailsUpdate() {
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
-    uploadImageMutation.mutate(file);
+    if (isCreateMode) {
+      const previewUrl = URL.createObjectURL(file);
+      setPendingCreateImages((prev) => [...prev, { file, previewUrl }]);
+      dispatch({ type: "setImageMessage", value: null });
+    } else {
+      uploadImageMutation.mutate(file);
+    }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -604,11 +715,20 @@ export default function ApartmentDetailsUpdate() {
       dispatch({ type: "setDragOverIndex", value: null });
       return;
     }
-    const currentImages = apartment?.img ?? [];
-    const newImages = [...currentImages];
-    const [removed] = newImages.splice(dragIndex, 1);
-    newImages.splice(dropIndex, 0, removed);
-    imagesUpdateMutation.mutate(newImages);
+    if (isCreateMode) {
+      setPendingCreateImages((prev) => {
+        const reordered = [...prev];
+        const [removed] = reordered.splice(dragIndex, 1);
+        reordered.splice(dropIndex, 0, removed);
+        return reordered;
+      });
+    } else {
+      const currentImages = apartment?.img ?? [];
+      const newImages = [...currentImages];
+      const [removed] = newImages.splice(dragIndex, 1);
+      newImages.splice(dropIndex, 0, removed);
+      imagesUpdateMutation.mutate(newImages);
+    }
     dispatch({ type: "setDraggedIndex", value: null });
     dispatch({ type: "setDragOverIndex", value: null });
   };
@@ -619,6 +739,16 @@ export default function ApartmentDetailsUpdate() {
   };
 
   const handleDeleteImage = (index: number) => {
+    if (isCreateMode) {
+      setPendingCreateImages((prev) => {
+        const removed = prev[index];
+        if (removed) {
+          URL.revokeObjectURL(removed.previewUrl);
+        }
+        return prev.filter((_, i) => i !== index);
+      });
+      return;
+    }
     const currentImages = apartment?.img ?? [];
     const imageId = currentImages[index];
     if (!imageId) return;
@@ -636,7 +766,7 @@ export default function ApartmentDetailsUpdate() {
     [prefecturesQuery.data],
   );
 
-  if (apartmentQuery.isLoading) {
+  if (!isCreateMode && apartmentQuery.isLoading) {
     return (
       <div className="h-full overflow-y-auto p-4 md:p-6">
         <Skeleton className="mb-4 h-8 w-64" />
@@ -648,7 +778,7 @@ export default function ApartmentDetailsUpdate() {
     );
   }
 
-  if (apartmentQuery.error || !apartment) {
+  if (!isCreateMode && (apartmentQuery.error || !apartment)) {
     return (
       <div className="h-full overflow-y-auto p-4 md:p-6">
         <p className="text-sm text-red-600">
@@ -663,8 +793,17 @@ export default function ApartmentDetailsUpdate() {
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <div className="mb-4 flex items-center gap-3">
-        <h1 className="text-xl font-bold md:text-2xl">{apartment.title}</h1>
+        <h1 className="text-xl font-bold md:text-2xl">
+          {isCreateMode
+            ? t("properties.createPageTitle", {
+                type: t("properties.tabs.apartments"),
+              })
+            : apartment.title}
+        </h1>
         <div className="ml-auto flex items-center gap-2">
+          {isCreateMode ? (
+            <Badge variant="outline">{t("properties.createModeBadge")}</Badge>
+          ) : null}
           {apartment.is_verified ? (
             <Badge variant="default">{t("properties.verified")}</Badge>
           ) : (
@@ -677,6 +816,13 @@ export default function ApartmentDetailsUpdate() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {isCreateMode ? (
+          <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+            {t("properties.createModeDescription", {
+              type: t("properties.tabs.apartments"),
+            })}
+          </div>
+        ) : null}
         {savedMessage && (
           <div className="rounded-md border bg-green-50 px-4 py-2 text-sm text-green-700">
             {savedMessage}
@@ -1087,7 +1233,7 @@ export default function ApartmentDetailsUpdate() {
                 )}
 
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-                  {apartment.img?.map((src, index) => {
+                  {imageItems.map((src, index) => {
                     const isDragged = draggedIndex === index;
                     const isDropTarget =
                       dragOverIndex === index && draggedIndex !== index;
@@ -1112,7 +1258,7 @@ export default function ApartmentDetailsUpdate() {
                         )}
                       >
                         <img
-                          src={resolveImageUrl(src)}
+                          src={isCreateMode ? src : resolveImageUrl(src)}
                           alt={`${apartment.title} ${index + 1}`}
                           className="pointer-events-none h-full w-full object-cover"
                           draggable={false}
@@ -1192,7 +1338,94 @@ export default function ApartmentDetailsUpdate() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {apartment.partner_user ? (
+                {isCreateMode ? (
+                  <>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="partner_user_id">
+                        {t("properties.partnerInfo")}
+                      </Label>
+                      <Input
+                        value={partnerSearchTerm}
+                        onChange={(e) => setPartnerSearchTerm(e.target.value)}
+                        placeholder={
+                          t("properties.partnerSearchPlaceholder") ??
+                          "Search partner by name, username, phone..."
+                        }
+                      />
+                      <Select
+                        value={selectedPartnerId}
+                        onValueChange={(value) => {
+                          setSelectedPartnerId(value);
+                          dispatch({ type: "setSavedMessage", value: null });
+                        }}
+                      >
+                        <SelectTrigger id="partner_user_id">
+                          <SelectValue
+                            placeholder={
+                              t("properties.selectPartner") ??
+                              "Select an existing partner"
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filteredPartnerOptions.map((partner) => {
+                            const name =
+                              partner.full_name ||
+                              [partner.first_name, partner.last_name]
+                                .filter(Boolean)
+                                .join(" ") ||
+                              partner.username ||
+                              String(partner.id);
+                            const phone = partner.phone_number
+                              ? ` • ${partner.phone_number}`
+                              : "";
+                            return (
+                              <SelectItem
+                                key={partner.id}
+                                value={String(partner.id)}
+                              >
+                                {`${name}${phone}`}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      {!partnersQuery.isLoading &&
+                      !partnersQuery.isError &&
+                      filteredPartnerOptions.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("properties.noPartnerMatches")}
+                        </p>
+                      ) : null}
+                      {partnersQuery.isLoading ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("common.loading")}
+                        </p>
+                      ) : null}
+                      {partnersQuery.isError ? (
+                        <p className="text-xs text-red-600">
+                          {t("properties.partnerLoadFailed") ??
+                            "Failed to load partners."}
+                        </p>
+                      ) : null}
+                    </div>
+                    {selectedPartner ? (
+                      <div className="space-y-1 md:col-span-2">
+                        <p className="text-sm font-medium">
+                          {selectedPartner.full_name ||
+                            [selectedPartner.first_name, selectedPartner.last_name]
+                              .filter(Boolean)
+                              .join(" ") ||
+                            selectedPartner.username ||
+                            "-"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {selectedPartner.phone_number || "-"}
+                        </p>
+                      </div>
+                    ) : null}
+                  </>
+                ) : apartment.partner_user ? (
                   <>
                     <div className="space-y-1 md:col-span-2">
                       <div className="flex items-center gap-3">
@@ -1428,7 +1661,13 @@ export default function ApartmentDetailsUpdate() {
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={updateMutation.isPending}>
             <Save className="mr-2 h-4 w-4" />
-            {updateMutation.isPending ? t("common.saving") : t("common.save")}
+            {updateMutation.isPending
+              ? isCreateMode
+                ? t("common.creating")
+                : t("common.saving")
+              : isCreateMode
+                ? t("common.create")
+                : t("common.save")}
           </Button>
         </div>
 

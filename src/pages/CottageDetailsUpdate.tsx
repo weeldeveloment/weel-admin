@@ -4,6 +4,7 @@ import {
   useMemo,
   useRef,
   useReducer,
+  useState,
 } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api";
 import { resolveImageUrl, cn } from "@/lib/utils";
 import { formatUzbekPhoneNumber, getPhoneHref } from "@/lib/phone";
+import { fetchAllPartners, type PartnerDetails } from "@/lib/partners";
 import type {
   CottageAdminList,
   CottageAdminUpdate,
@@ -290,7 +292,22 @@ const initialState: State = {
   descUz: "",
   amenities: [],
   currency: "USD",
-  price: [],
+  price: [
+    {
+      month_from: getMonthRange(0).from,
+      month_to: getMonthRange(0).to,
+      price_per_person: "10",
+      price_on_working_days: "100",
+      price_on_weekends: "100",
+    },
+    {
+      month_from: getMonthRange(1).from,
+      month_to: getMonthRange(1).to,
+      price_per_person: "10",
+      price_on_working_days: "100",
+      price_on_weekends: "100",
+    },
+  ],
   location: {
     latitude: "",
     longitude: "",
@@ -601,6 +618,11 @@ export default function CottageDetailsUpdate() {
   const navigate = useNavigate();
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string>("");
+  const [partnerSearchTerm, setPartnerSearchTerm] = useState("");
+  const [pendingCreateImages, setPendingCreateImages] = useState<
+    Array<{ file: File; previewUrl: string }>
+  >([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const savedMessageTimerRef = useRef<number | null>(null);
   const imageMessageTimerRef = useRef<number | null>(null);
@@ -629,8 +651,60 @@ export default function CottageDetailsUpdate() {
   const servicesQuery = useQuery({
     queryKey: ["services", state.data?.property_type_id],
     queryFn: () => fetchServices(state.data?.property_type_id),
-    enabled: Boolean(state.data?.property_type_id),
+    enabled: isCreateMode || Boolean(state.data?.property_type_id),
   });
+  const partnersQuery = useQuery({
+    queryKey: ["adminPartners"],
+    queryFn: fetchAllPartners,
+  });
+  const partnerOptions = useMemo(
+    () =>
+      (partnersQuery.data ?? [])
+        .filter((partner): partner is PartnerDetails & { id: number } =>
+          typeof partner.id === "number",
+        )
+        .sort((a, b) => {
+          const nameA =
+            a.full_name ||
+            [a.first_name, a.last_name].filter(Boolean).join(" ") ||
+            a.username ||
+            "";
+          const nameB =
+            b.full_name ||
+            [b.first_name, b.last_name].filter(Boolean).join(" ") ||
+            b.username ||
+            "";
+          return nameA.localeCompare(nameB);
+        }),
+    [partnersQuery.data],
+  );
+  const selectedPartner = useMemo(
+    () =>
+      partnerOptions.find((partner) => String(partner.id) === selectedPartnerId) ??
+      null,
+    [partnerOptions, selectedPartnerId],
+  );
+  const filteredPartnerOptions = useMemo(() => {
+    const q = partnerSearchTerm.trim().toLowerCase();
+    if (!q) return partnerOptions;
+    return partnerOptions.filter((partner) => {
+      const fullName =
+        partner.full_name ||
+        [partner.first_name, partner.last_name].filter(Boolean).join(" ") ||
+        "";
+      const haystack = [
+        fullName,
+        partner.username,
+        partner.phone_number,
+        partner.email,
+        String(partner.id),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [partnerOptions, partnerSearchTerm]);
 
   /* hydrate once from query */
   useEffect(() => {
@@ -655,12 +729,30 @@ export default function CottageDetailsUpdate() {
   const updateMutation = useMutation({
     mutationFn: async (payload: CottageAdminUpdate) => {
       const result = isCreateMode
-        ? await createCottage(payload)
+        ? await createCottage({
+            ...payload,
+            partner_user_id: Number(selectedPartnerId),
+          })
         : await updateCottage(propertyId!, payload);
       return result;
     },
     onSuccess: async (result) => {
       if (isCreateMode) {
+        for (const pending of pendingCreateImages) {
+          try {
+            await uploadCottageImage(result.guid, pending.file);
+          } catch {
+            // keep create success; image failures are surfaced as a message
+            dispatch({
+              type: "SET_ERROR_MESSAGE",
+              payload:
+                t("propertyDetails.messages.imageUpdateFailed") ??
+                "Failed to update image",
+            });
+          }
+        }
+        pendingCreateImages.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+        setPendingCreateImages([]);
         queryClient.invalidateQueries({ queryKey: ["properties"] });
         navigate(`/properties/cottages/${result.guid}`);
         return;
@@ -822,6 +914,15 @@ export default function CottageDetailsUpdate() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!propertyId) return;
+    if (isCreateMode && !selectedPartnerId) {
+      dispatch({
+        type: "SET_ERROR_MESSAGE",
+        payload:
+          t("properties.partnerSelectRequired") ??
+          "Select a partner before creating a property.",
+      });
+      return;
+    }
 
     const scalarPrices = extractScalarPrices(state.price);
 
@@ -886,8 +987,13 @@ export default function CottageDetailsUpdate() {
 
   /* ───── images ───── */
 
-  const currentImageCount = state.data?.img?.length ?? 0;
+  const currentImageCount = isCreateMode
+    ? pendingCreateImages.length
+    : (state.data?.img?.length ?? 0);
   const isMaxImages = currentImageCount >= MAX_IMAGES;
+  const imageItems = isCreateMode
+    ? pendingCreateImages.map((item) => item.previewUrl)
+    : (state.data?.img ?? []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -908,7 +1014,13 @@ export default function CottageDetailsUpdate() {
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
-    uploadImageMutation.mutate(file);
+    if (isCreateMode) {
+      const previewUrl = URL.createObjectURL(file);
+      setPendingCreateImages((prev) => [...prev, { file, previewUrl }]);
+      dispatch({ type: "SET_IMAGE_MESSAGE", payload: null });
+    } else {
+      uploadImageMutation.mutate(file);
+    }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -934,11 +1046,20 @@ export default function CottageDetailsUpdate() {
       dispatch({ type: "SET_DRAG_OVER_INDEX", payload: null });
       return;
     }
-    const currentImages = state.data?.img ?? [];
-    const newImages = [...currentImages];
-    const [removed] = newImages.splice(dragIndex, 1);
-    newImages.splice(dropIndex, 0, removed);
-    imagesUpdateMutation.mutate(newImages);
+    if (isCreateMode) {
+      setPendingCreateImages((prev) => {
+        const reordered = [...prev];
+        const [removed] = reordered.splice(dragIndex, 1);
+        reordered.splice(dropIndex, 0, removed);
+        return reordered;
+      });
+    } else {
+      const currentImages = state.data?.img ?? [];
+      const newImages = [...currentImages];
+      const [removed] = newImages.splice(dragIndex, 1);
+      newImages.splice(dropIndex, 0, removed);
+      imagesUpdateMutation.mutate(newImages);
+    }
     dispatch({ type: "SET_DRAGGED_INDEX", payload: null });
     dispatch({ type: "SET_DRAG_OVER_INDEX", payload: null });
   };
@@ -949,6 +1070,16 @@ export default function CottageDetailsUpdate() {
   };
 
   const handleDeleteImage = (index: number) => {
+    if (isCreateMode) {
+      setPendingCreateImages((prev) => {
+        const removed = prev[index];
+        if (removed) {
+          URL.revokeObjectURL(removed.previewUrl);
+        }
+        return prev.filter((_, i) => i !== index);
+      });
+      return;
+    }
     const currentImages = state.data?.img ?? [];
     imagesUpdateMutation.mutate(currentImages.filter((_, i) => i !== index));
   };
@@ -969,7 +1100,7 @@ export default function CottageDetailsUpdate() {
 
   /* ───── loading / error states ───── */
 
-  if (cottageQuery.isLoading) {
+  if (!isCreateMode && cottageQuery.isLoading) {
     return (
       <div className="h-full overflow-y-auto p-4 md:p-6">
         <Skeleton className="mb-4 h-8 w-64" />
@@ -981,7 +1112,7 @@ export default function CottageDetailsUpdate() {
     );
   }
 
-  if (cottageQuery.error || !state.data) {
+  if (!isCreateMode && (cottageQuery.error || !state.data)) {
     return (
       <div className="h-full overflow-y-auto p-4 md:p-6">
         <p className="text-sm text-red-600">
@@ -991,7 +1122,25 @@ export default function CottageDetailsUpdate() {
     );
   }
 
-  const cottage = state.data;
+  const cottage =
+    state.data ??
+    ({
+      guid: "",
+      title: state.title,
+      img: [],
+      services: [],
+      region: {},
+      district: { region: {} },
+      is_favorite: false,
+      is_allowed_corporate: state.allowedCorp,
+      created_at: "",
+      property_type_id: "",
+      property_type: {},
+      average_rating: null,
+      partner_user: undefined,
+      is_verified: state.isVerified,
+      is_archived: state.isArchived,
+    } as CottageAdminList);
   const deleteTitleToMatch = (cottage.title ?? "").trim();
   const deleteIsConfirmed =
     state.deleteConfirmText.trim() === deleteTitleToMatch;
@@ -999,8 +1148,17 @@ export default function CottageDetailsUpdate() {
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <div className="mb-4 flex items-center gap-3">
-        <h1 className="text-xl font-bold md:text-2xl">{cottage.title}</h1>
+        <h1 className="text-xl font-bold md:text-2xl">
+          {isCreateMode
+            ? t("properties.createPageTitle", {
+                type: t("properties.tabs.cottages"),
+              })
+            : cottage.title}
+        </h1>
         <div className="ml-auto flex items-center gap-2">
+          {isCreateMode ? (
+            <Badge variant="outline">{t("properties.createModeBadge")}</Badge>
+          ) : null}
           {cottage.is_verified ? (
             <Badge variant="default">{t("properties.verified")}</Badge>
           ) : (
@@ -1013,6 +1171,13 @@ export default function CottageDetailsUpdate() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {isCreateMode ? (
+          <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+            {t("properties.createModeDescription", {
+              type: t("properties.tabs.cottages"),
+            })}
+          </div>
+        ) : null}
         {state.savedMessage && (
           <div className="rounded-md border bg-green-50 px-4 py-2 text-sm text-green-700">
             {state.savedMessage}
@@ -1613,7 +1778,7 @@ export default function CottageDetailsUpdate() {
                 )}
 
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-                  {cottage.img?.map((src, index) => {
+                  {imageItems.map((src, index) => {
                     const isDragged = state.draggedIndex === index;
                     const isDropTarget =
                       state.dragOverIndex === index &&
@@ -1639,7 +1804,7 @@ export default function CottageDetailsUpdate() {
                         )}
                       >
                         <img
-                          src={resolveImageUrl(src)}
+                          src={isCreateMode ? src : resolveImageUrl(src)}
                           alt={`${cottage.title} ${index + 1}`}
                           className="pointer-events-none h-full w-full object-cover"
                           draggable={false}
@@ -1720,7 +1885,94 @@ export default function CottageDetailsUpdate() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {cottage.partner_user ? (
+                {isCreateMode ? (
+                  <>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="partner_user_id">
+                        {t("properties.partnerInfo")}
+                      </Label>
+                      <Input
+                        value={partnerSearchTerm}
+                        onChange={(e) => setPartnerSearchTerm(e.target.value)}
+                        placeholder={
+                          t("properties.partnerSearchPlaceholder") ??
+                          "Search partner by name, username, phone..."
+                        }
+                      />
+                      <Select
+                        value={selectedPartnerId}
+                        onValueChange={(value) => {
+                          setSelectedPartnerId(value);
+                          dispatch({ type: "SET_ERROR_MESSAGE", payload: null });
+                        }}
+                      >
+                        <SelectTrigger id="partner_user_id">
+                          <SelectValue
+                            placeholder={
+                              t("properties.selectPartner") ??
+                              "Select an existing partner"
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filteredPartnerOptions.map((partner) => {
+                            const name =
+                              partner.full_name ||
+                              [partner.first_name, partner.last_name]
+                                .filter(Boolean)
+                                .join(" ") ||
+                              partner.username ||
+                              String(partner.id);
+                            const phone = partner.phone_number
+                              ? ` • ${partner.phone_number}`
+                              : "";
+                            return (
+                              <SelectItem
+                                key={partner.id}
+                                value={String(partner.id)}
+                              >
+                                {`${name}${phone}`}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      {!partnersQuery.isLoading &&
+                      !partnersQuery.isError &&
+                      filteredPartnerOptions.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("properties.noPartnerMatches")}
+                        </p>
+                      ) : null}
+                      {partnersQuery.isLoading ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("common.loading")}
+                        </p>
+                      ) : null}
+                      {partnersQuery.isError ? (
+                        <p className="text-xs text-red-600">
+                          {t("properties.partnerLoadFailed") ??
+                            "Failed to load partners."}
+                        </p>
+                      ) : null}
+                    </div>
+                    {selectedPartner ? (
+                      <div className="space-y-1 md:col-span-2">
+                        <p className="text-sm font-medium">
+                          {selectedPartner.full_name ||
+                            [selectedPartner.first_name, selectedPartner.last_name]
+                              .filter(Boolean)
+                              .join(" ") ||
+                            selectedPartner.username ||
+                            "-"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {selectedPartner.phone_number || "-"}
+                        </p>
+                      </div>
+                    ) : null}
+                  </>
+                ) : cottage.partner_user ? (
                   <>
                     <div className="space-y-1 md:col-span-2">
                       <div className="flex items-center gap-3">
@@ -1923,134 +2175,149 @@ export default function CottageDetailsUpdate() {
                   </Select>
                 </div>
 
-                <Separator className="md:col-span-2" />
+                {!isCreateMode ? (
+                  <>
+                    <Separator className="md:col-span-2" />
 
-                <div className="space-y-1 text-sm text-muted-foreground md:col-span-2">
-                  <p>
-                    <span className="font-medium">GUID:</span> {cottage.guid}
-                  </p>
-                  <p>
-                    <span className="font-medium">
-                      {t("properties.createdAt")}:
-                    </span>{" "}
-                    {formatDateTime(cottage.created_at)}
-                  </p>
-                  <p>
-                    <span className="font-medium">
-                      {t("properties.averageRating")}:
-                    </span>{" "}
-                    {cottage.average_rating ?? "-"}
-                  </p>
-                  <p>
-                    <span className="font-medium">
-                      {t("properties.propertyType")}:
-                    </span>{" "}
-                    {cottage.property_type?.uz ??
-                      cottage.property_type?.ru ??
-                      cottage.property_type?.en ??
-                      "-"}
-                  </p>
-                </div>
+                    <div className="space-y-1 text-sm text-muted-foreground md:col-span-2">
+                      <p>
+                        <span className="font-medium">GUID:</span> {cottage.guid}
+                      </p>
+                      <p>
+                        <span className="font-medium">
+                          {t("properties.createdAt")}:
+                        </span>{" "}
+                        {formatDateTime(cottage.created_at)}
+                      </p>
+                      <p>
+                        <span className="font-medium">
+                          {t("properties.averageRating")}:
+                        </span>{" "}
+                        {cottage.average_rating ?? "-"}
+                      </p>
+                      <p>
+                        <span className="font-medium">
+                          {t("properties.propertyType")}:
+                        </span>{" "}
+                        {cottage.property_type?.uz ??
+                          cottage.property_type?.ru ??
+                          cottage.property_type?.en ??
+                          "-"}
+                      </p>
+                    </div>
 
-                <Separator className="md:col-span-2" />
+                    <Separator className="md:col-span-2" />
 
-                <div className="md:col-span-2">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => {
-                      dispatch({
-                        type: "SET_DELETE_CONFIRM_TEXT",
-                        payload: "",
-                      });
-                      dispatch({
-                        type: "SET_DELETE_DIALOG_OPEN",
-                        payload: true,
-                      });
-                    }}
-                    disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {deleteMutation.isPending
-                      ? t("properties.deleting")
-                      : t("properties.deleteCottage")}
-                  </Button>
-                </div>
+                    <div className="md:col-span-2">
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => {
+                          dispatch({
+                            type: "SET_DELETE_CONFIRM_TEXT",
+                            payload: "",
+                          });
+                          dispatch({
+                            type: "SET_DELETE_DIALOG_OPEN",
+                            payload: true,
+                          });
+                        }}
+                        disabled={deleteMutation.isPending}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {deleteMutation.isPending
+                          ? t("properties.deleting")
+                          : t("properties.deleteCottage")}
+                      </Button>
+                    </div>
+                  </>
+                ) : null}
               </CardContent>
             </Card>
 
-            <Dialog
-              open={state.deleteDialogOpen}
-              onOpenChange={(open) => {
-                dispatch({ type: "SET_DELETE_DIALOG_OPEN", payload: open });
-                if (!open) {
-                  dispatch({ type: "SET_DELETE_CONFIRM_TEXT", payload: "" });
-                }
-              }}
-            >
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    {t("properties.deleteConfirmTitle")}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {t("properties.deleteConfirmDescription", {
-                      title: cottage.title,
-                    })}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-2">
-                  <Label htmlFor="delete-confirm-input">
-                    {t("properties.deleteTypeToConfirmLabel")}
-                  </Label>
-                  <Input
-                    id="delete-confirm-input"
-                    value={state.deleteConfirmText}
-                    onChange={(e) =>
-                      dispatch({
-                        type: "SET_DELETE_CONFIRM_TEXT",
-                        payload: e.target.value,
-                      })
-                    }
-                    placeholder={t("properties.deleteTypeToConfirmPlaceholder")}
-                    autoComplete="off"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    {t("properties.deleteTypeToConfirmHint", {
-                      title: cottage.title,
-                    })}
-                  </p>
-                </div>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() =>
-                      dispatch({ type: "SET_DELETE_DIALOG_OPEN", payload: false })
-                    }
-                    disabled={deleteMutation.isPending}
-                  >
-                    {t("common.cancel")}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => deleteMutation.mutate()}
-                    disabled={deleteMutation.isPending || !deleteIsConfirmed}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {deleteMutation.isPending
-                      ? t("properties.deleting")
-                      : t("properties.confirmDelete")}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            {!isCreateMode ? (
+              <Dialog
+                open={state.deleteDialogOpen}
+                onOpenChange={(open) => {
+                  dispatch({ type: "SET_DELETE_DIALOG_OPEN", payload: open });
+                  if (!open) {
+                    dispatch({ type: "SET_DELETE_CONFIRM_TEXT", payload: "" });
+                  }
+                }}
+              >
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {t("properties.deleteConfirmTitle")}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {t("properties.deleteConfirmDescription", {
+                        title: cottage.title,
+                      })}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-2">
+                    <Label htmlFor="delete-confirm-input">
+                      {t("properties.deleteTypeToConfirmLabel")}
+                    </Label>
+                    <Input
+                      id="delete-confirm-input"
+                      value={state.deleteConfirmText}
+                      onChange={(e) =>
+                        dispatch({
+                          type: "SET_DELETE_CONFIRM_TEXT",
+                          payload: e.target.value,
+                        })
+                      }
+                      placeholder={t("properties.deleteTypeToConfirmPlaceholder")}
+                      autoComplete="off"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      {t("properties.deleteTypeToConfirmHint", {
+                        title: cottage.title,
+                      })}
+                    </p>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        dispatch({
+                          type: "SET_DELETE_DIALOG_OPEN",
+                          payload: false,
+                        })
+                      }
+                      disabled={deleteMutation.isPending}
+                    >
+                      {t("common.cancel")}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => deleteMutation.mutate()}
+                      disabled={deleteMutation.isPending || !deleteIsConfirmed}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      {deleteMutation.isPending
+                        ? t("properties.deleting")
+                        : t("properties.confirmDelete")}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            ) : null}
           </TabsContent>
         </Tabs>
 
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={updateMutation.isPending}>
             <Save className="mr-2 h-4 w-4" />
-            {updateMutation.isPending ? t("common.saving") : t("common.save")}
+            {updateMutation.isPending
+              ? isCreateMode
+                ? t("common.creating")
+                : t("common.saving")
+              : isCreateMode
+                ? t("common.create")
+                : t("common.save")}
           </Button>
         </div>
 
