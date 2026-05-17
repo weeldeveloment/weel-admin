@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import api from '@/lib/api'
 import { useTranslation } from 'react-i18next'
 import { AdminClient, AdminPartner, PaginatedResponse } from '@/types'
+import { formatUzbekPhoneNumber, getPhoneHref } from '@/lib/phone'
 
 const getApiErrorMessage = (err: unknown): string | null => {
   if (
@@ -114,12 +115,6 @@ export default function UsersPage() {
     return Math.ceil(filtered.length / ITEMS_PER_PAGE)
   }
 
-  const getPhoneHref = (phone?: string) => {
-    if (!phone) return ''
-    const normalized = phone.replace(/[^\d+]/g, '')
-    return `tel:${normalized}`
-  }
-
   const UserTable = ({ 
     users, 
     type, 
@@ -193,9 +188,9 @@ export default function UsersPage() {
                               <a
                                 href={getPhoneHref(user.phone_number)}
                                 className="text-sm font-medium text-foreground underline-offset-2 hover:underline"
-                                aria-label={`Call ${user.phone_number}`}
+                                aria-label={`Call ${formatUzbekPhoneNumber(user.phone_number)}`}
                               >
-                                {user.phone_number}
+                                {formatUzbekPhoneNumber(user.phone_number)}
                               </a>
                             ) : (
                               <span className="text-sm text-muted-foreground">-</span>

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useReducer, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api";
 import { resolveImageUrl, cn } from "@/lib/utils";
+import { formatUzbekPhoneNumber, getPhoneHref } from "@/lib/phone";
 import type {
   ApartmentAdminList,
   ApartmentAdminUpdate,
@@ -136,6 +137,16 @@ const updateApartment = async (
 ): Promise<ApartmentAdminList> => {
   const response = await api.patch<ApartmentAdminList>(
     `/property/admin/apartments/${id}/`,
+    payload,
+  );
+  return response.data;
+};
+
+const createApartment = async (
+  payload: ApartmentAdminUpdate & { partner_user_id?: number | null },
+): Promise<ApartmentAdminList> => {
+  const response = await api.post<ApartmentAdminList>(
+    "/property/admin/apartments/",
     payload,
   );
   return response.data;
@@ -342,6 +353,8 @@ function pageReducer(state: PageState, action: PageAction): PageState {
 
 export default function ApartmentDetailsUpdate() {
   const { propertyId } = useParams<{ propertyId: string }>();
+  const isCreateMode = propertyId === "create";
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
@@ -358,7 +371,7 @@ export default function ApartmentDetailsUpdate() {
   const apartmentQuery = useQuery({
     queryKey: ["apartment", propertyId],
     queryFn: () => fetchApartment(propertyId!),
-    enabled: Boolean(propertyId),
+    enabled: Boolean(propertyId) && !isCreateMode,
   });
 
   const regionsQuery = useQuery({
@@ -385,9 +398,18 @@ export default function ApartmentDetailsUpdate() {
   }, [apartment]);
 
   const updateMutation = useMutation({
-    mutationFn: (payload: ApartmentAdminUpdate) =>
-      updateApartment(propertyId!, payload),
+    mutationFn: (payload: ApartmentAdminUpdate) => {
+      if (isCreateMode) {
+        return createApartment(payload);
+      }
+      return updateApartment(propertyId!, payload);
+    },
     onSuccess: (data) => {
+      if (isCreateMode) {
+        queryClient.invalidateQueries({ queryKey: ["properties"] });
+        navigate(`/properties/apartments/${data.guid}`);
+        return;
+      }
       queryClient.setQueryData(["apartment", propertyId], data);
       dispatch({
         type: "setSavedMessage",
@@ -525,6 +547,12 @@ export default function ApartmentDetailsUpdate() {
       is_recommended: form.is_recommended,
       description_ru: form.descRu.trim(),
       description_uz: form.descUz.trim(),
+      check_in: "14:00:00",
+      check_out: "12:00:00",
+      is_allowed_alcohol: false,
+      is_allowed_corporate: false,
+      is_allowed_pets: false,
+      is_quiet_hours: false,
       description_en:
         form.descRu.trim() || form.descUz.trim()
           ? form.descRu.trim() || form.descUz.trim()
@@ -1195,7 +1223,20 @@ export default function ApartmentDetailsUpdate() {
                               "-"}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            @{apartment.partner_user.username}
+                            {apartment.partner_user.username ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const partnerId = apartment.partner_user?.id;
+                                  if (partnerId) navigate(`/partner/${partnerId}`);
+                                }}
+                                className="text-xs text-primary hover:underline"
+                              >
+                                @{apartment.partner_user.username}
+                              </button>
+                            ) : (
+                              "-"
+                            )}
                           </p>
                         </div>
                       </div>
@@ -1225,11 +1266,11 @@ export default function ApartmentDetailsUpdate() {
                       </Label>
                       {apartment.partner_user.phone_number ? (
                         <a
-                          href={`tel:${apartment.partner_user.phone_number}`}
+                          href={getPhoneHref(apartment.partner_user.phone_number)}
                           className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                         >
                           <Phone className="h-3.5 w-3.5" />
-                          {apartment.partner_user.phone_number}
+                          {formatUzbekPhoneNumber(apartment.partner_user.phone_number)}
                         </a>
                       ) : (
                         <p className="text-sm font-medium">-</p>

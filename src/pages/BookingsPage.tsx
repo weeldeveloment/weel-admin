@@ -32,6 +32,83 @@ const statusColors: Record<string, string> = {
   no_show: 'bg-orange-500 text-orange-50',
 }
 
+const PAGE_SIZE = 20
+
+const getNumericValue = (value: unknown): number => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    const prioritizedKeys = ['count', 'value', 'adults', 'children', 'babies']
+    for (const key of prioritizedKeys) {
+      if (key in record) {
+        const parsed = getNumericValue(record[key])
+        if (parsed > 0) return parsed
+      }
+    }
+    for (const nestedValue of Object.values(record)) {
+      const parsed = getNumericValue(nestedValue)
+      if (parsed > 0) return parsed
+    }
+  }
+  return 0
+}
+
+const matchesStatusFilter = (statusFilter: string, status: string) => {
+  switch (statusFilter) {
+    case 'negotiation':
+      return status === 'pending'
+    case 'booked':
+      return status === 'confirmed' || status === 'checked_in'
+    case 'cancelled':
+      return status === 'cancelled'
+    default:
+      return true
+  }
+}
+
+const normalizeBookingPrice = (booking: Booking) => {
+  const rawPrice = booking.booking_price as unknown
+  if (!rawPrice) return null
+
+  let source: unknown = rawPrice
+  if (typeof rawPrice === 'string') {
+    try {
+      source = JSON.parse(rawPrice)
+    } catch {
+      return null
+    }
+  }
+
+  if (!source || typeof source !== 'object') return null
+  const price = source as Record<string, unknown>
+  const subtotal = getNumericValue(price.subtotal)
+  const serviceFee = getNumericValue(price.service_fee)
+  const chargeAmount = getNumericValue(price.charge_amount)
+
+  const normalizedTotal =
+    chargeAmount > 0
+      ? chargeAmount
+      : subtotal > 0 || serviceFee > 0
+        ? subtotal + serviceFee
+        : 0
+
+  if (subtotal <= 0 && serviceFee <= 0 && normalizedTotal <= 0) {
+    return null
+  }
+
+  return {
+    subtotal,
+    serviceFee,
+    total: normalizedTotal,
+  }
+}
+
 export default function BookingsPage() {
   const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
@@ -50,7 +127,7 @@ export default function BookingsPage() {
   const fetchBookings = async () => {
     const params: Record<string, string> = {
       page: currentPage.toString(),
-      page_size: '20',
+      page_size: PAGE_SIZE.toString(),
       ordering,
     }
 
@@ -63,7 +140,7 @@ export default function BookingsPage() {
         params.status = 'pending'
         break
       case 'booked':
-        params.status_in = 'confirmed,checked_in'
+        params.status = 'confirmed,checked_in'
         break
       case 'cancelled':
         params.status = 'cancelled'
@@ -73,7 +150,12 @@ export default function BookingsPage() {
     }
 
     const response = await api.get<PaginatedBookings>('/booking/admin/bookings/', { params })
-    return response.data
+    return {
+      ...response.data,
+      results: response.data.results.filter((booking) =>
+        matchesStatusFilter(statusFilter, booking.status),
+      ),
+    }
   }
 
   const {
@@ -130,14 +212,16 @@ export default function BookingsPage() {
   }
 
   const formatGuests = (booking: Booking) => {
-    const parts = [
-      t('bookings.guests.adults', { count: booking.adults }),
-    ]
-    if (booking.children > 0) {
-      parts.push(t('bookings.guests.children', { count: booking.children }))
+    const adults = getNumericValue(booking.adults)
+    const children = getNumericValue(booking.children)
+    const babies = getNumericValue(booking.babies)
+
+    const parts = [`${adults} ${t('bookings.guests.adults')}`]
+    if (children > 0) {
+      parts.push(`${children} ${t('bookings.guests.children')}`)
     }
-    if (booking.babies > 0) {
-      parts.push(t('bookings.guests.babies', { count: booking.babies }))
+    if (babies > 0) {
+      parts.push(`${babies} ${t('bookings.guests.babies')}`)
     }
     return parts.join(', ')
   }
@@ -162,6 +246,7 @@ export default function BookingsPage() {
     { value: 'negotiation', label: t('bookings.tabs.negotiation') },
     { value: 'cancelled', label: t('bookings.tabs.cancelled') },
   ]
+  const totalPages = bookingsData ? Math.max(1, Math.ceil(bookingsData.count / PAGE_SIZE)) : 1
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col bg-background">
@@ -246,8 +331,11 @@ export default function BookingsPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {bookingsData?.results.map((booking) => (
-                  <Card key={booking.guid} className="p-4 hover:shadow-md transition-shadow bg-card">
+                {bookingsData?.results.map((booking) => {
+                  const price = normalizeBookingPrice(booking)
+
+                  return (
+                    <Card key={booking.guid} className="p-4 hover:shadow-md transition-shadow bg-card">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 space-y-3">
                         {/* Top row - Booking number and status */}
@@ -257,11 +345,8 @@ export default function BookingsPage() {
                             <span className="font-semibold text-sm">
                               #{booking.booking_number}
                             </span>
-                            <Badge
-                              variant="secondary"
-                              className={statusColors[booking.status]}
-                            >
-                              {statusLabels[booking.status]}
+                            <Badge variant="secondary" className={statusColors[booking.status]}>
+                              {statusLabels[booking.status] ?? booking.status}
                             </Badge>
                             {booking.is_overdue && (
                               <span className="inline-flex items-center gap-1 text-xs text-red-600 font-semibold">
@@ -314,30 +399,36 @@ export default function BookingsPage() {
                         </div>
 
                         {/* Price info */}
-                        {booking.booking_price && (
+                        {price && (
                           <div className="flex items-center gap-4 pt-2 border-t">
                             <div className="flex items-center gap-1.5 text-sm">
                               <DollarSign className="h-4 w-4 text-muted-foreground" />
                               <div className="space-y-0.5">
                                 <div className="text-xs text-muted-foreground">
-                                  {t('bookings.price.subtotal')}: {formatCurrency(booking.booking_price.subtotal)}
+                                  {t('bookings.price.subtotal')}: {formatCurrency(price.subtotal)}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                  {t('bookings.price.serviceFee')}: {formatCurrency(booking.booking_price.service_fee)}
+                                  {t('bookings.price.serviceFee')}: {formatCurrency(price.serviceFee)}
                                 </div>
                                 <div className="font-semibold">
-                                  {t('bookings.price.total')}: {formatCurrency(booking.booking_price.charge_amount)}
+                                  {t('bookings.price.total')}: {formatCurrency(price.total)}
                                 </div>
                               </div>
                             </div>
                           </div>
                         )}
 
-                        <div className="pt-2 border-t">
-                          <p className="text-xs text-muted-foreground">
-                            Booking actions are not exposed by the current admin API.
-                          </p>
-                        </div>
+                        {(booking.confirmed_at ||
+                          booking.checked_in_at ||
+                          booking.cancelled_at ||
+                          booking.no_show_at ||
+                          booking.completed_at) && (
+                          <div className="pt-2 border-t">
+                            <p className="text-xs font-medium text-muted-foreground">
+                              {t('bookings.timestamps.title')}
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Status timestamps */}
@@ -374,8 +465,9 @@ export default function BookingsPage() {
                         )}
                       </div>
                     </div>
-                  </Card>
-                ))}
+                    </Card>
+                  )
+                })}
               </div>
             )}
 
@@ -395,14 +487,13 @@ export default function BookingsPage() {
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <span className="text-sm font-medium px-2">
-                    {t('bookings.info.page', { page: currentPage })}
-                    {bookingsData.next && '+'}
+                    {t('bookings.info.page', { page: currentPage, total: totalPages })}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={!bookingsData.next}
+                    disabled={currentPage >= totalPages}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>

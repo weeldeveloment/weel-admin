@@ -6,6 +6,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -186,7 +193,10 @@ function PropertyCard({
 
 export default function PropertiesPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<PropertyTab>('cottages')
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [createType, setCreateType] = useState<PropertyTab>('cottages')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [cottagesSearch, setCottagesSearch] = useState('')
   const [apartmentsSearch, setApartmentsSearch] = useState('')
@@ -293,6 +303,16 @@ export default function PropertiesPage() {
     ? 'grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'
     : 'flex flex-col gap-3'
 
+  const openCreateDialog = (initialType: PropertyTab) => {
+    setCreateType(initialType)
+    setCreateDialogOpen(true)
+  }
+
+  const handleCreateProperty = () => {
+    setCreateDialogOpen(false)
+    navigate(`/properties/${createType}/create`)
+  }
+
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as PropertyTab)} className="space-y-4">
@@ -353,7 +373,11 @@ export default function PropertiesPage() {
                 </Button>
               </div>
             <div className="flex items-center gap-3">
-              <Button size="sm" className="hidden sm:inline-flex">
+              <Button
+                size="sm"
+                className="hidden sm:inline-flex"
+                onClick={() => openCreateDialog('cottages')}
+              >
                 <Plus className="h-4 w-4" />
                 {t('properties.createProperty')}
               </Button>
@@ -448,7 +472,11 @@ export default function PropertiesPage() {
                 </Button>
               </div>
               <div className="flex items-center gap-3">
-                <Button size="sm" className="hidden sm:inline-flex">
+                <Button
+                  size="sm"
+                  className="hidden sm:inline-flex"
+                  onClick={() => openCreateDialog('apartments')}
+                >
                   <Plus className="h-4 w-4" />
                   {t('properties.createProperty')}
                 </Button>
@@ -491,6 +519,28 @@ export default function PropertiesPage() {
           {apartmentsQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.apartments') })}</p> : null}
         </TabsContent>
       </Tabs>
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('properties.createDialog.title')}</DialogTitle>
+            <DialogDescription>{t('properties.createDialog.description')}</DialogDescription>
+          </DialogHeader>
+          <Tabs
+            value={createType}
+            onValueChange={(value) => setCreateType(value as PropertyTab)}
+            className="space-y-4"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="cottages">{t('properties.tabs.cottages')}</TabsTrigger>
+              <TabsTrigger value="apartments">{t('properties.tabs.apartments')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button onClick={handleCreateProperty}>
+            <Plus className="h-4 w-4" />
+            {t('properties.createDialog.continue')}
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -129,7 +129,7 @@ const resources = {
         },
         info: {
           showing: 'Showing {{count}} of {{total}} bookings',
-          page: 'Page {{page}}',
+          page: 'Page {{page}} of {{total}}',
         },
         price: {
           subtotal: 'Subtotal',
@@ -137,11 +137,12 @@ const resources = {
           total: 'Total',
         },
         guests: {
-          adults: '{{count, plural, one {# adult} other {# adults}}}',
-          children: '{{count, plural, one {# child} other {# children}}}',
-          babies: '{{count, plural, one {# baby} other {# babies}}}',
+          adults: 'adult(s)',
+          children: 'child(ren)',
+          babies: 'baby(ies)',
         },
         timestamps: {
+          title: 'History',
           confirmed: 'Confirmed',
           checked_in: 'Checked-in',
           cancelled: 'Cancelled',
@@ -160,6 +161,11 @@ const resources = {
           list: 'List',
         },
         createProperty: 'Create property',
+        createDialog: {
+          title: 'Create new property',
+          description: 'Choose property type to continue',
+          continue: 'Continue',
+        },
         searchLabel: 'Search by name or city',
         filter: {
           label: 'Filters',
@@ -601,7 +607,7 @@ const resources = {
         },
         info: {
           showing: 'Показано {{count}} из {{total}} бронирований',
-          page: 'Страница {{page}}',
+          page: 'Страница {{page}} из {{total}}',
         },
         price: {
           subtotal: 'Промежуточный итог',
@@ -609,11 +615,12 @@ const resources = {
           total: 'Итого',
         },
         guests: {
-          adults: '{{count, plural, one {# взрослый} few {# взрослых} many {# взрослых} other {# взрослых}}}',
-          children: '{{count, plural, one {# ребенок} few {# ребенка} many {# детей} other {# детей}}}',
-          babies: '{{count, plural, one {# малыш} few {# малыша} many {# малышей} other {# малышей}}}',
+          adults: 'взр.',
+          children: 'дет.',
+          babies: 'мл.',
         },
         timestamps: {
+          title: 'История',
           confirmed: 'Подтверждено',
           checked_in: 'Заезд',
           cancelled: 'Отменено',
@@ -632,6 +639,11 @@ const resources = {
           list: 'Список',
         },
         createProperty: 'Создать объект',
+        createDialog: {
+          title: 'Создание объекта',
+          description: 'Выберите тип объекта для продолжения',
+          continue: 'Продолжить',
+        },
         searchLabel: 'Поиск по названию или городу',
         filter: {
           label: 'Фильтры',
@@ -1073,7 +1085,7 @@ const resources = {
         },
         info: {
           showing: '{{count}} / {{total}} ta bron ko‘rsatilmoqda',
-          page: '{{page}}-sahifa',
+          page: '{{page}} / {{total}}-sahifa',
         },
         price: {
           subtotal: 'Oraliq summa',
@@ -1081,11 +1093,12 @@ const resources = {
           total: 'Jami',
         },
         guests: {
-          adults: '{{count}} katta',
-          children: '{{count}} bola',
-          babies: '{{count}} chaqaloq',
+          adults: 'katta',
+          children: 'bola',
+          babies: 'chaqaloq',
         },
         timestamps: {
+          title: 'Tarix',
           confirmed: 'Tasdiqlangan',
           checked_in: 'Joylashgan',
           cancelled: 'Bekor qilingan',
@@ -1104,6 +1117,11 @@ const resources = {
           list: 'Roʻyxat',
         },
         createProperty: 'Obyekt yaratish',
+        createDialog: {
+          title: 'Yangi obyekt yaratish',
+          description: 'Davom etish uchun obyekt turini tanlang',
+          continue: 'Davom etish',
+        },
         searchLabel: 'Nomi yoki shahar bo\'yicha qidirish',
         filter: {
           label: 'Filtrlar',

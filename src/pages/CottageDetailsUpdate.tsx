@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "@/lib/api";
 import { resolveImageUrl, cn } from "@/lib/utils";
+import { formatUzbekPhoneNumber, getPhoneHref } from "@/lib/phone";
 import type {
   CottageAdminList,
   CottageAdminUpdate,
@@ -520,6 +521,16 @@ const updateCottage = async (
   return response.data;
 };
 
+const createCottage = async (
+  payload: CottageAdminUpdate & { partner_user_id?: number | null },
+): Promise<CottageAdminList> => {
+  const response = await api.post<CottageAdminList>(
+    "/property/admin/cottages/",
+    payload,
+  );
+  return response.data;
+};
+
 const deleteCottage = async (id: string): Promise<void> => {
   await api.delete(`/property/admin/cottages/${id}/`);
 };
@@ -584,6 +595,7 @@ const fetchPrefectures = async (): Promise<LocationOption[]> => {
 
 export default function CottageDetailsUpdate() {
   const { propertyId } = useParams<{ propertyId: string }>();
+  const isCreateMode = propertyId === "create";
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -596,7 +608,7 @@ export default function CottageDetailsUpdate() {
   const cottageQuery = useQuery({
     queryKey: ["cottage", propertyId],
     queryFn: () => fetchCottage(propertyId!),
-    enabled: Boolean(propertyId),
+    enabled: Boolean(propertyId) && !isCreateMode,
   });
 
   const regionsQuery = useQuery({
@@ -642,10 +654,17 @@ export default function CottageDetailsUpdate() {
 
   const updateMutation = useMutation({
     mutationFn: async (payload: CottageAdminUpdate) => {
-      const result = await updateCottage(propertyId!, payload);
+      const result = isCreateMode
+        ? await createCottage(payload)
+        : await updateCottage(propertyId!, payload);
       return result;
     },
-    onSuccess: async () => {
+    onSuccess: async (result) => {
+      if (isCreateMode) {
+        queryClient.invalidateQueries({ queryKey: ["properties"] });
+        navigate(`/properties/cottages/${result.guid}`);
+        return;
+      }
       dispatch({
         type: "SET_SAVED_MESSAGE",
         payload: t("common.saved") ?? "Saved successfully",
@@ -1732,7 +1751,20 @@ export default function CottageDetailsUpdate() {
                               "-"}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            @{cottage.partner_user.username}
+                            {cottage.partner_user.username ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const partnerId = cottage.partner_user?.id;
+                                  if (partnerId) navigate(`/partner/${partnerId}`);
+                                }}
+                                className="text-xs text-primary hover:underline"
+                              >
+                                @{cottage.partner_user.username}
+                              </button>
+                            ) : (
+                              "-"
+                            )}
                           </p>
                         </div>
                       </div>
@@ -1762,11 +1794,11 @@ export default function CottageDetailsUpdate() {
                       </Label>
                       {cottage.partner_user.phone_number ? (
                         <a
-                          href={`tel:${cottage.partner_user.phone_number}`}
+                          href={getPhoneHref(cottage.partner_user.phone_number)}
                           className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                         >
                           <Phone className="h-3.5 w-3.5" />
-                          {cottage.partner_user.phone_number}
+                          {formatUzbekPhoneNumber(cottage.partner_user.phone_number)}
                         </a>
                       ) : (
                         <p className="text-sm font-medium">-</p>
