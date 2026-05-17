@@ -86,6 +86,7 @@ export interface BookingPrice {
 export interface Booking {
   guid: string
   booking_number: string
+  currency?: string
   check_in: string
   check_out: string
   adults: number
@@ -380,5 +381,4 @@ export const clampDecimalPlaces = (value: unknown, maxDecimals = 8): string => {
   const clampedFraction = fractionPart.slice(0, maxDecimals)
   return `${isNegative ? '-' : ''}${intPart}${clampedFraction ? `.${clampedFraction}` : ''}`
 }
-
 

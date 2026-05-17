@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Search,
   Home,
+  Hash,
   User,
   Calendar,
   Users,
@@ -90,6 +91,9 @@ const normalizeBookingPrice = (booking: Booking) => {
   const subtotal = getNumericValue(price.subtotal)
   const serviceFee = getNumericValue(price.service_fee)
   const chargeAmount = getNumericValue(price.charge_amount)
+  const currencyFromPrice = typeof price.currency === 'string' ? price.currency.toUpperCase() : null
+  const currencyFromBooking = typeof booking.currency === 'string' ? booking.currency.toUpperCase() : null
+  const currency = currencyFromPrice ?? currencyFromBooking ?? 'USD'
 
   const normalizedTotal =
     chargeAmount > 0
@@ -106,6 +110,7 @@ const normalizeBookingPrice = (booking: Booking) => {
     subtotal,
     serviceFee,
     total: normalizedTotal,
+    currency,
   }
 }
 
@@ -204,10 +209,10 @@ export default function BookingsPage() {
     }
   }
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency,
     }).format(amount)
   }
 
@@ -341,7 +346,7 @@ export default function BookingsPage() {
                         {/* Top row - Booking number and status */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Home className="h-4 w-4 text-muted-foreground" />
+                            <Hash className="h-4 w-4 text-muted-foreground" />
                             <span className="font-semibold text-sm">
                               #{booking.booking_number}
                             </span>
@@ -405,13 +410,13 @@ export default function BookingsPage() {
                               <DollarSign className="h-4 w-4 text-muted-foreground" />
                               <div className="space-y-0.5">
                                 <div className="text-xs text-muted-foreground">
-                                  {t('bookings.price.subtotal')}: {formatCurrency(price.subtotal)}
+                                  {t('bookings.price.subtotal')}: {formatCurrency(price.subtotal, price.currency)}
                                 </div>
                                 <div className="text-xs text-muted-foreground">
-                                  {t('bookings.price.serviceFee')}: {formatCurrency(price.serviceFee)}
+                                  {t('bookings.price.serviceFee')}: {formatCurrency(price.serviceFee, price.currency)}
                                 </div>
                                 <div className="font-semibold">
-                                  {t('bookings.price.total')}: {formatCurrency(price.total)}
+                                  {t('bookings.price.total')}: {formatCurrency(price.total, price.currency)}
                                 </div>
                               </div>
                             </div>
