@@ -57,6 +57,7 @@ import {
   Copy,
   Check,
   Phone,
+  Upload,
 } from "lucide-react";
 
 type LocationOption = {
@@ -249,6 +250,7 @@ type State = {
   imageMessage: string | null;
   draggedIndex: number | null;
   dragOverIndex: number | null;
+  isDragOver: boolean;
   deleteDialogOpen: boolean;
   deleteConfirmText: string;
 };
@@ -281,6 +283,7 @@ type Action =
   | { type: "SET_IMAGE_MESSAGE"; payload: string | null }
   | { type: "SET_DRAGGED_INDEX"; payload: number | null }
   | { type: "SET_DRAG_OVER_INDEX"; payload: number | null }
+  | { type: "SET_IS_DRAG_OVER"; payload: boolean }
   | { type: "SET_DELETE_DIALOG_OPEN"; payload: boolean }
   | { type: "SET_DELETE_CONFIRM_TEXT"; payload: string };
 
@@ -335,6 +338,7 @@ const initialState: State = {
   imageMessage: null,
   draggedIndex: null,
   dragOverIndex: null,
+  isDragOver: false,
   deleteDialogOpen: false,
   deleteConfirmText: "",
 };
@@ -509,6 +513,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, draggedIndex: action.payload };
     case "SET_DRAG_OVER_INDEX":
       return { ...state, dragOverIndex: action.payload };
+    case "SET_IS_DRAG_OVER":
+      return { ...state, isDragOver: action.payload };
     case "SET_DELETE_DIALOG_OPEN":
       return { ...state, deleteDialogOpen: action.payload };
     case "SET_DELETE_CONFIRM_TEXT":
@@ -1022,6 +1028,59 @@ export default function CottageDetailsUpdate() {
       uploadImageMutation.mutate(file);
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch({ type: "SET_IS_DRAG_OVER", payload: false });
+
+    if (isMaxImages) {
+      dispatch({
+        type: "SET_IMAGE_MESSAGE",
+        payload:
+          t("properties.maxImagesReached") ??
+          `Maximum ${MAX_IMAGES} images allowed.`,
+      });
+      if (imageMessageTimerRef.current) {
+        window.clearTimeout(imageMessageTimerRef.current);
+      }
+      imageMessageTimerRef.current = window.setTimeout(() => {
+        dispatch({ type: "SET_IMAGE_MESSAGE", payload: null });
+      }, 3000);
+      return;
+    }
+
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/"),
+    );
+    if (files.length === 0) return;
+
+    if (isCreateMode) {
+      const newImages = files.map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+      setPendingCreateImages((prev) => [...prev, ...newImages]);
+    } else {
+      const file = files[0];
+      uploadImageMutation.mutate(file);
+    }
+  };
+
+  const handleDragOverZone = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!state.isDragOver && !isMaxImages) {
+      dispatch({ type: "SET_IS_DRAG_OVER", payload: true });
+    }
+  };
+
+  const handleDragLeaveZone = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    dispatch({ type: "SET_IS_DRAG_OVER", payload: false });
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -1777,7 +1836,24 @@ export default function CottageDetailsUpdate() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+                <div
+                  className={cn(
+                    "relative rounded-lg transition-all",
+                    state.isDragOver && !isMaxImages && "ring-2 ring-primary ring-offset-2 bg-primary/5",
+                  )}
+                  onDrop={handleFileDrop}
+                  onDragOver={handleDragOverZone}
+                  onDragLeave={handleDragLeaveZone}
+                >
+                  {state.isDragOver && (
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 rounded-lg bg-primary/10 pointer-events-none">
+                      <Upload className="h-8 w-8 text-primary" />
+                      <span className="text-sm font-medium text-primary">
+                        {t("common.dropHere") ?? "Drop image here"}
+                      </span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
                   {imageItems.map((src, index) => {
                     const isDragged = state.draggedIndex === index;
                     const isDropTarget =
@@ -1865,6 +1941,7 @@ export default function CottageDetailsUpdate() {
                       </span>
                     </label>
                   )}
+                </div>
                 </div>
 
                 {isMaxImages && (

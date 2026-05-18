@@ -40,6 +40,7 @@ import {
   Copy,
   Check,
   Phone,
+  Upload,
 } from "lucide-react";
 
 type LocationOption = {
@@ -281,6 +282,7 @@ type PageState = {
   imageMessage: string | null;
   draggedIndex: number | null;
   dragOverIndex: number | null;
+  isDragOver: boolean;
 };
 
 type PageAction =
@@ -289,7 +291,8 @@ type PageAction =
   | { type: "setSavedMessage"; value: string | null }
   | { type: "setImageMessage"; value: string | null }
   | { type: "setDraggedIndex"; value: number | null }
-  | { type: "setDragOverIndex"; value: number | null };
+  | { type: "setDragOverIndex"; value: number | null }
+  | { type: "setIsDragOver"; value: boolean };
 
 function pageReducer(state: PageState, action: PageAction): PageState {
   switch (action.type) {
@@ -347,6 +350,8 @@ function pageReducer(state: PageState, action: PageAction): PageState {
       return { ...state, draggedIndex: action.value };
     case "setDragOverIndex":
       return { ...state, dragOverIndex: action.value };
+    case "setIsDragOver":
+      return { ...state, isDragOver: action.value };
     default:
       return state;
   }
@@ -365,13 +370,14 @@ export default function ApartmentDetailsUpdate() {
     imageMessage: null,
     draggedIndex: null,
     dragOverIndex: null,
+    isDragOver: false,
   });
   const [selectedPartnerId, setSelectedPartnerId] = useState("");
   const [partnerSearchTerm, setPartnerSearchTerm] = useState("");
   const [pendingCreateImages, setPendingCreateImages] = useState<
     Array<{ file: File; previewUrl: string }>
   >([]);
-  const { form, savedMessage, imageMessage, draggedIndex, dragOverIndex } = state;
+  const { form, savedMessage, imageMessage, draggedIndex, dragOverIndex, isDragOver } = state;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const apartmentQuery = useQuery({
@@ -691,6 +697,54 @@ export default function ApartmentDetailsUpdate() {
       uploadImageMutation.mutate(file);
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch({ type: "setIsDragOver", value: false });
+
+    if (isMaxImages) {
+      dispatch({
+        type: "setImageMessage",
+        value:
+          t("properties.maxImagesReached") ??
+          `Maximum ${MAX_IMAGES} images allowed.`,
+      });
+      setTimeout(() => dispatch({ type: "setImageMessage", value: null }), 3000);
+      return;
+    }
+
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/"),
+    );
+    if (files.length === 0) return;
+
+    if (isCreateMode) {
+      const newImages = files.map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+      setPendingCreateImages((prev) => [...prev, ...newImages]);
+    } else {
+      const file = files[0];
+      uploadImageMutation.mutate(file);
+    }
+  };
+
+  const handleDragOverZone = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragOver && !isMaxImages) {
+      dispatch({ type: "setIsDragOver", value: true });
+    }
+  };
+
+  const handleDragLeaveZone = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    dispatch({ type: "setIsDragOver", value: false });
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -1232,7 +1286,24 @@ export default function ApartmentDetailsUpdate() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+                <div
+                  className={cn(
+                    "relative rounded-lg transition-all",
+                    isDragOver && !isMaxImages && "ring-2 ring-primary ring-offset-2 bg-primary/5",
+                  )}
+                  onDrop={handleFileDrop}
+                  onDragOver={handleDragOverZone}
+                  onDragLeave={handleDragLeaveZone}
+                >
+                  {isDragOver && (
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 rounded-lg bg-primary/10 pointer-events-none">
+                      <Upload className="h-8 w-8 text-primary" />
+                      <span className="text-sm font-medium text-primary">
+                        {t("common.dropHere") ?? "Drop image here"}
+                      </span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
                   {imageItems.map((src, index) => {
                     const isDragged = draggedIndex === index;
                     const isDropTarget =
@@ -1319,6 +1390,7 @@ export default function ApartmentDetailsUpdate() {
                       </span>
                     </label>
                   )}
+                </div>
                 </div>
 
                 {isMaxImages && (
