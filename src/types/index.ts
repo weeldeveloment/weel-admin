@@ -216,6 +216,22 @@ export interface PropertyItem {
   country?: string | null
   is_verified?: boolean
   created_at?: string
+  price?: string | null
+  currency?: string | null
+  price_per_person?: string | null
+  price_on_working_days?: string | null
+  price_on_weekends?: string | null
+  region_id?: number | null
+  district_id?: number | null
+  guests?: number | null
+  rooms?: number | null
+  beds?: number | null
+  bathrooms?: number | null
+  average_rating?: number | null
+  is_archived?: boolean
+  is_recommended?: boolean
+  latitude?: string | null
+  longitude?: string | null
 }
 
 export interface PropertyListResult {

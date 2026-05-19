@@ -314,14 +314,14 @@ export default function PropertiesPage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-4 md:p-6">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as PropertyTab)} className="space-y-4">
+    <div className="flex h-full flex-col p-4 md:p-6">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as PropertyTab)} className="flex h-full flex-col">
         <TabsList>
           <TabsTrigger value="cottages">{t('properties.tabs.cottages')}</TabsTrigger>
           <TabsTrigger value="apartments">{t('properties.tabs.apartments')}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="cottages" className="space-y-4">
+        <TabsContent value="cottages" className="flex h-full flex-col space-y-4">
           <div className="space-y-2">
             <p className="text-sm font-medium text-foreground">{t('properties.filter.label')}</p>
             <div className="flex flex-wrap items-end gap-3">
@@ -420,7 +420,7 @@ export default function PropertiesPage() {
           {cottagesQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.cottages') })}</p> : null}
         </TabsContent>
 
-        <TabsContent value="apartments" className="space-y-4">
+        <TabsContent value="apartments" className="flex h-full flex-col space-y-4">
           <div className="space-y-2">
             <p className="text-sm font-medium text-foreground">{t('properties.filter.label')}</p>
             <div className="flex flex-wrap items-end gap-3">

@@ -161,6 +161,7 @@ const resources = {
         viewMode: {
           grid: 'Grid',
           list: 'List',
+          table: 'Table',
         },
         createProperty: 'Create property',
         createDialog: {
@@ -650,6 +651,7 @@ const resources = {
         viewMode: {
           grid: 'Сетка',
           list: 'Список',
+          table: 'Таблица',
         },
         createProperty: 'Создать объект',
         createDialog: {
@@ -1139,6 +1141,7 @@ const resources = {
         viewMode: {
           grid: 'Setka',
           list: 'Roʻyxat',
+          table: 'Jadval',
         },
         createProperty: 'Obyekt yaratish',
         createDialog: {
