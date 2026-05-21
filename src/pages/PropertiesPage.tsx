@@ -402,22 +402,24 @@ export default function PropertiesPage() {
             </div>
           </div>
           </div>
-          {cottagesQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.cottages') })}</p> : null}
-          {cottagesQuery.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.cottages') })}</p> : null}
-          {cottagesQuery.isSuccess && !cottagesQuery.isFetchingNextPage && filteredCottageItems.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.cottages') })}</p>
-          ) : null}
-          {filteredCottageItems.length > 0 ? (
-            <ul className={listContainerClass}>
-              {filteredCottageItems.map((item) => (
-                <li key={item.guid}>
-                  <PropertyCard item={item} viewMode={viewMode} type="cottages" />
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <div ref={cottagesLoadMoreRef} className="h-4" />
-          {cottagesQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.cottages') })}</p> : null}
+          <div className="min-h-0 flex-1 overflow-auto">
+            {cottagesQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.cottages') })}</p> : null}
+            {cottagesQuery.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.cottages') })}</p> : null}
+            {cottagesQuery.isSuccess && !cottagesQuery.isFetchingNextPage && filteredCottageItems.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.cottages') })}</p>
+            ) : null}
+            {filteredCottageItems.length > 0 ? (
+              <ul className={listContainerClass}>
+                {filteredCottageItems.map((item) => (
+                  <li key={item.guid}>
+                    <PropertyCard item={item} viewMode={viewMode} type="cottages" />
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <div ref={cottagesLoadMoreRef} className="h-4" />
+            {cottagesQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.cottages') })}</p> : null}
+          </div>
         </TabsContent>
 
         <TabsContent value="apartments" className="flex h-full flex-col space-y-4">
@@ -501,22 +503,24 @@ export default function PropertiesPage() {
               </div>
             </div>
           </div>
-          {apartmentsQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.apartments') })}</p> : null}
-          {apartmentsQuery.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.apartments') })}</p> : null}
-          {apartmentsQuery.isSuccess && !apartmentsQuery.isFetchingNextPage && filteredApartmentItems.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.apartments') })}</p>
-          ) : null}
-          {filteredApartmentItems.length > 0 ? (
-            <ul className={listContainerClass}>
-              {filteredApartmentItems.map((item) => (
-                <li key={item.guid}>
-                  <PropertyCard item={item} viewMode={viewMode} type="apartments" />
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <div ref={apartmentsLoadMoreRef} className="h-4" />
-          {apartmentsQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.apartments') })}</p> : null}
+          <div className="min-h-0 flex-1 overflow-auto">
+            {apartmentsQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.apartments') })}</p> : null}
+            {apartmentsQuery.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.apartments') })}</p> : null}
+            {apartmentsQuery.isSuccess && !apartmentsQuery.isFetchingNextPage && filteredApartmentItems.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.apartments') })}</p>
+            ) : null}
+            {filteredApartmentItems.length > 0 ? (
+              <ul className={listContainerClass}>
+                {filteredApartmentItems.map((item) => (
+                  <li key={item.guid}>
+                    <PropertyCard item={item} viewMode={viewMode} type="apartments" />
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <div ref={apartmentsLoadMoreRef} className="h-4" />
+            {apartmentsQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.apartments') })}</p> : null}
+          </div>
         </TabsContent>
       </Tabs>
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>

@@ -26,6 +26,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -378,6 +386,7 @@ export default function ApartmentDetailsUpdate() {
   const [pendingCreateImages, setPendingCreateImages] = useState<
     Array<{ file: File; previewUrl: string }>
   >([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { form, savedMessage, imageMessage, draggedIndex, dragOverIndex, isDragOver } = state;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -594,6 +603,22 @@ export default function ApartmentDetailsUpdate() {
           "Failed to update image",
       });
       setTimeout(() => dispatch({ type: "setImageMessage", value: null }), 3000);
+    },
+  });
+
+  const deleteApartmentMutation = useMutation({
+    mutationFn: () => api.delete(`/property/admin/apartments/${propertyId}/`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["properties"] });
+      navigate("/properties");
+    },
+    onError: () => {
+      dispatch({
+        type: "setSavedMessage",
+        value:
+          t("propertyDetails.messages.deleteFailed") ??
+          "Failed to delete apartment",
+      });
     },
   });
 
@@ -1733,6 +1758,24 @@ export default function ApartmentDetailsUpdate() {
                       "-"}
                   </p>
                 </div>
+
+                <Separator className="md:col-span-2" />
+
+                {!isCreateMode && (
+                  <div className="md:col-span-2">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => setDeleteDialogOpen(true)}
+                      disabled={deleteApartmentMutation.isPending}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      {deleteApartmentMutation.isPending
+                        ? t("properties.deleting")
+                        : t("properties.deleteApartment")}
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -1760,6 +1803,40 @@ export default function ApartmentDetailsUpdate() {
             <CopyBlock label="Form State" data={form} />
           </div>
         </details>
+
+        {!isCreateMode && (
+          <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle>{t("properties.deleteDialog.title")}</DialogTitle>
+                <DialogDescription>
+                  {t("properties.deleteDialog.description", {
+                    title: apartment.title ?? "",
+                  })}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="flex flex-col gap-2 sm:flex-row">
+                <Button
+                  variant="outline"
+                  onClick={() => setDeleteDialogOpen(false)}
+                  disabled={deleteApartmentMutation.isPending}
+                >
+                  {t("common.cancel")}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteApartmentMutation.mutate()}
+                  disabled={deleteApartmentMutation.isPending}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {deleteApartmentMutation.isPending
+                    ? t("properties.deleting")
+                    : t("properties.confirmDelete")}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </form>
     </div>
   );

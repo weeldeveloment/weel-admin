@@ -23,6 +23,7 @@ const resources = {
         today: 'Today',
         yesterday: 'Yesterday',
         search: 'Search',
+        menu: 'Menu',
         language: 'Language',
         theme: 'Theme',
         themes: {
@@ -263,6 +264,7 @@ const resources = {
         createModeBadge: 'Create mode',
         createModeDescription: 'You are creating a new {{type}}. Partner assignment is required.',
         deleteCottage: 'Delete cottage',
+        deleteApartment: 'Delete apartment',
         deleting: 'Deleting...',
         deleteFailed: 'Failed to delete cottage',
         deleteConfirmTitle: 'Delete cottage',
@@ -271,6 +273,10 @@ const resources = {
         deleteTypeToConfirmPlaceholder: 'Cottage name',
         deleteTypeToConfirmHint: 'To confirm, type "{{title}}" exactly.',
         confirmDelete: 'Delete',
+        deleteDialog: {
+          title: 'Delete Apartment',
+          description: 'Are you sure you want to delete "{{title}}"? This action cannot be undone.',
+        },
       },
       chat: {
         title: 'Messages',
@@ -513,6 +519,7 @@ const resources = {
         today: 'Сегодня',
         yesterday: 'Вчера',
         search: 'Поиск',
+        menu: 'Меню',
         language: 'Язык',
         theme: 'Тема',
         themes: {
@@ -753,6 +760,7 @@ const resources = {
         createModeBadge: 'Режим создания',
         createModeDescription: 'Вы создаёте новый объект типа "{{type}}". Назначение партнёра обязательно.',
         deleteCottage: 'Удалить коттедж',
+        deleteApartment: 'Удалить квартиру',
         deleting: 'Удаление...',
         deleteFailed: 'Не удалось удалить коттедж',
         deleteConfirmTitle: 'Удалить коттедж',
@@ -761,6 +769,10 @@ const resources = {
         deleteTypeToConfirmPlaceholder: 'Название коттеджа',
         deleteTypeToConfirmHint: 'Чтобы подтвердить, введите "{{title}}" точно.',
         confirmDelete: 'Удалить',
+        deleteDialog: {
+          title: 'Удалить квартиру',
+          description: 'Вы уверены, что хотите удалить "{{title}}"? Это действие нельзя отменить.',
+        },
       },
       chat: {
         title: 'Сообщения',
@@ -1003,6 +1015,7 @@ const resources = {
         today: 'Bugun',
         yesterday: 'Kecha',
         search: 'Qidiruv',
+        menu: 'Menyu',
         language: 'Til',
         theme: 'Mavzu',
         themes: {
@@ -1243,6 +1256,7 @@ const resources = {
         createModeBadge: 'Yaratish rejimi',
         createModeDescription: 'Siz yangi {{type}} yaratyapsiz. Hamkor biriktirish majburiy.',
         deleteCottage: 'Kottejni o\'chirish',
+        deleteApartment: 'Kvartirani o\'chirish',
         deleting: 'O\'chirilmoqda...',
         deleteFailed: 'Kottejni o\'chirib bo\'lmadi',
         deleteConfirmTitle: 'Kottejni o\'chirish',
@@ -1251,6 +1265,10 @@ const resources = {
         deleteTypeToConfirmPlaceholder: 'Kottej nomi',
         deleteTypeToConfirmHint: 'Tasdiqlash uchun "{{title}}" ni aynan kiriting.',
         confirmDelete: 'O\'chirish',
+        deleteDialog: {
+          title: 'Kvartirani o\'chirish',
+          description: '"{{title}}" ni o\'chirishni xohlaysizmi? Bu harakatni qaytarib bo\'lmaydi.',
+        },
       },
       chat: {
         title: 'Xabarlar',
