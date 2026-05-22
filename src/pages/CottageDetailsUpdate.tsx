@@ -76,13 +76,9 @@ function CopyBlock({ label, data }: { label: string; data: unknown }) {
   const json = JSON.stringify(data, null, 2);
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(json);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* ignore */
-    }
+    await navigator.clipboard.writeText(json);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
 
   return (
@@ -186,7 +182,8 @@ function getMutationErrorMessage(error: unknown, fallback: string): string {
       };
     };
   };
-  const firstErrorDetail = maybeAxiosLikeError.response?.data?.errors?.[0]?.detail;
+  const firstErrorDetail =
+    maybeAxiosLikeError.response?.data?.errors?.[0]?.detail;
   if (firstErrorDetail) {
     return firstErrorDetail;
   }
@@ -348,7 +345,8 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "HYDRATE_FROM_API": {
       const merged = action.payload as CottageAdminListWithPrices;
-      const detail = (merged.property_detail || {}) as CottageAdminPropertyDetail;
+      const detail = (merged.property_detail ||
+        {}) as CottageAdminPropertyDetail;
       const currentRange = getMonthRange(0);
       const nextRange = getMonthRange(1);
       const currency = (merged.currency as "USD" | "UZS") || "USD";
@@ -586,33 +584,30 @@ const fetchServices = async (
 
 const fetchRegions = async (): Promise<LocationOption[]> => {
   const response = await api.get<RegionList[]>("/property/admin/regions/");
-  return (response.data ?? [])
-    .map((r) => ({ id: String(r.id ?? ""), label: r.title ?? "" }))
-    .filter((i) => i.id);
+  return (response.data ?? []).map((r) => ({
+    id: String(r.id ?? ""),
+    label: r.title ?? "",
+  }));
 };
 
 const fetchDistricts = async (): Promise<LocationOption[]> => {
   const response = await api.get<DistrictList[]>("/property/admin/districts/");
-  return (response.data ?? [])
-    .map((d) => ({
-      id: String(d.id ?? ""),
-      label: d.title ?? "",
-      region_id: String(d.region_id ?? ""),
-    }))
-    .filter((i) => i.id);
+  return (response.data ?? []).map((d) => ({
+    id: String(d.id ?? ""),
+    label: d.title ?? "",
+    region_id: String(d.region_id ?? ""),
+  }));
 };
 
 const fetchPrefectures = async (): Promise<LocationOption[]> => {
   const response = await api.get<PrefectureList[]>(
     "/property/admin/prefectures/",
   );
-  return (response.data ?? [])
-    .map((p) => ({
-      id: String(p.guid ?? ""),
-      label: p.title ?? "",
-      district_guid: String(p.district?.guid ?? ""),
-    }))
-    .filter((i) => i.id);
+  return (response.data ?? []).map((p) => ({
+    id: String(p.guid ?? ""),
+    label: p.title ?? "",
+    district_guid: String(p.district?.guid ?? ""),
+  }));
 };
 
 /* ──────────── component ──────────── */
@@ -667,8 +662,9 @@ export default function CottageDetailsUpdate() {
   const partnerOptions = useMemo(
     () =>
       (partnersQuery.data ?? [])
-        .filter((partner): partner is PartnerDetails & { id: number } =>
-          typeof partner.id === "number",
+        .filter(
+          (partner): partner is PartnerDetails & { id: number } =>
+            typeof partner.id === "number",
         )
         .sort((a, b) => {
           const nameA =
@@ -687,8 +683,9 @@ export default function CottageDetailsUpdate() {
   );
   const selectedPartner = useMemo(
     () =>
-      partnerOptions.find((partner) => String(partner.id) === selectedPartnerId) ??
-      null,
+      partnerOptions.find(
+        (partner) => String(partner.id) === selectedPartnerId,
+      ) ?? null,
     [partnerOptions, selectedPartnerId],
   );
   const filteredPartnerOptions = useMemo(() => {
@@ -758,7 +755,9 @@ export default function CottageDetailsUpdate() {
             });
           }
         }
-        pendingCreateImages.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+        pendingCreateImages.forEach((item) =>
+          URL.revokeObjectURL(item.previewUrl),
+        );
         setPendingCreateImages([]);
         queryClient.invalidateQueries({ queryKey: ["properties"] });
         navigate(`/properties/cottages/${result.guid}`);
@@ -962,7 +961,9 @@ export default function CottageDetailsUpdate() {
       country: state.location.country || null,
       city: state.location.city || null,
       region_id: state.location.region_id ? state.location.region_id : null,
-      district_id: state.location.district_id ? state.location.district_id : null,
+      district_id: state.location.district_id
+        ? state.location.district_id
+        : null,
       prefecture_id: state.location.prefecture_id || null,
       services: state.amenities,
       description_ru: state.descRu || null,
@@ -1556,13 +1557,11 @@ export default function CottageDetailsUpdate() {
                       </Label>
                       <PriceInput
                         currency={state.currency}
-                        value={String(state.price[0]?.price_on_working_days ?? "")}
+                        value={String(
+                          state.price[0]?.price_on_working_days ?? "",
+                        )}
                         onChange={(value) =>
-                          updatePriceField(
-                            0,
-                            "price_on_working_days",
-                            value,
-                          )
+                          updatePriceField(0, "price_on_working_days", value)
                         }
                       />
                     </div>
@@ -1574,11 +1573,7 @@ export default function CottageDetailsUpdate() {
                         currency={state.currency}
                         value={String(state.price[0]?.price_on_weekends ?? "")}
                         onChange={(value) =>
-                          updatePriceField(
-                            0,
-                            "price_on_weekends",
-                            value,
-                          )
+                          updatePriceField(0, "price_on_weekends", value)
                         }
                       />
                     </div>
@@ -1597,13 +1592,11 @@ export default function CottageDetailsUpdate() {
                       </Label>
                       <PriceInput
                         currency={state.currency}
-                        value={String(state.price[1]?.price_on_working_days ?? "")}
+                        value={String(
+                          state.price[1]?.price_on_working_days ?? "",
+                        )}
                         onChange={(value) =>
-                          updatePriceField(
-                            1,
-                            "price_on_working_days",
-                            value,
-                          )
+                          updatePriceField(1, "price_on_working_days", value)
                         }
                       />
                     </div>
@@ -1615,11 +1608,7 @@ export default function CottageDetailsUpdate() {
                         currency={state.currency}
                         value={String(state.price[1]?.price_on_weekends ?? "")}
                         onChange={(value) =>
-                          updatePriceField(
-                            1,
-                            "price_on_weekends",
-                            value,
-                          )
+                          updatePriceField(1, "price_on_weekends", value)
                         }
                       />
                     </div>
@@ -1847,7 +1836,9 @@ export default function CottageDetailsUpdate() {
                 <div
                   className={cn(
                     "relative rounded-lg transition-all",
-                    state.isDragOver && !isMaxImages && "ring-2 ring-primary ring-offset-2 bg-primary/5",
+                    state.isDragOver &&
+                      !isMaxImages &&
+                      "ring-2 ring-primary ring-offset-2 bg-primary/5",
                   )}
                   onDrop={handleFileDrop}
                   onDragOver={handleDragOverZone}
@@ -1862,94 +1853,97 @@ export default function CottageDetailsUpdate() {
                     </div>
                   )}
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-                  {imageItems.map((src, index) => {
-                    const isDragged = state.draggedIndex === index;
-                    const isDropTarget =
-                      state.dragOverIndex === index &&
-                      state.draggedIndex !== index;
+                    {imageItems.map((src, index) => {
+                      const isDragged = state.draggedIndex === index;
+                      const isDropTarget =
+                        state.dragOverIndex === index &&
+                        state.draggedIndex !== index;
 
-                    return (
-                      <div
-                        key={src}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, index)}
-                        onDragOver={(e) => handleDragOver(e, index)}
-                        onDrop={(e) => handleDrop(e, index)}
-                        onDragEnd={handleDragEnd}
-                        className={cn(
-                          "group relative aspect-[4/3] select-none overflow-hidden rounded-lg border bg-muted transition-all duration-200",
-                          isDragged &&
-                            "z-0 scale-95 opacity-40 ring-2 ring-primary/50",
-                          isDropTarget &&
-                            "z-10 scale-105 shadow-lg ring-2 ring-primary",
-                          !isDragged &&
-                            !isDropTarget &&
-                            "hover:ring-1 hover:ring-border",
-                        )}
-                      >
-                        <img
-                          src={isCreateMode ? src : resolveImageUrl(src)}
-                          alt={`${cottage.title} ${index + 1}`}
-                          className="pointer-events-none h-full w-full object-cover"
-                          draggable={false}
-                        />
+                      return (
+                        <div
+                          key={src}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragOver={(e) => handleDragOver(e, index)}
+                          onDrop={(e) => handleDrop(e, index)}
+                          onDragEnd={handleDragEnd}
+                          className={cn(
+                            "group relative aspect-[4/3] select-none overflow-hidden rounded-lg border bg-muted transition-all duration-200",
+                            isDragged &&
+                              "z-0 scale-95 opacity-40 ring-2 ring-primary/50",
+                            isDropTarget &&
+                              "z-10 scale-105 shadow-lg ring-2 ring-primary",
+                            !isDragged &&
+                              !isDropTarget &&
+                              "hover:ring-1 hover:ring-border",
+                          )}
+                        >
+                          <img
+                            src={isCreateMode ? src : resolveImageUrl(src)}
+                            alt={`${cottage.title} ${index + 1}`}
+                            className="pointer-events-none h-full w-full object-cover"
+                            draggable={false}
+                          />
 
-                        <div className="absolute left-1.5 top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-[10px] font-bold text-white">
-                          {index + 1}
-                        </div>
+                          <div className="absolute left-1.5 top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-[10px] font-bold text-white">
+                            {index + 1}
+                          </div>
 
-                        <div className="absolute right-1.5 top-1.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">
-                          <div
-                            className="flex h-7 w-7 cursor-grab items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60 active:cursor-grabbing"
+                          <div className="absolute right-1.5 top-1.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">
+                            <div
+                              className="flex h-7 w-7 cursor-grab items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60 active:cursor-grabbing"
+                              title={
+                                t("properties.dragToReorder") ??
+                                "Drag to reorder"
+                              }
+                            >
+                              <GripVertical className="h-3.5 w-3.5" />
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteImage(index)}
+                            disabled={imagesUpdateMutation.isPending}
+                            className="absolute bottom-1.5 right-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white opacity-70 transition-all hover:bg-red-500/90 hover:opacity-100 disabled:opacity-30"
                             title={
-                              t("properties.dragToReorder") ?? "Drag to reorder"
+                              t("properties.deleteImage") ?? "Delete image"
                             }
                           >
-                            <GripVertical className="h-3.5 w-3.5" />
-                          </div>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
                         </div>
+                      );
+                    })}
 
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteImage(index)}
-                          disabled={imagesUpdateMutation.isPending}
-                          className="absolute bottom-1.5 right-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white opacity-70 transition-all hover:bg-red-500/90 hover:opacity-100 disabled:opacity-30"
-                          title={t("properties.deleteImage") ?? "Delete image"}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    );
-                  })}
-
-                  {!isMaxImages && (
-                    <label
-                      className={cn(
-                        "flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 transition-colors hover:border-primary/50 hover:bg-primary/10",
-                        uploadImageMutation.isPending &&
-                          "pointer-events-none opacity-60",
-                      )}
-                    >
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={handleFileSelect}
-                      />
-                      {uploadImageMutation.isPending ? (
-                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                      ) : (
-                        <Plus className="h-5 w-5 text-primary" />
-                      )}
-                      <span className="text-xs font-medium text-primary">
-                        {uploadImageMutation.isPending
-                          ? t("propertyDetails.actions.updatingImage")
-                          : t("propertyDetails.actions.updateImage")}
-                      </span>
-                    </label>
-                  )}
-                </div>
+                    {!isMaxImages && (
+                      <label
+                        className={cn(
+                          "flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 transition-colors hover:border-primary/50 hover:bg-primary/10",
+                          uploadImageMutation.isPending &&
+                            "pointer-events-none opacity-60",
+                        )}
+                      >
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={handleFileSelect}
+                        />
+                        {uploadImageMutation.isPending ? (
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                        ) : (
+                          <Plus className="h-5 w-5 text-primary" />
+                        )}
+                        <span className="text-xs font-medium text-primary">
+                          {uploadImageMutation.isPending
+                            ? t("propertyDetails.actions.updatingImage")
+                            : t("propertyDetails.actions.updateImage")}
+                        </span>
+                      </label>
+                    )}
+                  </div>
                 </div>
 
                 {isMaxImages && (
@@ -1988,7 +1982,10 @@ export default function CottageDetailsUpdate() {
                         value={selectedPartnerId}
                         onValueChange={(value) => {
                           setSelectedPartnerId(value);
-                          dispatch({ type: "SET_ERROR_MESSAGE", payload: null });
+                          dispatch({
+                            type: "SET_ERROR_MESSAGE",
+                            payload: null,
+                          });
                         }}
                       >
                         <SelectTrigger id="partner_user_id">
@@ -2045,7 +2042,10 @@ export default function CottageDetailsUpdate() {
                       <div className="space-y-1 md:col-span-2">
                         <p className="text-sm font-medium">
                           {selectedPartner.full_name ||
-                            [selectedPartner.first_name, selectedPartner.last_name]
+                            [
+                              selectedPartner.first_name,
+                              selectedPartner.last_name,
+                            ]
                               .filter(Boolean)
                               .join(" ") ||
                             selectedPartner.username ||
@@ -2093,7 +2093,8 @@ export default function CottageDetailsUpdate() {
                                 type="button"
                                 onClick={() => {
                                   const partnerId = cottage.partner_user?.id;
-                                  if (partnerId) navigate(`/partner/${partnerId}`);
+                                  if (partnerId)
+                                    navigate(`/partner/${partnerId}`);
                                 }}
                                 className="text-xs text-primary hover:underline"
                               >
@@ -2135,7 +2136,9 @@ export default function CottageDetailsUpdate() {
                           className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                         >
                           <Phone className="h-3.5 w-3.5" />
-                          {formatUzbekPhoneNumber(cottage.partner_user.phone_number)}
+                          {formatUzbekPhoneNumber(
+                            cottage.partner_user.phone_number,
+                          )}
                         </a>
                       ) : (
                         <p className="text-sm font-medium">-</p>
@@ -2266,7 +2269,8 @@ export default function CottageDetailsUpdate() {
 
                     <div className="space-y-1 text-sm text-muted-foreground md:col-span-2">
                       <p>
-                        <span className="font-medium">GUID:</span> {cottage.guid}
+                        <span className="font-medium">GUID:</span>{" "}
+                        {cottage.guid}
                       </p>
                       <p>
                         <span className="font-medium">
@@ -2354,7 +2358,9 @@ export default function CottageDetailsUpdate() {
                           payload: e.target.value,
                         })
                       }
-                      placeholder={t("properties.deleteTypeToConfirmPlaceholder")}
+                      placeholder={t(
+                        "properties.deleteTypeToConfirmPlaceholder",
+                      )}
                       autoComplete="off"
                     />
                     <p className="text-sm text-muted-foreground">
