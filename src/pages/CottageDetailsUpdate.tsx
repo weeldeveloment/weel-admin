@@ -655,10 +655,12 @@ export default function CottageDetailsUpdate() {
     queryFn: () => fetchServices(state.data?.property_type_id),
     enabled: isCreateMode || Boolean(state.data?.property_type_id),
   });
+
   const partnersQuery = useQuery({
     queryKey: ["adminPartners"],
     queryFn: fetchAllPartners,
   });
+
   const partnerOptions = useMemo(
     () =>
       (partnersQuery.data ?? [])
@@ -669,12 +671,12 @@ export default function CottageDetailsUpdate() {
         .sort((a, b) => {
           const nameA =
             a.full_name ||
-            [a.first_name, a.last_name].filter(Boolean).join(" ") ||
+            [a.first_name, a.last_name].join(" ") ||
             a.username ||
             "";
           const nameB =
             b.full_name ||
-            [b.first_name, b.last_name].filter(Boolean).join(" ") ||
+            [b.first_name, b.last_name].join(" ") ||
             b.username ||
             "";
           return nameA.localeCompare(nameB);
