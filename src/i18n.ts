@@ -43,6 +43,7 @@ const resources = {
         properties: 'Properties',
         stories: 'Stories',
         news: 'News',
+        banners: 'Banners',
         chat: 'Chat',
       },
       auth: {
@@ -382,6 +383,8 @@ const resources = {
           image: 'Image',
           video: 'Video',
           mediaFile: 'Media file',
+          currentMedia: 'Current media',
+          replaceMedia: 'Replace media',
         },
         deleteDialog: {
           title: 'Delete News',
@@ -391,6 +394,46 @@ const resources = {
         empty: {
           title: 'No news found',
           description: 'News articles will appear here when you create them',
+        },
+      },
+      banners: {
+        title: 'Banners',
+        subtitle: 'Create and manage platform banners',
+        create: 'Create Banner',
+        loading: 'Loading banners...',
+        error: 'Failed to load banners',
+        searchPlaceholder: 'Search banners...',
+        created: 'Created',
+        actions: {
+          preview: 'Preview',
+          edit: 'Edit',
+        },
+        preview: {
+          title: 'Banner Preview',
+        },
+        createDialog: {
+          title: 'Create Banner',
+          description: 'Create a new platform banner (370x120px)',
+        },
+        editDialog: {
+          title: 'Edit Banner',
+          description: 'Update the platform banner',
+        },
+        form: {
+          htmlSource: 'HTML Source',
+          htmlSourcePlaceholder: 'Paste HTML source code...',
+          image: 'Banner Image',
+          currentImage: 'Current image',
+          replaceImage: 'Replace image',
+        },
+        deleteDialog: {
+          title: 'Delete Banner',
+          description: 'Are you sure you want to delete this banner? This action cannot be undone.',
+          confirm: 'Delete',
+        },
+        empty: {
+          title: 'No banners found',
+          description: 'Banners will appear here when you create them',
         },
       },
       dashboard: {
@@ -594,6 +637,7 @@ const resources = {
         properties: 'Объекты',
         stories: 'Истории',
         news: 'Новости',
+        banners: 'Баннеры',
         chat: 'Чат',
       },
       auth: {
@@ -933,6 +977,8 @@ const resources = {
           image: 'Изображение',
           video: 'Видео',
           mediaFile: 'Медиа файл',
+          currentMedia: 'Текущее медиа',
+          replaceMedia: 'Заменить медиа',
         },
         deleteDialog: {
           title: 'Удалить новость',
@@ -942,6 +988,46 @@ const resources = {
         empty: {
           title: 'Новости не найдены',
           description: 'Новости появятся здесь, когда вы их создадите',
+        },
+      },
+      banners: {
+        title: 'Баннеры',
+        subtitle: 'Создание и управление баннерами платформы',
+        create: 'Создать баннер',
+        loading: 'Загрузка баннеров...',
+        error: 'Не удалось загрузить баннеры',
+        searchPlaceholder: 'Поиск баннеров...',
+        created: 'Создано',
+        actions: {
+          preview: 'Просмотр',
+          edit: 'Редактировать',
+        },
+        preview: {
+          title: 'Просмотр баннера',
+        },
+        createDialog: {
+          title: 'Создать баннер',
+          description: 'Создать новый баннер платформы (370x120px)',
+        },
+        editDialog: {
+          title: 'Редактировать баннер',
+          description: 'Обновить баннер платформы',
+        },
+        form: {
+          htmlSource: 'HTML код',
+          htmlSourcePlaceholder: 'Вставьте HTML код...',
+          image: 'Изображение баннера',
+          currentImage: 'Текущее изображение',
+          replaceImage: 'Заменить изображение',
+        },
+        deleteDialog: {
+          title: 'Удалить баннер',
+          description: 'Вы уверены, что хотите удалить этот баннер? Это действие нельзя отменить.',
+          confirm: 'Удалить',
+        },
+        empty: {
+          title: 'Баннеры не найдены',
+          description: 'Баннеры появятся здесь, когда вы их создадите',
         },
       },
       dashboard: {
@@ -1145,6 +1231,7 @@ const resources = {
         properties: 'Obyektlar',
         stories: 'Hikoyalar',
         news: 'Yangiliklar',
+        banners: 'Bannerlar',
         chat: 'Chat',
       },
       auth: {
@@ -1484,6 +1571,8 @@ const resources = {
           image: 'Rasm',
           video: 'Video',
           mediaFile: 'Media fayl',
+          currentMedia: 'Joriy media',
+          replaceMedia: 'Media almashtirish',
         },
         deleteDialog: {
           title: 'Yangilikni o‘chirish',
@@ -1493,6 +1582,46 @@ const resources = {
         empty: {
           title: 'Yangiliklar topilmadi',
           description: 'Yangiliklar siz yaratganingizda shu yerda paydo bo‘ladi',
+        },
+      },
+      banners: {
+        title: 'Bannerlar',
+        subtitle: 'Platforma bannerlarini yaratish va boshqarish',
+        create: 'Banner yaratish',
+        loading: 'Bannerlar yuklanmoqda...',
+        error: 'Bannerlarni yuklab bo‘lmadi',
+        searchPlaceholder: 'Bannerlarni qidirish...',
+        created: 'Yaratilgan',
+        actions: {
+          preview: 'Ko‘rish',
+          edit: 'Tahrirlash',
+        },
+        preview: {
+          title: 'Bannerni ko‘rish',
+        },
+        createDialog: {
+          title: 'Banner yaratish',
+          description: 'Yangi platforma bannerni yaratish (370x120px)',
+        },
+        editDialog: {
+          title: 'Bannerni tahrirlash',
+          description: 'Platforma bannerni yangilash',
+        },
+        form: {
+          htmlSource: 'HTML manba',
+          htmlSourcePlaceholder: 'HTML kodini joylashtiring...',
+          image: 'Banner rasmi',
+          currentImage: 'Joriy rasm',
+          replaceImage: 'Rasmni almashtirish',
+        },
+        deleteDialog: {
+          title: 'Bannerni o‘chirish',
+          description: 'Bu bannerni o‘chirishni xohlaysizmi? Bu harakatni qaytarib bo‘lmaydi.',
+          confirm: 'O‘chirish',
+        },
+        empty: {
+          title: 'Bannerlar topilmadi',
+          description: 'Bannerlar siz yaratganingizda shu yerda paydo bo‘ladi',
         },
       },
       dashboard: {

@@ -13,6 +13,7 @@ import CottageDetailsUpdate from './pages/CottageDetailsUpdate'
 import ApartmentDetailsUpdate from './pages/ApartmentDetailsUpdate'
 import StoriesModerationPage from './pages/StoriesModerationPage'
 import NewsManagementPage from './pages/NewsManagementPage'
+import BannerManagementPage from './pages/BannerManagementPage'
 
 function App() {
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore()
@@ -58,6 +59,7 @@ function App() {
         <Route path="properties/:propertyType/:propertyId" element={<Navigate to="/properties" replace />} />
         <Route path="stories" element={<StoriesModerationPage />} />
         <Route path="news" element={<NewsManagementPage />} />
+        <Route path="banners" element={<BannerManagementPage />} />
       </Route>
     </Routes>
   )

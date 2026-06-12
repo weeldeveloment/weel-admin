@@ -565,8 +565,32 @@ export default function NewsManagementPage() {
                 className="rounded-xl min-h-24"
               />
             </div>
+            {/* Existing media preview */}
+            {editingNews && editingNews.media.length > 0 && !formData.media_file && (
+              <div className="space-y-2">
+                <Label>{t('news.form.currentMedia')}</Label>
+                <div className="flex flex-wrap gap-2">
+                  {editingNews.media.map((m) => (
+                    <div key={m.guid} className="relative h-20 w-20 rounded-lg overflow-hidden bg-muted border">
+                      {m.media_type === 'video' ? (
+                        <video src={m.media_url ?? ''} className="h-full w-full object-cover" />
+                      ) : (
+                        <img src={m.media_url ?? ''} alt="" className="h-full w-full object-cover" />
+                      )}
+                      <div className="absolute top-0.5 right-0.5">
+                        <Badge variant="secondary" className="text-[10px] px-1">
+                          {m.media_type}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="edit-news-media-type">{t('news.form.mediaType')}</Label>
+              <Label htmlFor="edit-news-media-type">
+                {editingNews && editingNews.media.length > 0 ? t('news.form.replaceMedia') : t('news.form.mediaType')}
+              </Label>
               <Select
                 value={formData.media_type}
                 onValueChange={(v) => setFormData(prev => ({ ...prev, media_type: v }))}

@@ -168,6 +168,14 @@ export interface AdminStory {
   body?: string | null
 }
 
+export interface Banner {
+  guid: string
+  html_source: string
+  image: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface AdminNews {
   guid: string
   title: string | null
