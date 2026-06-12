@@ -1,8 +1,8 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const distDir = join(import.meta.dir, "dist");
-const port = Number(process.env.PORT);
+const port = Number(process.env.PORT || 3000);
 
 function contentType(pathname: string): string | undefined {
   if (pathname.endsWith(".html")) return "text/html; charset=utf-8";
@@ -21,6 +21,29 @@ function contentType(pathname: string): string | undefined {
   return undefined;
 }
 
+function cacheHeadersFor(pathname: string) {
+  // Treat index.html (SPA shell) as no-cache so shell updates immediately after deploy
+  if (pathname === "/" || pathname === "/index.html") {
+    return {
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
+    };
+  }
+
+  // Long-term cache for static hashed assets (Vite outputs hashed filenames)
+  if (pathname.match(/\.[a-f0-9]{6,}\./) || pathname.match(/\.(?:css|js|mjs|json|jpg|jpeg|png|gif|ico|svg|webp|woff2?|ttf|eot)$/)) {
+    return {
+      "Cache-Control": "public, max-age=31536000, immutable",
+    };
+  }
+
+  // Default: no-cache for unknown routes (SPA fallback will serve index.html)
+  return {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+  };
+}
+
 Bun.serve({
   port,
   async fetch(req) {
@@ -29,15 +52,29 @@ Bun.serve({
     const rel = pathname === "/" ? "/index.html" : pathname;
     const filePath = join(distDir, rel.replace(/^\//, ""));
 
-    // Serve the file if it exists, otherwise fall back to SPA index.html.
     const finalPath = existsSync(filePath) ? filePath : join(distDir, "index.html");
-    const file = Bun.file(finalPath);
 
-    return new Response(file, {
-      headers: {
-        ...(contentType(finalPath) ? { "Content-Type": contentType(finalPath)! } : {}),
-      },
-    });
+    // Prepare file response and add cache headers + basic validators
+    const file = Bun.file(finalPath);
+    const headers: Record<string, string> = {};
+
+    const ct = contentType(finalPath);
+    if (ct) headers["Content-Type"] = ct;
+
+    // Add Cache-Control / ETag / Last-Modified where possible
+    const relPathForHeaders = rel;
+    const ch = cacheHeadersFor(relPathForHeaders);
+    Object.assign(headers, ch);
+
+    try {
+      const st = statSync(finalPath);
+      headers["Last-Modified"] = new Date(st.mtimeMs).toUTCString();
+      headers["ETag"] = `W/"${st.size}-${Math.floor(st.mtimeMs)}"`;
+    } catch (e) {
+      // ignore
+    }
+
+    return new Response(file, { headers });
   },
 });
 

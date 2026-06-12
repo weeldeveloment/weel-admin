@@ -1,27 +1,44 @@
+# Production multi-stage Dockerfile for Vite-built frontend (Bun runtime for Dokploy)
+
+# --- Build stage (Bun) ---
 FROM oven/bun:1.2.22 AS build
+LABEL stage=builder
 
 WORKDIR /app
 
-COPY bun.lock package.json ./
-RUN bun install --frozen-lockfile
+# Install dependencies first to leverage Docker layer cache
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production=false
 
+# Copy source files and build with Vite
 COPY . .
 
-ARG VITE_API_URL
-ARG VITE_WS_URL
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_WS_URL=$VITE_WS_URL
+# Accept build-time overrides for Vite envs
+ARG VITE_API_URL=""
+ARG VITE_WS_URL=""
+ARG CACHEBUST=""
+ENV VITE_API_URL=${VITE_API_URL} \
+    VITE_WS_URL=${VITE_WS_URL} \
+    NODE_ENV=production
 
+# Use CACHEBUST arg to force rebuild when CI provides a new value
+RUN echo "cachebust=$CACHEBUST"
+
+# Build the app
 RUN bun run build
 
-FROM oven/bun:1.2.22-alpine
+# --- Runtime stage (Bun) ---
+FROM oven/bun:1.2.22-alpine AS runtime
+LABEL stage=runtime
 
 WORKDIR /app
-ENV NODE_ENV=production
-ENV PORT=3000
 
+# Copy built assets and serve script
 COPY --from=build /app/dist ./dist
 COPY serve.ts ./serve.ts
 
+ENV PORT=3000
+
 EXPOSE 3000
+
 CMD ["bun", "run", "serve.ts"]

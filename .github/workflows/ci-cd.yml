@@ -87,6 +87,7 @@ jobs:
           build-args: |
             VITE_API_URL=${{ secrets.VITE_API_URL }}
             VITE_WS_URL=${{ secrets.VITE_WS_URL }}
+            CACHEBUST=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -99,7 +100,12 @@ jobs:
         run: |
           # Preferred: deployment webhook (no Dokploy API key required).
           if [ -n "$DOKPLOY_WEBHOOK_URL" ]; then
-            payload="$(printf '{"ref":"%s","repository":{"full_name":"%s"}}' "$GITHUB_REF" "$GITHUB_REPOSITORY")"
+            # Include applicationId and the exact image tag so Dokploy can deploy the correct image
+            IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
+            SHA_TAG="sha-${GITHUB_SHA}"
+            payload="$(printf '{"applicationId":"%s","image":"%s","tag":"%s","ref":"%s","repository":{"full_name":"%s"}}' \ 
+              "$DOKPLOY_APPLICATION_ID" "$IMAGE" "$SHA_TAG" "$GITHUB_REF" "$GITHUB_REPOSITORY")"
+            echo "Payload to Dokploy: $payload" >&2
             response="$(curl -sS -X POST "$DOKPLOY_WEBHOOK_URL" \
               -H "Content-Type: application/json" \
               -H "X-GitHub-Event: push" \
