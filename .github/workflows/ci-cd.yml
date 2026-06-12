@@ -100,17 +100,19 @@ jobs:
         run: |
           # Preferred: deployment webhook (no Dokploy API key required).
           if [ -n "$DOKPLOY_WEBHOOK_URL" ]; then
+            set -euo pipefail
             # Include applicationId and the exact image tag so Dokploy can deploy the correct image
             IMAGE="ghcr.io/${GITHUB_REPOSITORY}"
             SHA_TAG="sha-${GITHUB_SHA}"
-            payload="$(printf '{"applicationId":"%s","image":"%s","tag":"%s","ref":"%s","repository":{"full_name":"%s"}}' \ 
-              "$DOKPLOY_APPLICATION_ID" "$IMAGE" "$SHA_TAG" "$GITHUB_REF" "$GITHUB_REPOSITORY")"
-            echo "Payload to Dokploy: $payload" >&2
-            response="$(curl -sS -X POST "$DOKPLOY_WEBHOOK_URL" \
+            payload=$(printf '{"applicationId":"%s","image":"%s","tag":"%s","ref":"%s","repository":{"full_name":"%s"}}' \
+              "$DOKPLOY_APPLICATION_ID" "$IMAGE" "$SHA_TAG" "$GITHUB_REF" "$GITHUB_REPOSITORY")
+
+            # Send payload (use --data-raw to avoid curl interpreting @)
+            response=$(curl -fsS -X POST "$DOKPLOY_WEBHOOK_URL" \
               -H "Content-Type: application/json" \
               -H "X-GitHub-Event: push" \
-              -d "$payload")"
-            echo "$response"
+              --data-raw "$payload" || true)
+            echo "Dokploy response: $response"
             exit 0
           fi
 
