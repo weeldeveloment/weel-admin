@@ -70,8 +70,9 @@ Bun.serve({
       const st = statSync(finalPath);
       headers["Last-Modified"] = new Date(st.mtimeMs).toUTCString();
       headers["ETag"] = `W/"${st.size}-${Math.floor(st.mtimeMs)}"`;
-    } catch (e) {
-      // ignore
+    } catch (err) {
+      // ignore; reference the error to satisfy linter
+      void err;
     }
 
     return new Response(file, { headers });
