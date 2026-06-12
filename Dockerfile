@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Install dependencies first to leverage Docker layer cache
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production=false
+RUN bun install --frozen-lockfile
 
 # Copy source files and build with Vite
 COPY . .
