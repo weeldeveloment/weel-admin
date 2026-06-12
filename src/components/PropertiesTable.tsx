@@ -137,6 +137,18 @@ export default function PropertiesTable({ partnerId, onCountChange }: Properties
     )
   }
 
+  const getPropertyInfo = (property: PartnerProperty) => (
+    <>
+      <p className="line-clamp-1 font-semibold">{property.title}</p>
+      <div className="flex items-center justify-between gap-2">
+        <Badge variant="outline">{getPropertyType(property)}</Badge>
+        <span className="text-sm text-muted-foreground">
+          {formatPrice(property.price, property.currency)}
+        </span>
+      </div>
+    </>
+  )
+
   return (
     <div className="space-y-4">
       {/* Filters */}
@@ -238,13 +250,7 @@ export default function PropertiesTable({ partnerId, onCountChange }: Properties
                       {renderImage(property, 'h-full w-full object-cover')}
                     </div>
                     <div className="flex flex-1 flex-col justify-center space-y-2 p-4">
-                      <p className="line-clamp-1 font-semibold">{property.title}</p>
-                      <div className="flex items-center justify-between gap-2">
-                        <Badge variant="outline">{getPropertyType(property)}</Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {formatPrice(property.price, property.currency)}
-                        </span>
-                      </div>
+                      {getPropertyInfo(property)}
                     </div>
                   </button>
                 ))}
@@ -262,13 +268,7 @@ export default function PropertiesTable({ partnerId, onCountChange }: Properties
                       {renderImage(property, 'h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]')}
                     </div>
                     <div className="space-y-2 p-4">
-                      <p className="line-clamp-2 text-sm font-semibold">{property.title}</p>
-                      <div className="flex items-center justify-between gap-2">
-                        <Badge variant="outline">{getPropertyType(property)}</Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {formatPrice(property.price, property.currency)}
-                        </span>
-                      </div>
+                      {getPropertyInfo(property)}
                     </div>
                   </button>
                 ))}

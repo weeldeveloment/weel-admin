@@ -1,10 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -12,20 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Image, LayoutGrid, List, Plus, RotateCcw } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useTranslation } from 'react-i18next'
 import { PropertyItem, PropertyListResult, PaginatedResponse } from '@/types'
-import { formatDate } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
+import PropertyTabContent from '@/components/PropertyTabContent'
 
 type PropertyTab = 'cottages' | 'apartments'
 type ViewMode = 'grid' | 'list'
@@ -91,106 +80,6 @@ const getNextPageFromUrl = (nextUrl: string | null): number | undefined => {
   }
 }
 
-function PropertyCard({
-  item,
-  viewMode,
-  type,
-}: {
-  item: PropertyItem
-  viewMode: ViewMode
-  type: PropertyTab
-}) {
-  const navigate = useNavigate()
-  const { t } = useTranslation()
-
-  const handleClick = () => {
-    const propertyId = item.guid
-    if (!propertyId) return
-    navigate(`/properties/${type}/${propertyId}`)
-  }
-
-  const verifiedBadge = (
-    <Badge
-      variant={item.is_verified ? 'default' : 'secondary'}
-      className="text-[10px] px-1.5 py-0"
-    >
-      {item.is_verified ? t('properties.verified') : t('properties.unverified')}
-    </Badge>
-  )
-
-  const dateText = item.created_at ? (
-    <span className="text-[10px] text-muted-foreground">
-      {formatDate(item.created_at)}
-    </span>
-  ) : null
-
-  if (viewMode === 'list') {
-    return (
-      <button
-        type="button"
-        className="group flex w-full overflow-hidden rounded-xl border text-left text-sm transition-all hover:shadow-md"
-        onClick={handleClick}
-      >
-        <div className="h-24 w-32 shrink-0 bg-muted sm:h-28 sm:w-40">
-          {item.img?.[0] ? (
-            <img
-              src={item.img[0]}
-              alt={item.title}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-              <Image className="h-8 w-8 text-muted-foreground" />
-            </div>
-          )}
-        </div>
-        <Card className="flex flex-1 flex-col justify-center rounded-none border-0 border-l shadow-none">
-          <CardContent className="space-y-1.5 p-4">
-            <p className="line-clamp-1 font-semibold">{item.title}</p>
-            <p className="text-xs text-muted-foreground">{item.city}</p>
-            <div className="flex items-center gap-2">
-              {verifiedBadge}
-              {dateText}
-            </div>
-          </CardContent>
-        </Card>
-      </button>
-    )
-  }
-
-  return (
-    <button
-      type="button"
-      className="group w-full overflow-hidden rounded-xl border text-left text-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-      onClick={handleClick}
-    >
-      <div className="aspect-[4/3] w-full bg-muted">
-        {item.img?.[0] ? (
-          <img
-            src={item.img[0]}
-            alt={item.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-muted">
-            <Image className="h-10 w-10 text-muted-foreground" />
-          </div>
-        )}
-      </div>
-      <Card className="rounded-none border-0 border-t shadow-none">
-        <CardContent className="space-y-1.5 p-4">
-          <p className="line-clamp-1 font-semibold">{item.title}</p>
-          <p className="text-xs text-muted-foreground">{item.city}</p>
-          <div className="flex items-center justify-between pt-0.5">
-            {verifiedBadge}
-            {dateText}
-          </div>
-        </CardContent>
-      </Card>
-    </button>
-  )
-}
-
 export default function PropertiesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -206,8 +95,8 @@ export default function PropertiesPage() {
   const [cottagesDateTo, setCottagesDateTo] = useState('')
   const [apartmentsDateFrom, setApartmentsDateFrom] = useState('')
   const [apartmentsDateTo, setApartmentsDateTo] = useState('')
-  const cottagesLoadMoreRef = useRef<HTMLDivElement | null>(null)
-  const apartmentsLoadMoreRef = useRef<HTMLDivElement | null>(null)
+  const cottagesLoadMoreRef = useRef<HTMLDivElement>(null)
+  const apartmentsLoadMoreRef = useRef<HTMLDivElement>(null)
 
   const cottagesQuery = useInfiniteQuery({
     queryKey: ['properties', 'cottages', cottagesSearch],
@@ -263,46 +152,6 @@ export default function PropertiesPage() {
     })
   }, [apartmentItems, apartmentsVerified, apartmentsDateFrom, apartmentsDateTo])
 
-  useEffect(() => {
-    if (activeTab !== 'cottages') return
-    if (!cottagesLoadMoreRef.current) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0]
-        if (!target.isIntersecting) return
-        if (!cottagesQuery.hasNextPage || cottagesQuery.isFetchingNextPage) return
-        void cottagesQuery.fetchNextPage()
-      },
-      { rootMargin: '200px' }
-    )
-
-    observer.observe(cottagesLoadMoreRef.current)
-    return () => observer.disconnect()
-  }, [activeTab, cottagesQuery.hasNextPage, cottagesQuery.isFetchingNextPage, cottagesQuery.fetchNextPage])
-
-  useEffect(() => {
-    if (activeTab !== 'apartments') return
-    if (!apartmentsLoadMoreRef.current) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0]
-        if (!target.isIntersecting) return
-        if (!apartmentsQuery.hasNextPage || apartmentsQuery.isFetchingNextPage) return
-        void apartmentsQuery.fetchNextPage()
-      },
-      { rootMargin: '200px' }
-    )
-
-    observer.observe(apartmentsLoadMoreRef.current)
-    return () => observer.disconnect()
-  }, [activeTab, apartmentsQuery.hasNextPage, apartmentsQuery.isFetchingNextPage, apartmentsQuery.fetchNextPage])
-
-  const listContainerClass = viewMode === 'grid'
-    ? 'grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3'
-    : 'flex flex-col gap-3'
-
   const openCreateDialog = (initialType: PropertyTab) => {
     setCreateType(initialType)
     setCreateDialogOpen(true)
@@ -321,208 +170,47 @@ export default function PropertiesPage() {
           <TabsTrigger value="apartments">{t('properties.tabs.apartments')}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="cottages" className="flex h-full flex-col space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">{t('properties.filter.label')}</p>
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex flex-1 flex-wrap items-end gap-3">
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t('properties.searchLabel')}</Label>
-                  <Input
-                    type="text"
-                    placeholder={t('properties.searchPlaceholder', { type: t('properties.tabs.cottages') })}
-                    value={cottagesSearch}
-                    onChange={(e) => setCottagesSearch(e.target.value)}
-                    className="w-52"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t('properties.filter.verified')}</Label>
-                  <Select value={cottagesVerified} onValueChange={(v) => setCottagesVerified(v as VerifiedFilter)}>
-                    <SelectTrigger className="w-44">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t('properties.filter.all')}</SelectItem>
-                      <SelectItem value="verified">{t('properties.verified')}</SelectItem>
-                      <SelectItem value="unverified">{t('properties.unverified')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t('properties.filter.dateFrom')}</Label>
-                  <Input type="date" value={cottagesDateFrom} onChange={(e) => setCottagesDateFrom(e.target.value)} className="w-40" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t('properties.filter.dateTo')}</Label>
-                  <Input type="date" value={cottagesDateTo} onChange={(e) => setCottagesDateTo(e.target.value)} className="w-40" />
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-9 px-2 text-muted-foreground"
-                  onClick={() => {
-                    setCottagesSearch('')
-                    setCottagesVerified('all')
-                    setCottagesDateFrom('')
-                    setCottagesDateTo('')
-                  }}
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  {t('properties.filter.reset')}
-                </Button>
-              </div>
-            <div className="flex items-center gap-3">
-              <Button
-                size="sm"
-                className="hidden sm:inline-flex"
-                onClick={() => openCreateDialog('cottages')}
-              >
-                <Plus className="h-4 w-4" />
-                {t('properties.createProperty')}
-              </Button>
-              <div className="flex items-center rounded-md border">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('grid')}
-                  className={`inline-flex items-center justify-center p-2 transition-colors ${viewMode === 'grid' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                  title={t('properties.viewMode.grid')}
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('list')}
-                  className={`inline-flex items-center justify-center p-2 transition-colors ${viewMode === 'list' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                  title={t('properties.viewMode.list')}
-                >
-                  <List className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-          </div>
-          <div className="min-h-0 flex-1 overflow-auto">
-            {cottagesQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.cottages') })}</p> : null}
-            {cottagesQuery.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.cottages') })}</p> : null}
-            {cottagesQuery.isSuccess && !cottagesQuery.isFetchingNextPage && filteredCottageItems.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.cottages') })}</p>
-            ) : null}
-            {filteredCottageItems.length > 0 ? (
-              <ul className={listContainerClass}>
-                {filteredCottageItems.map((item) => (
-                  <li key={item.guid}>
-                    <PropertyCard item={item} viewMode={viewMode} type="cottages" />
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            <div ref={cottagesLoadMoreRef} className="h-4" />
-            {cottagesQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.cottages') })}</p> : null}
-          </div>
+        <TabsContent value="cottages">
+          <PropertyTabContent
+            tab="cottages"
+            search={cottagesSearch}
+            onSearchChange={setCottagesSearch}
+            verified={cottagesVerified}
+            onVerifiedChange={setCottagesVerified}
+            dateFrom={cottagesDateFrom}
+            onDateFromChange={setCottagesDateFrom}
+            dateTo={cottagesDateTo}
+            onDateToChange={setCottagesDateTo}
+            query={cottagesQuery}
+            filteredItems={filteredCottageItems}
+            loadMoreRef={cottagesLoadMoreRef}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onOpenCreate={openCreateDialog}
+          />
         </TabsContent>
 
-        <TabsContent value="apartments" className="flex h-full flex-col space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">{t('properties.filter.label')}</p>
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex flex-1 flex-wrap items-end gap-3">
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t('properties.searchLabel')}</Label>
-                  <Input
-                    type="text"
-                    placeholder={t('properties.searchPlaceholder', { type: t('properties.tabs.apartments') })}
-                    value={apartmentsSearch}
-                    onChange={(e) => setApartmentsSearch(e.target.value)}
-                    className="w-52"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t('properties.filter.verified')}</Label>
-                  <Select value={apartmentsVerified} onValueChange={(v) => setApartmentsVerified(v as VerifiedFilter)}>
-                    <SelectTrigger className="w-44">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t('properties.filter.all')}</SelectItem>
-                      <SelectItem value="verified">{t('properties.verified')}</SelectItem>
-                      <SelectItem value="unverified">{t('properties.unverified')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t('properties.filter.dateFrom')}</Label>
-                  <Input type="date" value={apartmentsDateFrom} onChange={(e) => setApartmentsDateFrom(e.target.value)} className="w-40" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t('properties.filter.dateTo')}</Label>
-                  <Input type="date" value={apartmentsDateTo} onChange={(e) => setApartmentsDateTo(e.target.value)} className="w-40" />
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-9 px-2 text-muted-foreground"
-                  onClick={() => {
-                    setApartmentsSearch('')
-                    setApartmentsVerified('all')
-                    setApartmentsDateFrom('')
-                    setApartmentsDateTo('')
-                  }}
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  {t('properties.filter.reset')}
-                </Button>
-              </div>
-              <div className="flex items-center gap-3">
-                <Button
-                  size="sm"
-                  className="hidden sm:inline-flex"
-                  onClick={() => openCreateDialog('apartments')}
-                >
-                  <Plus className="h-4 w-4" />
-                  {t('properties.createProperty')}
-                </Button>
-                <div className="flex items-center rounded-md border">
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('grid')}
-                    className={`inline-flex items-center justify-center p-2 transition-colors ${viewMode === 'grid' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                    title={t('properties.viewMode.grid')}
-                  >
-                    <LayoutGrid className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode('list')}
-                    className={`inline-flex items-center justify-center p-2 transition-colors ${viewMode === 'list' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-                    title={t('properties.viewMode.list')}
-                  >
-                    <List className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="min-h-0 flex-1 overflow-auto">
-            {apartmentsQuery.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: t('properties.tabs.apartments') })}</p> : null}
-            {apartmentsQuery.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: t('properties.tabs.apartments') })}</p> : null}
-            {apartmentsQuery.isSuccess && !apartmentsQuery.isFetchingNextPage && filteredApartmentItems.length === 0 ? (
-              <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: t('properties.tabs.apartments') })}</p>
-            ) : null}
-            {filteredApartmentItems.length > 0 ? (
-              <ul className={listContainerClass}>
-                {filteredApartmentItems.map((item) => (
-                  <li key={item.guid}>
-                    <PropertyCard item={item} viewMode={viewMode} type="apartments" />
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            <div ref={apartmentsLoadMoreRef} className="h-4" />
-            {apartmentsQuery.isFetchingNextPage ? <p className="mt-3 text-xs text-muted-foreground">{t('properties.loadMore', { type: t('properties.tabs.apartments') })}</p> : null}
-          </div>
+        <TabsContent value="apartments">
+          <PropertyTabContent
+            tab="apartments"
+            search={apartmentsSearch}
+            onSearchChange={setApartmentsSearch}
+            verified={apartmentsVerified}
+            onVerifiedChange={setApartmentsVerified}
+            dateFrom={apartmentsDateFrom}
+            onDateFromChange={setApartmentsDateFrom}
+            dateTo={apartmentsDateTo}
+            onDateToChange={setApartmentsDateTo}
+            query={apartmentsQuery}
+            filteredItems={filteredApartmentItems}
+            loadMoreRef={apartmentsLoadMoreRef}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onOpenCreate={openCreateDialog}
+          />
         </TabsContent>
       </Tabs>
+
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

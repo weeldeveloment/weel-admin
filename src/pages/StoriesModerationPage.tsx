@@ -35,6 +35,7 @@ import {
 import api from '@/lib/api'
 import { useTranslation } from 'react-i18next'
 import { AdminStory, PaginatedResponse } from '@/types'
+import ErrorAlert from '@/components/ErrorAlert'
 
 const getApiErrorMessage = (err: unknown): string | null => {
   if (
@@ -199,20 +200,7 @@ export default function StoriesModerationPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-          <p className="text-sm font-medium text-red-800">{error}</p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-3 border-red-300 text-red-700 hover:bg-red-100"
-            onClick={() => {
-              setError(null)
-              void fetchStories()
-            }}
-          >
-            {t('common.retry')}
-          </Button>
-        </div>
+        <ErrorAlert message={error} onRetry={() => { setError(null); void fetchStories() }} />
       )}
 
       {/* Controls */}
