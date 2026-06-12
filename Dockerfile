@@ -24,6 +24,10 @@ ENV VITE_API_URL=${VITE_API_URL} \
 # Use CACHEBUST arg to force rebuild when CI provides a new value
 RUN echo "cachebust=$CACHEBUST"
 
+# Write deploy version so serve.ts can use it as a cache-busting token
+ARG DEPLOY_VERSION=""
+RUN echo "${DEPLOY_VERSION}" > /app/.deploy-version
+
 # Build the app
 RUN bun run build
 
@@ -35,6 +39,7 @@ WORKDIR /app
 
 # Copy built assets and serve script
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/.deploy-version ./.deploy-version
 COPY serve.ts ./serve.ts
 
 ENV PORT=3000

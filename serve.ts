@@ -1,8 +1,18 @@
-import { existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const distDir = join(import.meta.dir, "dist");
 const port = Number(process.env.PORT || 3000);
+
+const deployVersion =
+  process.env.DEPLOY_VERSION ||
+  (() => {
+    try {
+      return readFileSync(join(distDir, "..", ".deploy-version"), "utf-8").trim();
+    } catch {
+      return String(Date.now());
+    }
+  })();
 
 function contentType(pathname: string): string | undefined {
   if (pathname.endsWith(".html")) return "text/html; charset=utf-8";
@@ -22,23 +32,23 @@ function contentType(pathname: string): string | undefined {
 }
 
 function cacheHeadersFor(pathname: string) {
-  // Treat index.html (SPA shell) as no-cache so shell updates immediately after deploy
-  if (pathname === "/" || pathname === "/index.html") {
+  const isHtml = pathname === "/" || pathname === "/index.html" || pathname.endsWith(".html");
+  if (isHtml) {
     return {
       "Cache-Control": "no-cache, no-store, must-revalidate",
       Pragma: "no-cache",
       Expires: "0",
+      "Surrogate-Control": "no-store",
+      "CDN-Cache-Control": "no-store",
     };
   }
 
-  // Long-term cache for static hashed assets (Vite outputs hashed filenames)
   if (pathname.match(/\.[a-f0-9]{6,}\./) || pathname.match(/\.(?:css|js|mjs|json|jpg|jpeg|png|gif|ico|svg|webp|woff2?|ttf|eot)$/)) {
     return {
       "Cache-Control": "public, max-age=31536000, immutable",
     };
   }
 
-  // Default: no-cache for unknown routes (SPA fallback will serve index.html)
   return {
     "Cache-Control": "no-cache, no-store, must-revalidate",
   };
@@ -54,30 +64,28 @@ Bun.serve({
 
     const finalPath = existsSync(filePath) ? filePath : join(distDir, "index.html");
 
-    // Prepare file response and add cache headers + basic validators
     const file = Bun.file(finalPath);
     const headers: Record<string, string> = {};
 
     const ct = contentType(finalPath);
     if (ct) headers["Content-Type"] = ct;
 
-    // Add Cache-Control / ETag / Last-Modified where possible
-    const relPathForHeaders = rel;
-    const ch = cacheHeadersFor(relPathForHeaders);
+    const ch = cacheHeadersFor(rel);
     Object.assign(headers, ch);
+
+    headers["X-Deploy-Version"] = deployVersion;
 
     try {
       const st = statSync(finalPath);
       headers["Last-Modified"] = new Date(st.mtimeMs).toUTCString();
       headers["ETag"] = `W/"${st.size}-${Math.floor(st.mtimeMs)}"`;
-    } catch (err) {
-      // ignore; reference the error to satisfy linter
-      void err;
+    } catch {
+      // stat failed — skip validators
     }
 
     return new Response(file, { headers });
   },
 });
 
-console.log(`Serving ${distDir} on :${port}`);
+console.log(`Serving ${distDir} on :${port} [version=${deployVersion}]`);
 
