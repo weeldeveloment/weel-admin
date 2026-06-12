@@ -75,12 +75,15 @@ Bun.serve({
 
     headers["X-Deploy-Version"] = deployVersion;
 
-    try {
-      const st = statSync(finalPath);
-      headers["Last-Modified"] = new Date(st.mtimeMs).toUTCString();
-      headers["ETag"] = `W/"${st.size}-${Math.floor(st.mtimeMs)}"`;
-    } catch {
-      // stat failed — skip validators
+    const isHtml = rel === "/" || rel === "/index.html" || rel.endsWith(".html");
+    if (!isHtml) {
+      try {
+        const st = statSync(finalPath);
+        headers["Last-Modified"] = new Date(st.mtimeMs).toUTCString();
+        headers["ETag"] = `W/"${st.size}-${Math.floor(st.mtimeMs)}"`;
+      } catch {
+        // stat failed — skip validators
+      }
     }
 
     return new Response(file, { headers });
