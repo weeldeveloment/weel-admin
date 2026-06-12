@@ -163,8 +163,12 @@ export default function PropertiesPage() {
   }
 
   return (
-    <div className="flex h-full flex-col p-4 md:p-6">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as PropertyTab)} className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto p-4 md:p-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as PropertyTab)}
+        className="flex min-h-0 flex-col"
+      >
         <TabsList>
           <TabsTrigger value="cottages">{t('properties.tabs.cottages')}</TabsTrigger>
           <TabsTrigger value="apartments">{t('properties.tabs.apartments')}</TabsTrigger>

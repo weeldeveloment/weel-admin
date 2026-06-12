@@ -94,7 +94,7 @@ export default function PropertyTabContent({
   }
 
   return (
-    <div className="flex h-full flex-col space-y-4">
+    <div className="flex flex-col space-y-4">
       <div className="space-y-2">
         <p className="text-sm font-medium text-foreground">{t('properties.filter.label')}</p>
         <div className="flex flex-wrap items-end gap-3">
@@ -170,7 +170,7 @@ export default function PropertyTabContent({
           </div>
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div className="space-y-4">
         {query.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: tabLabel })}</p> : null}
         {query.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: tabLabel })}</p> : null}
         {query.isSuccess && !query.isFetchingNextPage && filteredItems.length === 0 ? (

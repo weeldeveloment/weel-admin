@@ -16,7 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Users, MessageSquare, LogOut, Home, Building2, BookOpen } from 'lucide-react'
+import { Users, MessageSquare, LogOut, Home, Building2, BookOpen, Newspaper } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeToggle } from './ThemeToggle'
@@ -31,6 +31,7 @@ export default function Layout() {
     { icon: Users, label: t('nav.users'), path: '/users' },
     { icon: Building2, label: t('nav.properties'), path: '/properties' },
     { icon: BookOpen, label: t('nav.stories'), path: '/stories' },
+    { icon: Newspaper, label: t('nav.news'), path: '/news' },
     { icon: MessageSquare, label: t('nav.chat'), path: '/chat' },
   ]
 

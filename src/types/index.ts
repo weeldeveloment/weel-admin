@@ -163,6 +163,23 @@ export interface AdminStory {
   uploaded_at: string | null
   views: number
   media: StoryMedia[]
+  is_platform_news?: boolean
+  title?: string | null
+  body?: string | null
+}
+
+export interface AdminNews {
+  guid: string
+  title: string | null
+  body: string | null
+  is_verified: boolean
+  verified_by_user_id: number | null
+  verified_at: string | null
+  created_at: string
+  updated_at: string
+  uploaded_at: string | null
+  views: number
+  media: StoryMedia[]
 }
 
 export interface Actor {

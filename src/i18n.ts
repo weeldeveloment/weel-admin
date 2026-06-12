@@ -42,6 +42,7 @@ const resources = {
         bookings: 'Bookings',
         properties: 'Properties',
         stories: 'Stories',
+        news: 'News',
         chat: 'Chat',
       },
       auth: {
@@ -338,6 +339,60 @@ const resources = {
           description: 'Stories will appear here when partners upload them',
         },
       },
+      news: {
+        title: 'Platform News',
+        subtitle: 'Create and manage platform news articles',
+        create: 'Create News',
+        loading: 'Loading news...',
+        error: 'Failed to load news',
+        deleteError: 'Failed to delete news',
+        searchPlaceholder: 'Search by title or GUID...',
+        sort: {
+          newest: 'Newest first',
+          oldest: 'Oldest first',
+          mostViewed: 'Most viewed',
+        },
+        tabs: {
+          all: 'All',
+        },
+        views: '{{count}} views',
+        created: 'Created',
+        actions: {
+          preview: 'Preview',
+          edit: 'Edit',
+        },
+        preview: {
+          title: 'News Preview',
+        },
+        createDialog: {
+          title: 'Create News',
+          description: 'Create a new platform news article',
+        },
+        editDialog: {
+          title: 'Edit News',
+          description: 'Update the platform news article',
+        },
+        form: {
+          title: 'Title',
+          titlePlaceholder: 'News title',
+          body: 'Content',
+          bodyPlaceholder: 'News content...',
+          mediaType: 'Media type',
+          mediaTypePlaceholder: 'Select media type',
+          image: 'Image',
+          video: 'Video',
+          mediaFile: 'Media file',
+        },
+        deleteDialog: {
+          title: 'Delete News',
+          description: 'Are you sure you want to delete this news article? This action cannot be undone.',
+          confirm: 'Delete',
+        },
+        empty: {
+          title: 'No news found',
+          description: 'News articles will appear here when you create them',
+        },
+      },
       dashboard: {
         title: 'Dashboard',
         welcome: 'Welcome to Weel Admin Panel',
@@ -538,6 +593,7 @@ const resources = {
         bookings: 'Бронирования',
         properties: 'Объекты',
         stories: 'Истории',
+        news: 'Новости',
         chat: 'Чат',
       },
       auth: {
@@ -834,6 +890,60 @@ const resources = {
           description: 'Истории появятся здесь, когда партнёры их загрузят',
         },
       },
+      news: {
+        title: 'Новости платформы',
+        subtitle: 'Создание и управление новостями платформы',
+        create: 'Создать новость',
+        loading: 'Загрузка новостей...',
+        error: 'Не удалось загрузить новости',
+        deleteError: 'Не удалось удалить новость',
+        searchPlaceholder: 'Поиск по названию или GUID...',
+        sort: {
+          newest: 'Сначала новые',
+          oldest: 'Сначала старые',
+          mostViewed: 'Больше просмотров',
+        },
+        tabs: {
+          all: 'Все',
+        },
+        views: '{{count}} просмотров',
+        created: 'Создано',
+        actions: {
+          preview: 'Просмотр',
+          edit: 'Редактировать',
+        },
+        preview: {
+          title: 'Просмотр новости',
+        },
+        createDialog: {
+          title: 'Создать новость',
+          description: 'Создать новую статью новостей платформы',
+        },
+        editDialog: {
+          title: 'Редактировать новость',
+          description: 'Обновить статью новостей платформы',
+        },
+        form: {
+          title: 'Заголовок',
+          titlePlaceholder: 'Заголовок новости',
+          body: 'Содержание',
+          bodyPlaceholder: 'Содержание новости...',
+          mediaType: 'Тип медиа',
+          mediaTypePlaceholder: 'Выберите тип медиа',
+          image: 'Изображение',
+          video: 'Видео',
+          mediaFile: 'Медиа файл',
+        },
+        deleteDialog: {
+          title: 'Удалить новость',
+          description: 'Вы уверены, что хотите удалить эту новость? Это действие нельзя отменить.',
+          confirm: 'Удалить',
+        },
+        empty: {
+          title: 'Новости не найдены',
+          description: 'Новости появятся здесь, когда вы их создадите',
+        },
+      },
       dashboard: {
         title: 'Дашборд',
         welcome: 'Добро пожаловать в админ-панель Weel',
@@ -1034,6 +1144,7 @@ const resources = {
         bookings: 'Bronlar',
         properties: 'Obyektlar',
         stories: 'Hikoyalar',
+        news: 'Yangiliklar',
         chat: 'Chat',
       },
       auth: {
@@ -1328,6 +1439,60 @@ const resources = {
         empty: {
           title: 'Hikoyalar topilmadi',
           description: 'Hamkorlar hikoya yuklaganda ular shu yerda paydo bo‘ladi',
+        },
+      },
+      news: {
+        title: 'Platforma yangiliklari',
+        subtitle: 'Platforma yangiliklarini yaratish va boshqarish',
+        create: 'Yangilik yaratish',
+        loading: 'Yangiliklar yuklanmoqda...',
+        error: 'Yangiliklarni yuklab bo‘lmadi',
+        deleteError: 'Yangilikni o‘chirib bo‘lmadi',
+        searchPlaceholder: 'Sarlavha yoki GUID bo‘yicha qidiring...',
+        sort: {
+          newest: 'Avval yangilar',
+          oldest: 'Avval eskilari',
+          mostViewed: 'Eng ko‘p ko‘rilgan',
+        },
+        tabs: {
+          all: 'Barchasi',
+        },
+        views: '{{count}} marta ko‘rilgan',
+        created: 'Yaratilgan',
+        actions: {
+          preview: 'Ko‘rish',
+          edit: 'Tahrirlash',
+        },
+        preview: {
+          title: 'Yangilikni ko‘rish',
+        },
+        createDialog: {
+          title: 'Yangilik yaratish',
+          description: 'Yangi platforma yangiligi yaratish',
+        },
+        editDialog: {
+          title: 'Yangilikni tahrirlash',
+          description: 'Platforma yangiligini yangilash',
+        },
+        form: {
+          title: 'Sarlavha',
+          titlePlaceholder: 'Yangilik sarlavhasi',
+          body: 'Matn',
+          bodyPlaceholder: 'Yangilik matni...',
+          mediaType: 'Media turi',
+          mediaTypePlaceholder: 'Media turini tanlang',
+          image: 'Rasm',
+          video: 'Video',
+          mediaFile: 'Media fayl',
+        },
+        deleteDialog: {
+          title: 'Yangilikni o‘chirish',
+          description: 'Bu yangilikni o‘chirishni xohlaysizmi? Bu harakatni qaytarib bo‘lmaydi.',
+          confirm: 'O‘chirish',
+        },
+        empty: {
+          title: 'Yangiliklar topilmadi',
+          description: 'Yangiliklar siz yaratganingizda shu yerda paydo bo‘ladi',
         },
       },
       dashboard: {
