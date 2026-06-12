@@ -35,11 +35,11 @@ function cacheHeadersFor(pathname: string) {
   const isHtml = pathname === "/" || pathname === "/index.html" || pathname.endsWith(".html");
   if (isHtml) {
     return {
-      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Cache-Control": "private, no-cache, no-store, must-revalidate, max-age=0",
       Pragma: "no-cache",
       Expires: "0",
       "Surrogate-Control": "no-store",
-      "CDN-Cache-Control": "no-store",
+      "CDN-Cache-Control": "private, no-store",
     };
   }
 

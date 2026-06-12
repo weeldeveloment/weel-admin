@@ -17,15 +17,16 @@ COPY . .
 ARG VITE_API_URL=""
 ARG VITE_WS_URL=""
 ARG CACHEBUST=""
+ARG DEPLOY_VERSION=""
 ENV VITE_API_URL=${VITE_API_URL} \
     VITE_WS_URL=${VITE_WS_URL} \
+    DEPLOY_VERSION=${DEPLOY_VERSION} \
     NODE_ENV=production
 
 # Use CACHEBUST arg to force rebuild when CI provides a new value
 RUN echo "cachebust=$CACHEBUST"
 
 # Write deploy version so serve.ts can use it as a cache-busting token
-ARG DEPLOY_VERSION=""
 RUN echo "${DEPLOY_VERSION}" > /app/.deploy-version
 
 # Build the app
