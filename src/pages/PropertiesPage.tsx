@@ -13,10 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Plus } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useTranslation } from 'react-i18next'
-import { PropertyItem, PropertyListResult, PaginatedResponse } from '@/types'
+import { PropertyItem, PropertyListResult, PaginatedResponse, PropertyTab } from '@/types'
 import PropertyTabContent from '@/components/PropertyTabContent'
 
-type PropertyTab = 'cottages' | 'apartments'
 type ViewMode = 'grid' | 'list'
 type VerifiedFilter = 'all' | 'verified' | 'unverified'
 
@@ -54,7 +53,8 @@ const fetchPropertiesByType = async (
   search: string
 ): Promise<PropertyListResult> => {
   const endpoint = '/property/admin/all/'
-  const propertyTypeValue = type === 'cottages' ? 'cottage' : 'apartment'
+  const propertyTypeValue =
+    type === 'cottages' ? 'cottage' : type === 'apartments' ? 'apartment' : 'hotel'
   const params: Record<string, string | number> = {
     page,
     page_size: 12,
@@ -89,14 +89,19 @@ export default function PropertiesPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [cottagesSearch, setCottagesSearch] = useState('')
   const [apartmentsSearch, setApartmentsSearch] = useState('')
+  const [hotelsSearch, setHotelsSearch] = useState('')
   const [cottagesVerified, setCottagesVerified] = useState<VerifiedFilter>('all')
   const [apartmentsVerified, setApartmentsVerified] = useState<VerifiedFilter>('all')
+  const [hotelsVerified, setHotelsVerified] = useState<VerifiedFilter>('all')
   const [cottagesDateFrom, setCottagesDateFrom] = useState('')
   const [cottagesDateTo, setCottagesDateTo] = useState('')
   const [apartmentsDateFrom, setApartmentsDateFrom] = useState('')
   const [apartmentsDateTo, setApartmentsDateTo] = useState('')
+  const [hotelsDateFrom, setHotelsDateFrom] = useState('')
+  const [hotelsDateTo, setHotelsDateTo] = useState('')
   const cottagesLoadMoreRef = useRef<HTMLDivElement>(null)
   const apartmentsLoadMoreRef = useRef<HTMLDivElement>(null)
+  const hotelsLoadMoreRef = useRef<HTMLDivElement>(null)
 
   const cottagesQuery = useInfiniteQuery({
     queryKey: ['properties', 'cottages', cottagesSearch],
@@ -114,6 +119,14 @@ export default function PropertiesPage() {
     enabled: activeTab === 'apartments',
   })
 
+  const hotelsQuery = useInfiniteQuery({
+    queryKey: ['properties', 'hotels', hotelsSearch],
+    queryFn: ({ pageParam }) => fetchPropertiesByType('hotels', pageParam, hotelsSearch),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => getNextPageFromUrl(lastPage.next),
+    enabled: activeTab === 'hotels',
+  })
+
   const cottageItems = useMemo(
     () => cottagesQuery.data?.pages.flatMap((page) => page.items) ?? [],
     [cottagesQuery.data]
@@ -122,6 +135,11 @@ export default function PropertiesPage() {
   const apartmentItems = useMemo(
     () => apartmentsQuery.data?.pages.flatMap((page) => page.items) ?? [],
     [apartmentsQuery.data]
+  )
+
+  const hotelItems = useMemo(
+    () => hotelsQuery.data?.pages.flatMap((page) => page.items) ?? [],
+    [hotelsQuery.data]
   )
 
   const filteredCottageItems = useMemo(() => {
@@ -152,6 +170,20 @@ export default function PropertiesPage() {
     })
   }, [apartmentItems, apartmentsVerified, apartmentsDateFrom, apartmentsDateTo])
 
+  const filteredHotelItems = useMemo(() => {
+    return hotelItems.filter((item) => {
+      if (hotelsVerified !== 'all') {
+        const isActive = item.is_active ?? false
+        if (hotelsVerified === 'verified' && !isActive) return false
+        if (hotelsVerified === 'unverified' && isActive) return false
+      }
+      const itemDate = item.created_at?.split('T')[0]
+      if (hotelsDateFrom && itemDate && itemDate < hotelsDateFrom) return false
+      if (hotelsDateTo && itemDate && itemDate > hotelsDateTo) return false
+      return true
+    })
+  }, [hotelItems, hotelsVerified, hotelsDateFrom, hotelsDateTo])
+
   const openCreateDialog = (initialType: PropertyTab) => {
     setCreateType(initialType)
     setCreateDialogOpen(true)
@@ -172,6 +204,7 @@ export default function PropertiesPage() {
         <TabsList>
           <TabsTrigger value="cottages">{t('properties.tabs.cottages')}</TabsTrigger>
           <TabsTrigger value="apartments">{t('properties.tabs.apartments')}</TabsTrigger>
+          <TabsTrigger value="hotels">{t('properties.tabs.hotels')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="cottages">
@@ -213,6 +246,26 @@ export default function PropertiesPage() {
             onOpenCreate={openCreateDialog}
           />
         </TabsContent>
+
+        <TabsContent value="hotels">
+          <PropertyTabContent
+            tab="hotels"
+            search={hotelsSearch}
+            onSearchChange={setHotelsSearch}
+            verified={hotelsVerified}
+            onVerifiedChange={setHotelsVerified}
+            dateFrom={hotelsDateFrom}
+            onDateFromChange={setHotelsDateFrom}
+            dateTo={hotelsDateTo}
+            onDateToChange={setHotelsDateTo}
+            query={hotelsQuery}
+            filteredItems={filteredHotelItems}
+            loadMoreRef={hotelsLoadMoreRef}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onOpenCreate={openCreateDialog}
+          />
+        </TabsContent>
       </Tabs>
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
@@ -226,9 +279,10 @@ export default function PropertiesPage() {
             onValueChange={(value) => setCreateType(value as PropertyTab)}
             className="space-y-4"
           >
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="cottages">{t('properties.tabs.cottages')}</TabsTrigger>
               <TabsTrigger value="apartments">{t('properties.tabs.apartments')}</TabsTrigger>
+              <TabsTrigger value="hotels">{t('properties.tabs.hotels')}</TabsTrigger>
             </TabsList>
           </Tabs>
           <Button onClick={handleCreateProperty}>

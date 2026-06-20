@@ -184,6 +184,7 @@ const resources = {
         tabs: {
           cottages: 'Cottages',
           apartments: 'Apartments',
+          hotels: 'Hotels',
           basic: 'Basic',
           pricing: 'Pricing',
           location: 'Location',
@@ -778,6 +779,7 @@ const resources = {
         tabs: {
           cottages: 'Коттеджи',
           apartments: 'Квартиры',
+          hotels: 'Отели',
           basic: 'Основное',
           pricing: 'Цены',
           location: 'Локация',
@@ -1372,6 +1374,7 @@ const resources = {
         tabs: {
           cottages: 'Kottejlar',
           apartments: 'Kvartiralar',
+          hotels: 'Mehmonxonalar',
           basic: 'Asosiy',
           pricing: 'Narxlar',
           location: 'Lokatsiya',

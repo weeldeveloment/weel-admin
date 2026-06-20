@@ -11,10 +11,9 @@ import {
 } from '@/components/ui/select'
 import { LayoutGrid, List, Plus, RotateCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { PropertyItem } from '@/types'
+import { PropertyItem, PropertyTab } from '@/types'
 import PropertyCard from './PropertyCard'
 
-type PropertyTab = 'cottages' | 'apartments'
 type ViewMode = 'grid' | 'list'
 type VerifiedFilter = 'all' | 'verified' | 'unverified'
 

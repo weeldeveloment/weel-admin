@@ -2,11 +2,10 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Image } from 'lucide-react'
-import { PropertyItem } from '@/types'
+import { Building2, Image } from 'lucide-react'
+import { PropertyItem, PropertyTab } from '@/types'
 import { formatDate } from '@/lib/utils'
 
-type PropertyTab = 'cottages' | 'apartments'
 type ViewMode = 'grid' | 'list'
 
 export default function PropertyCard({
@@ -42,6 +41,14 @@ export default function PropertyCard({
     </span>
   ) : null
 
+  const tenantBadge =
+    type === 'hotels' && item.organization_name ? (
+      <Badge variant="outline" className="gap-1 text-[10px] px-1.5 py-0">
+        <Building2 className="h-3 w-3" />
+        {item.organization_name}
+      </Badge>
+    ) : null
+
   if (viewMode === 'list') {
     return (
       <button
@@ -68,6 +75,7 @@ export default function PropertyCard({
             <p className="text-xs text-muted-foreground">{item.city}</p>
             <div className="flex items-center gap-2">
               {verifiedBadge}
+              {tenantBadge}
               {dateText}
             </div>
           </CardContent>
@@ -100,7 +108,10 @@ export default function PropertyCard({
           <p className="line-clamp-1 font-semibold">{item.title}</p>
           <p className="text-xs text-muted-foreground">{item.city}</p>
           <div className="flex items-center justify-between pt-0.5">
-            {verifiedBadge}
+            <div className="flex items-center gap-2">
+              {verifiedBadge}
+              {tenantBadge}
+            </div>
             {dateText}
           </div>
         </CardContent>

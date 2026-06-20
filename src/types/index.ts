@@ -255,8 +255,33 @@ export interface PropertyItem {
   average_rating?: number | null
   is_archived?: boolean
   is_recommended?: boolean
+  is_active?: boolean
   latitude?: string | null
   longitude?: string | null
+  address?: string | null
+  description_ru?: string | null
+  description_uz?: string | null
+  description_en?: string | null
+  check_in_time?: string | null
+  check_out_time?: string | null
+  cancellation_policy?: string | null
+  timezone?: string | null
+  amenities?: string[]
+  star_rating?: number | null
+  is_allowed_alcohol?: boolean
+  is_allowed_pets?: boolean
+  is_quiet_hours?: boolean
+  tenant_schema?: string | null
+  organization_id?: number | null
+  organization_name?: string | null
+  organization_slug?: string | null
+  organization?: {
+    id?: number | null
+    name?: string | null
+    slug?: string | null
+    schema_name?: string | null
+  } | null
+  property_detail?: Record<string, unknown> | null
 }
 
 export interface PropertyListResult {
@@ -266,7 +291,7 @@ export interface PropertyListResult {
   previous: string | null
 }
 
-export type PropertyTab = 'cottages' | 'apartments'
+export type PropertyTab = 'cottages' | 'apartments' | 'hotels'
 
 export interface PropertyLocationRegion {
   id?: number | null
@@ -327,12 +352,17 @@ export interface BasePropertyDetails {
   is_verified?: boolean
   is_archived?: boolean
   is_recommended?: boolean
+  is_active?: boolean
   verification_status?: string
   verified_by_user_id?: number | null
   region_id?: string | number
   district_id?: string | number
   prefecture_id?: string
   property_location?: PropertyLocation | null
+  organization_id?: number | null
+  organization_name?: string | null
+  organization_slug?: string | null
+  tenant_schema?: string | null
 }
 
 export interface ApartmentPropertyDetails extends BasePropertyDetails {
@@ -350,12 +380,38 @@ export interface CottagePropertyDetails extends BasePropertyDetails {
   bathrooms?: number
 }
 
+export interface HotelPropertyDetails extends BasePropertyDetails {
+  address?: string | null
+  description_ru?: string | null
+  description_uz?: string | null
+  description_en?: string | null
+  check_in_time?: string | null
+  check_out_time?: string | null
+  cancellation_policy?: string | null
+  timezone?: string | null
+  amenities?: string[]
+  star_rating?: number | null
+  organization?: {
+    id?: number | null
+    name?: string | null
+    slug?: string | null
+    schema_name?: string | null
+  } | null
+}
+
 export interface LocationOption {
   id: string
   label: string
 }
 
-export type PropertyDetails = ApartmentPropertyDetails | CottagePropertyDetails
+export type PropertyDetails = ApartmentPropertyDetails | CottagePropertyDetails | HotelPropertyDetails
+
+export interface HotelOrganizationOption {
+  id: number
+  name: string
+  slug: string
+  schema_name: string
+}
 
 export const parseString = (value: unknown, fallback = ''): string => {
   return typeof value === 'string' ? value : fallback
@@ -422,4 +478,3 @@ export const clampDecimalPlaces = (value: unknown, maxDecimals = 8): string => {
   const clampedFraction = fractionPart.slice(0, maxDecimals)
   return `${isNegative ? '-' : ''}${intPart}${clampedFraction ? `.${clampedFraction}` : ''}`
 }
-

@@ -11,6 +11,7 @@ import Partner from './pages/Partner'
 import PropertiesPage from './pages/PropertiesPage'
 import CottageDetailsUpdate from './pages/CottageDetailsUpdate'
 import ApartmentDetailsUpdate from './pages/ApartmentDetailsUpdate'
+import HotelDetailsUpdate from './pages/HotelDetailsUpdate'
 import StoriesModerationPage from './pages/StoriesModerationPage'
 import NewsManagementPage from './pages/NewsManagementPage'
 import BannerManagementPage from './pages/BannerManagementPage'
@@ -56,6 +57,7 @@ function App() {
         <Route path="properties" element={<PropertiesPage />} />
         <Route path="properties/cottages/:propertyId" element={<CottageDetailsUpdate />} />
         <Route path="properties/apartments/:propertyId" element={<ApartmentDetailsUpdate />} />
+        <Route path="properties/hotels/:propertyId" element={<HotelDetailsUpdate />} />
         <Route path="properties/:propertyType/:propertyId" element={<Navigate to="/properties" replace />} />
         <Route path="stories" element={<StoriesModerationPage />} />
         <Route path="news" element={<NewsManagementPage />} />
