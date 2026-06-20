@@ -10,6 +10,16 @@ const normalizeAdminUser = (user: User): User => ({
   role: 'admin',
 })
 
+const clearAuthTokens = () => {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
+}
+
+const fetchAdminUser = async () => {
+  const response = await api.get<User>('/admin-auth/me/')
+  return response.data
+}
+
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
@@ -26,31 +36,37 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email: string, password: string) => {
     try {
-      const response = await api.post<AuthResponse>('/admin-auth/login/', {
+      const response = await api.post<Partial<AuthResponse>>('/admin-auth/login/', {
         email,
         password,
       })
 
-      const { access, refresh, user } = response.data
-      
-      // Verify user is admin
-      if (!isAdminUser(user)) {
-        throw new Error('Access denied. Admin privileges required.')
+      const { access, refresh } = response.data
+
+      if (!access || !refresh) {
+        throw new Error('Login response did not include authentication tokens.')
       }
-      
+
       localStorage.setItem('access_token', access)
       localStorage.setItem('refresh_token', refresh)
-      
+
+      const user = await fetchAdminUser()
+
+      if (!isAdminUser(user)) {
+        clearAuthTokens()
+        throw new Error('Access denied. Admin privileges required.')
+      }
+
       set({ user: normalizeAdminUser(user), isAuthenticated: true })
     } catch (error: unknown) {
       console.error('Login failed:', error)
+      clearAuthTokens()
       throw error
     }
   },
 
   logout: () => {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    clearAuthTokens()
     set({ user: null, isAuthenticated: false })
   },
 
@@ -63,20 +79,17 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     try {
-      const response = await api.get<User>('/admin-auth/me/')
-      
-      // Verify user is admin
-      if (!isAdminUser(response.data)) {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
+      const user = await fetchAdminUser()
+
+      if (!isAdminUser(user)) {
+        clearAuthTokens()
         set({ user: null, isAuthenticated: false, isLoading: false })
         return
       }
-      
-      set({ user: normalizeAdminUser(response.data), isAuthenticated: true, isLoading: false })
+
+      set({ user: normalizeAdminUser(user), isAuthenticated: true, isLoading: false })
     } catch {
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
+      clearAuthTokens()
       set({ user: null, isAuthenticated: false, isLoading: false })
     }
   },
