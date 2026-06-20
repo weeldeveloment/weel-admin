@@ -43,6 +43,7 @@ type HotelForm = {
   description_en: string
   amenities: string
   is_active: boolean
+  is_testing: boolean
   is_allowed_alcohol: boolean
   is_allowed_pets: boolean
   is_quiet_hours: boolean
@@ -82,6 +83,7 @@ const emptyForm: HotelForm = {
   description_en: '',
   amenities: '',
   is_active: true,
+  is_testing: false,
   is_allowed_alcohol: false,
   is_allowed_pets: false,
   is_quiet_hours: true,
@@ -118,6 +120,7 @@ function reducer(state: State, action: Action): State {
               ? (detail.amenities as string[]).join(', ')
               : '',
           is_active: item.is_active ?? true,
+          is_testing: item.is_testing ?? false,
           is_allowed_alcohol: item.is_allowed_alcohol ?? Boolean(detail.is_allowed_alcohol),
           is_allowed_pets: item.is_allowed_pets ?? Boolean(detail.is_allowed_pets),
           is_quiet_hours: item.is_quiet_hours ?? Boolean(detail.is_quiet_hours ?? true),
@@ -220,6 +223,7 @@ export default function HotelDetailsUpdate() {
           .map((value) => value.trim())
           .filter(Boolean),
         is_active: form.is_active,
+        is_testing: form.is_testing,
         is_allowed_alcohol: form.is_allowed_alcohol,
         is_allowed_pets: form.is_allowed_pets,
         is_quiet_hours: form.is_quiet_hours,
@@ -652,6 +656,15 @@ export default function HotelDetailsUpdate() {
                     }
                   />
                   <span>Active</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={form.is_testing}
+                    onCheckedChange={(value) =>
+                      dispatch({ type: 'setField', key: 'is_testing', value: Boolean(value) })
+                    }
+                  />
+                  <span>{t('properties.isTesting')}</span>
                 </label>
                 <label className="flex items-center gap-2 text-sm">
                   <Checkbox

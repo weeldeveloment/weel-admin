@@ -242,6 +242,7 @@ type State = {
   isVerified: boolean;
   isArchived: boolean;
   isRecommended: boolean;
+  isTesting: boolean;
   verificationStatus: string | null;
   savedMessage: string | null;
   errorMessage: string | null;
@@ -275,6 +276,7 @@ type Action =
   | { type: "SET_IS_VERIFIED"; payload: boolean }
   | { type: "SET_IS_ARCHIVED"; payload: boolean }
   | { type: "SET_IS_RECOMMENDED"; payload: boolean }
+  | { type: "SET_IS_TESTING"; payload: boolean }
   | { type: "SET_VERIFICATION_STATUS"; payload: string | null }
   | { type: "SET_SAVED_MESSAGE"; payload: string | null }
   | { type: "SET_ERROR_MESSAGE"; payload: string | null }
@@ -330,6 +332,7 @@ const initialState: State = {
   isVerified: false,
   isArchived: false,
   isRecommended: false,
+  isTesting: false,
   verificationStatus: null,
   savedMessage: null,
   errorMessage: null,
@@ -454,6 +457,7 @@ function reducer(state: State, action: Action): State {
         isVerified: merged.is_verified ?? false,
         isArchived: merged.is_archived ?? false,
         isRecommended: merged.is_recommended ?? false,
+        isTesting: merged.is_testing ?? false,
         verificationStatus: merged.verification_status ?? null,
       };
     }
@@ -500,6 +504,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, isArchived: action.payload };
     case "SET_IS_RECOMMENDED":
       return { ...state, isRecommended: action.payload };
+    case "SET_IS_TESTING":
+      return { ...state, isTesting: action.payload };
     case "SET_VERIFICATION_STATUS":
       return { ...state, verificationStatus: action.payload };
     case "SET_SAVED_MESSAGE":
@@ -988,6 +994,7 @@ export default function CottageDetailsUpdate() {
       currency: state.currency,
       is_verified: state.isVerified,
       is_archived: state.isArchived,
+      is_testing: state.isTesting,
       is_recommended: state.isRecommended,
       verification_status: state.verificationStatus,
     };
@@ -2232,6 +2239,22 @@ export default function CottageDetailsUpdate() {
                   />
                   <Label htmlFor="is_recommended" className="cursor-pointer">
                     {t("properties.isRecommended")}
+                  </Label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="is_testing"
+                    checked={state.isTesting}
+                    onCheckedChange={(v) =>
+                      dispatch({
+                        type: "SET_IS_TESTING",
+                        payload: Boolean(v),
+                      })
+                    }
+                  />
+                  <Label htmlFor="is_testing" className="cursor-pointer">
+                    {t("properties.isTesting")}
                   </Label>
                 </div>
 

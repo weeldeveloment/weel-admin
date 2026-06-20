@@ -131,6 +131,7 @@ type ApartmentForm = {
   verification_status: string | null;
   is_archived: boolean;
   is_recommended: boolean;
+  is_testing: boolean;
   descRu: string;
   descUz: string;
 };
@@ -281,6 +282,7 @@ const emptyForm: ApartmentForm = {
   verification_status: null,
   is_archived: false,
   is_recommended: false,
+  is_testing: false,
   descRu: "",
   descUz: "",
 };
@@ -335,6 +337,7 @@ function pageReducer(state: PageState, action: PageAction): PageState {
           verification_status: apartment.verification_status ?? null,
           is_archived: apartment.is_archived ?? false,
           is_recommended: Boolean(apartment.is_recommended),
+          is_testing: Boolean(apartment.is_testing),
           descRu: detail?.description_ru ?? "",
           descUz: detail?.description_uz ?? "",
         },
@@ -676,6 +679,7 @@ export default function ApartmentDetailsUpdate() {
       is_verified: form.is_verified,
       verification_status: form.verification_status || undefined,
       is_archived: form.is_archived,
+      is_testing: form.is_testing,
       is_recommended: form.is_recommended,
       description_ru: form.descRu.trim(),
       description_uz: form.descUz.trim(),
@@ -1683,6 +1687,19 @@ export default function ApartmentDetailsUpdate() {
                   />
                   <Label htmlFor="is_archived" className="cursor-pointer">
                     {t("properties.isArchived")}
+                  </Label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="is_testing"
+                    checked={form.is_testing}
+                    onCheckedChange={(v) =>
+                      handleChange("is_testing", Boolean(v))
+                    }
+                  />
+                  <Label htmlFor="is_testing" className="cursor-pointer">
+                    {t("properties.isTesting")}
                   </Label>
                 </div>
 

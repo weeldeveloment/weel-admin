@@ -625,6 +625,8 @@ export interface ApartmentAdminList {
   verification_status?: string | null;
   /** Is recommended */
   is_recommended?: boolean | null;
+  /** Is testing */
+  is_testing?: boolean;
   /** Is verified */
   is_verified?: boolean;
   /** Is archived */
@@ -727,6 +729,8 @@ export interface ApartmentAdminUpdate {
   verification_status?: string;
   /** Is archived */
   is_archived?: boolean;
+  /** Is testing */
+  is_testing?: boolean;
   /** Is recommended */
   is_recommended?: boolean;
   /** Partner user id */
@@ -953,6 +957,8 @@ export interface CottageAdminList {
   weekend_only_sunday_inclusive?: boolean | null;
   /** Is recommended */
   is_recommended?: boolean | null;
+  /** Is testing */
+  is_testing?: boolean;
   /** Is verified */
   is_verified?: boolean;
   /** Is archived */
@@ -1091,6 +1097,8 @@ export interface CottageAdminUpdate {
   verification_status?: string | null;
   /** Is archived */
   is_archived?: boolean;
+  /** Is testing */
+  is_testing?: boolean;
   /** Is recommended */
   is_recommended?: boolean;
   partner_user?: CottagePartnerUserUpdate;

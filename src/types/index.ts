@@ -255,6 +255,7 @@ export interface PropertyItem {
   average_rating?: number | null
   is_archived?: boolean
   is_recommended?: boolean
+  is_testing?: boolean
   is_active?: boolean
   latitude?: string | null
   longitude?: string | null
@@ -352,6 +353,7 @@ export interface BasePropertyDetails {
   is_verified?: boolean
   is_archived?: boolean
   is_recommended?: boolean
+  is_testing?: boolean
   is_active?: boolean
   verification_status?: string
   verified_by_user_id?: number | null
