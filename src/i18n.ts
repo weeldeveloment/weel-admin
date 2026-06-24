@@ -188,6 +188,7 @@ const resources = {
           basic: 'Basic',
           pricing: 'Pricing',
           location: 'Location',
+          calendar: 'Calendar',
           images: 'Images',
           partner: 'Partner',
           apartmentDetails: 'Apartment Details',
@@ -280,6 +281,24 @@ const resources = {
         deleteDialog: {
           title: 'Delete Apartment',
           description: 'Are you sure you want to delete "{{title}}"? This action cannot be undone.',
+        },
+        calendar: {
+          title: 'Availability calendar',
+          range: '{{from}} to {{to}}',
+          loadFailed: 'Failed to load calendar.',
+          updateFailed: 'Failed to update calendar.',
+          unverified: 'Calendar editing is available only for verified cottages.',
+          legend: {
+            available: 'Available',
+            booked: 'Booked',
+            held: 'Held',
+            blocked: 'Blocked',
+          },
+          actions: {
+            makeAvailable: 'Mark as available',
+            block: 'Block date',
+            hold: 'Mark as held',
+          },
         },
       },
       chat: {
@@ -784,6 +803,7 @@ const resources = {
           basic: 'Основное',
           pricing: 'Цены',
           location: 'Локация',
+          calendar: 'Календарь',
           images: 'Изображения',
           partner: 'Партнёр',
           apartmentDetails: 'Данные квартиры',
@@ -876,6 +896,24 @@ const resources = {
         deleteDialog: {
           title: 'Удалить квартиру',
           description: 'Вы уверены, что хотите удалить "{{title}}"? Это действие нельзя отменить.',
+        },
+        calendar: {
+          title: 'Календарь занятости',
+          range: 'С {{from}} по {{to}}',
+          loadFailed: 'Не удалось загрузить календарь.',
+          updateFailed: 'Не удалось обновить календарь.',
+          unverified: 'Редактирование календаря доступно только для верифицированных дач.',
+          legend: {
+            available: 'Свободно',
+            booked: 'Забронировано',
+            held: 'Холд',
+            blocked: 'Заблокировано',
+          },
+          actions: {
+            makeAvailable: 'Сделать доступным',
+            block: 'Заблокировать дату',
+            hold: 'Поставить холд',
+          },
         },
       },
       chat: {
@@ -1380,6 +1418,7 @@ const resources = {
           basic: 'Asosiy',
           pricing: 'Narxlar',
           location: 'Lokatsiya',
+          calendar: 'Kalendar',
           images: 'Rasmlar',
           partner: 'Hamkor',
           apartmentDetails: 'Kvartira tafsilotlari',
@@ -1472,6 +1511,24 @@ const resources = {
         deleteDialog: {
           title: 'Kvartirani o\'chirish',
           description: '"{{title}}" ni o\'chirishni xohlaysizmi? Bu harakatni qaytarib bo\'lmaydi.',
+        },
+        calendar: {
+          title: 'Bandlik kalendari',
+          range: '{{from}} dan {{to}} gacha',
+          loadFailed: 'Kalendarni yuklab bo‘lmadi.',
+          updateFailed: 'Kalendarni yangilab bo‘lmadi.',
+          unverified: 'Kalendarni tahrirlash faqat tasdiqlangan kottejlar uchun mavjud.',
+          legend: {
+            available: 'Bo‘sh',
+            booked: 'Band qilingan',
+            held: 'Hold',
+            blocked: 'Bloklangan',
+          },
+          actions: {
+            makeAvailable: 'Bo‘sh qilish',
+            block: 'Sanani bloklash',
+            hold: 'Hold qo‘yish',
+          },
         },
       },
       chat: {

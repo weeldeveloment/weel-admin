@@ -40,6 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CottageCalendarSection from "@/components/CottageCalendarSection";
 import {
   Dialog,
   DialogContent,
@@ -1347,6 +1348,11 @@ export default function CottageDetailsUpdate() {
             <TabsTrigger value="location">
               {t("properties.tabs.location")}
             </TabsTrigger>
+            {!isCreateMode ? (
+              <TabsTrigger value="calendar">
+                {t("properties.tabs.calendar")}
+              </TabsTrigger>
+            ) : null}
             <TabsTrigger value="images">
               {t("properties.tabs.images")}
             </TabsTrigger>
@@ -1877,6 +1883,15 @@ export default function CottageDetailsUpdate() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {!isCreateMode ? (
+            <TabsContent value="calendar" className="space-y-4">
+              <CottageCalendarSection
+                propertyId={cottage.guid}
+                isVerified={Boolean(cottage.is_verified)}
+              />
+            </TabsContent>
+          ) : null}
 
           {/* ── IMAGES ── */}
           <TabsContent value="images" className="space-y-4">
