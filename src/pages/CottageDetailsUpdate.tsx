@@ -140,6 +140,17 @@ function normalizePriceValue(value: unknown): string {
   return String(value);
 }
 
+function defaultPerPersonPrice(
+  currency: "USD" | "UZS",
+  exchangeRate?: number,
+): string {
+  if (currency === "USD") return "10";
+  if (Number.isFinite(exchangeRate) && (exchangeRate ?? 0) > 0) {
+    return String(Math.round(10 * (exchangeRate as number)));
+  }
+  return "100000";
+}
+
 function toPositiveNumber(value: unknown, fallback = 1) {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
@@ -376,7 +387,7 @@ function reducer(state: State, action: Action): State {
         return d.getMonth() === nextMonth && d.getFullYear() === nextYear;
       });
 
-      const perPerson = currency === "USD" ? "10" : "100000";
+      const perPerson = normalizePriceValue(merged.price_per_person);
 
       return {
         ...state,
@@ -656,6 +667,12 @@ export default function CottageDetailsUpdate() {
     queryFn: fetchPrefectures,
   });
 
+  const exchangeRateQuery = useQuery({
+    queryKey: ["exchangeRate"],
+    queryFn: fetchExchangeRate,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const servicesQuery = useQuery({
     queryKey: ["services", state.data?.property_type_id],
     queryFn: () => fetchServices(state.data?.property_type_id),
@@ -931,7 +948,14 @@ export default function CottageDetailsUpdate() {
       dispatch({ type: "SET_SAVED_MESSAGE", payload: null });
       dispatch({ type: "SET_ERROR_MESSAGE", payload: null });
       try {
-        const rate = await fetchExchangeRate();
+        const resolvedRate =
+          exchangeRateQuery.data ??
+          (await queryClient.fetchQuery({
+            queryKey: ["exchangeRate"],
+            queryFn: fetchExchangeRate,
+            staleTime: 5 * 60 * 1000,
+          }));
+        const rate = Number.isFinite(resolvedRate) ? Number(resolvedRate) : 0;
         const convert = (value: string | number) => {
           const num = typeof value === "string" ? Number.parseFloat(value) : value;
           if (!Number.isFinite(num)) return String(value);
@@ -945,7 +969,7 @@ export default function CottageDetailsUpdate() {
         };
         const nextPrice = state.price.map((item) => ({
           ...item,
-          price_per_person: convert(item.price_per_person),
+          price_per_person: defaultPerPersonPrice(newCurrency, rate),
           price_on_working_days: convert(item.price_on_working_days),
           price_on_weekends: convert(item.price_on_weekends),
         }));
@@ -960,7 +984,7 @@ export default function CottageDetailsUpdate() {
         });
       }
     },
-    [state.currency, state.price, t],
+    [exchangeRateQuery.data, queryClient, state.currency, state.price, t],
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -977,13 +1001,15 @@ export default function CottageDetailsUpdate() {
     }
 
     const scalarPrices = extractScalarPrices(state.price);
+    const hiddenPerPerson = defaultPerPersonPrice(
+      state.currency,
+      exchangeRateQuery.data,
+    );
 
     const normalizedPriceRows = state.price.map((item) => ({
       month_from: item.month_from,
       month_to: item.month_to,
-      price_per_person: String(
-        item.price_per_person ?? scalarPrices.price_per_person,
-      ),
+      price_per_person: hiddenPerPerson,
       price_on_working_days: String(
         item.price_on_working_days ?? scalarPrices.price_on_working_days,
       ),
@@ -1026,7 +1052,7 @@ export default function CottageDetailsUpdate() {
       beds: state.beds,
       bathrooms: state.bathrooms,
       price: normalizedPriceRows,
-      price_per_person: String(scalarPrices.price_per_person),
+      price_per_person: hiddenPerPerson,
       price_on_working_days: String(scalarPrices.price_on_working_days),
       price_on_weekends: String(scalarPrices.price_on_weekends),
       currency: state.currency,
