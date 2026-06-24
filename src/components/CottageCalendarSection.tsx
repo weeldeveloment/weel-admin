@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, Loader2 } from "lucide-react";
@@ -50,6 +50,16 @@ const STATUS_STYLES: Record<CalendarStatus, string> = {
 };
 
 const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const LOG_PREFIX = "[CottageCalendarSection]";
+let globalMountCount = 0;
+
+function logInfo(event: string, payload: Record<string, unknown>) {
+  console.info(`${LOG_PREFIX} ${event}\n${JSON.stringify(payload, null, 2)}`);
+}
+
+function logError(event: string, payload: Record<string, unknown>) {
+  console.error(`${LOG_PREFIX} ${event}\n${JSON.stringify(payload, null, 2)}`);
+}
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -160,16 +170,76 @@ export default function CottageCalendarSection({
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const instanceIdRef = useRef(++globalMountCount);
+  const fetchCountRef = useRef(0);
 
   const today = useMemo(() => startOfDay(new Date()), []);
-  const rangeStart = useMemo(() => new Date(today.getFullYear(), today.getMonth(), 1), [today]);
-  const rangeEnd = useMemo(() => endOfMonth(addMonths(today, 2)), [today]);
+  const rangeStart = useMemo(() => today, [today]);
+  const firstVisibleMonth = useMemo(
+    () => new Date(today.getFullYear(), today.getMonth(), 1),
+    [today],
+  );
+  const rangeEnd = useMemo(() => endOfMonth(addMonths(today, 1)), [today]);
   const fromDate = useMemo(() => toIsoDate(rangeStart), [rangeStart]);
   const toDate = useMemo(() => toIsoDate(rangeEnd), [rangeEnd]);
 
+  useEffect(() => {
+    logInfo("mount", {
+      instanceId: instanceIdRef.current,
+      globalMountCount,
+      propertyId,
+      isVerified,
+    });
+
+    return () => {
+      logInfo("unmount", {
+        instanceId: instanceIdRef.current,
+        propertyId,
+      });
+    };
+  }, [propertyId, isVerified]);
+
+  useEffect(() => {
+    logInfo("query-range", {
+      instanceId: instanceIdRef.current,
+      propertyId,
+      fromDate,
+      toDate,
+    });
+  }, [fromDate, propertyId, toDate]);
+
   const calendarQuery = useQuery({
     queryKey: ["cottageCalendar", propertyId, fromDate, toDate],
-    queryFn: () => fetchPropertyCalendar(propertyId, fromDate, toDate),
+    queryFn: async () => {
+      fetchCountRef.current += 1;
+      logInfo("fetch-start", {
+        instanceId: instanceIdRef.current,
+        fetchCount: fetchCountRef.current,
+        propertyId,
+        fromDate,
+        toDate,
+      });
+      try {
+        const result = await fetchPropertyCalendar(propertyId, fromDate, toDate);
+        logInfo("fetch-success", {
+          instanceId: instanceIdRef.current,
+          fetchCount: fetchCountRef.current,
+          propertyId,
+          loadedDates: Object.keys(result).length,
+        });
+        return result;
+      } catch (error) {
+        logError("fetch-error", {
+          instanceId: instanceIdRef.current,
+          fetchCount: fetchCountRef.current,
+          propertyId,
+          fromDate,
+          toDate,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
+    },
     enabled: Boolean(propertyId),
   });
 
@@ -180,18 +250,37 @@ export default function CottageCalendarSection({
     }: {
       action: CalendarAction;
       date: string;
-    }) => mutatePropertyCalendar(propertyId, action, date),
+    }) => {
+      logInfo("mutation-start", {
+        instanceId: instanceIdRef.current,
+        propertyId,
+        action,
+        date,
+      });
+      return mutatePropertyCalendar(propertyId, action, date);
+    },
     onSuccess: async () => {
+      logInfo("mutation-success", {
+        instanceId: instanceIdRef.current,
+        propertyId,
+      });
       await queryClient.invalidateQueries({
         queryKey: ["cottageCalendar", propertyId, fromDate, toDate],
       });
       setSelectedDate(null);
     },
+    onError: (error) => {
+      logError("mutation-error", {
+        instanceId: instanceIdRef.current,
+        propertyId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    },
   });
 
   const months = useMemo(
-    () => Array.from({ length: 3 }, (_, index) => addMonths(rangeStart, index)),
-    [rangeStart],
+    () => Array.from({ length: 2 }, (_, index) => addMonths(firstVisibleMonth, index)),
+    [firstVisibleMonth],
   );
 
   const selectedStatus = selectedDate
@@ -201,6 +290,7 @@ export default function CottageCalendarSection({
   const selectedActions = useMemo(() => {
     if (!selectedDate) return [];
     const actions: Array<{ status: CalendarStatus; label: string }> = [];
+    if (selectedStatus === "booked") return actions;
 
     if (selectedStatus !== "available") {
       actions.push({
@@ -227,12 +317,28 @@ export default function CottageCalendarSection({
   const handleStatusChange = (nextStatus: CalendarStatus) => {
     if (!selectedDate) return;
     const action = getMutationAction(nextStatus, selectedStatus);
+    logInfo("status-click", {
+      instanceId: instanceIdRef.current,
+      propertyId,
+      selectedDate,
+      selectedStatus,
+      nextStatus,
+      action,
+    });
     if (!action) {
       setSelectedDate(null);
       return;
     }
     mutation.mutate({ action, date: selectedDate });
   };
+
+  useEffect(() => {
+    logInfo("selection-change", {
+      instanceId: instanceIdRef.current,
+      propertyId,
+      selectedDate,
+    });
+  }, [propertyId, selectedDate]);
 
   return (
     <Card>
@@ -260,7 +366,7 @@ export default function CottageCalendarSection({
         ) : null}
 
         {calendarQuery.isLoading ? (
-          <div className="grid gap-4 xl:grid-cols-3">
+          <div className="grid gap-4 xl:grid-cols-2">
             {months.map((month) => (
               <Skeleton key={month.toISOString()} className="h-[360px] w-full" />
             ))}
@@ -286,7 +392,7 @@ export default function CottageCalendarSection({
         ) : null}
 
         {!calendarQuery.isLoading && !calendarQuery.isError ? (
-          <div className="grid gap-4 xl:grid-cols-3">
+          <div className="grid gap-4 xl:grid-cols-2">
             {months.map((month) => (
               <div key={month.toISOString()} className="rounded-lg border bg-card">
                 <div className="border-b px-4 py-3">
@@ -307,6 +413,28 @@ export default function CottageCalendarSection({
                     const isDisabled = !day.inMonth || day.isPast || !isVerified;
                     const isBooked = day.status === "booked";
                     const isSelected = selectedDate === day.iso;
+                    const dayButtonClassName = cn(
+                      "min-h-10 w-full rounded-md border text-sm font-medium transition-colors",
+                      STATUS_STYLES[day.status],
+                      !day.inMonth && "border-dashed border-slate-100 bg-slate-50 text-slate-300",
+                      (day.isPast || !isVerified) &&
+                        "cursor-not-allowed opacity-60 hover:border-inherit hover:bg-inherit",
+                      isBooked && "opacity-80",
+                      isSelected && "ring-2 ring-slate-900 ring-offset-2",
+                    );
+
+                    if (isDisabled) {
+                      return (
+                        <button
+                          key={day.iso}
+                          type="button"
+                          disabled
+                          className={dayButtonClassName}
+                        >
+                          {day.date.getDate()}
+                        </button>
+                      );
+                    }
 
                     return (
                       <Popover
@@ -317,16 +445,7 @@ export default function CottageCalendarSection({
                         <PopoverTrigger asChild>
                           <button
                             type="button"
-                            disabled={isDisabled || isBooked}
-                            className={cn(
-                              "min-h-10 rounded-md border text-sm font-medium transition-colors",
-                              STATUS_STYLES[day.status],
-                              !day.inMonth && "border-dashed border-slate-100 bg-slate-50 text-slate-300",
-                              (day.isPast || !isVerified) &&
-                                "cursor-not-allowed opacity-60 hover:border-inherit hover:bg-inherit",
-                              isBooked && "cursor-not-allowed opacity-80",
-                              isSelected && "ring-2 ring-slate-900 ring-offset-2",
-                            )}
+                            className={dayButtonClassName}
                           >
                             {day.date.getDate()}
                           </button>
@@ -340,30 +459,38 @@ export default function CottageCalendarSection({
                               </p>
                             </div>
                             <div className="space-y-2">
-                              {selectedActions.map((actionItem) => (
-                                <Button
-                                  key={actionItem.status}
-                                  type="button"
-                                  variant="outline"
-                                  className="w-full justify-between"
-                                  disabled={mutation.isPending}
-                                  onClick={() => handleStatusChange(actionItem.status)}
-                                >
-                                  <span>{actionItem.label}</span>
-                                  {mutation.isPending && selectedDate === day.iso ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    <span
-                                      className={cn(
-                                        "h-2.5 w-2.5 rounded-full",
-                                        actionItem.status === "available" && "bg-slate-900",
-                                        actionItem.status === "blocked" && "bg-rose-500",
-                                        actionItem.status === "held" && "bg-amber-400",
-                                      )}
-                                    />
-                                  )}
-                                </Button>
-                              ))}
+                              {selectedActions.length > 0 ? (
+                                selectedActions.map((actionItem) => (
+                                  <Button
+                                    key={actionItem.status}
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full justify-between"
+                                    disabled={mutation.isPending}
+                                    onClick={() => handleStatusChange(actionItem.status)}
+                                  >
+                                    <span>{actionItem.label}</span>
+                                    {mutation.isPending && selectedDate === day.iso ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <span
+                                        className={cn(
+                                          "h-2.5 w-2.5 rounded-full",
+                                          actionItem.status === "available" && "bg-slate-900",
+                                          actionItem.status === "blocked" && "bg-rose-500",
+                                          actionItem.status === "held" && "bg-amber-400",
+                                        )}
+                                      />
+                                    )}
+                                  </Button>
+                                ))
+                              ) : (
+                                <p className="text-xs text-muted-foreground">
+                                  {isBooked
+                                    ? t("properties.calendar.bookedReadonly")
+                                    : t("properties.calendar.noActions")}
+                                </p>
+                              )}
                             </div>
                             {mutation.isError ? (
                               <p className="text-xs text-rose-600">

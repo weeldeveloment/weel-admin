@@ -39,6 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CottageCalendarSection from "@/components/CottageCalendarSection";
 import {
   Save,
   GripVertical,
@@ -936,6 +937,11 @@ export default function ApartmentDetailsUpdate() {
             <TabsTrigger value="location">
               {t("properties.tabs.location")}
             </TabsTrigger>
+            {!isCreateMode ? (
+              <TabsTrigger value="calendar">
+                {t("properties.tabs.calendar")}
+              </TabsTrigger>
+            ) : null}
             <TabsTrigger value="details">
               {t("properties.tabs.details")}
             </TabsTrigger>
@@ -1212,6 +1218,15 @@ export default function ApartmentDetailsUpdate() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {!isCreateMode ? (
+            <TabsContent value="calendar" className="space-y-4">
+              <CottageCalendarSection
+                propertyId={apartment.guid}
+                isVerified={Boolean(apartment.is_verified)}
+              />
+            </TabsContent>
+          ) : null}
 
           <TabsContent value="details" className="space-y-4">
             <Card>

@@ -288,6 +288,8 @@ const resources = {
           loadFailed: 'Failed to load calendar.',
           updateFailed: 'Failed to update calendar.',
           unverified: 'Calendar editing is available only for verified cottages.',
+          bookedReadonly: 'Booked dates are view-only.',
+          noActions: 'No actions available for this date.',
           legend: {
             available: 'Available',
             booked: 'Booked',
@@ -903,6 +905,8 @@ const resources = {
           loadFailed: 'Не удалось загрузить календарь.',
           updateFailed: 'Не удалось обновить календарь.',
           unverified: 'Редактирование календаря доступно только для верифицированных дач.',
+          bookedReadonly: 'Забронированные даты доступны только для просмотра.',
+          noActions: 'Для этой даты нет доступных действий.',
           legend: {
             available: 'Свободно',
             booked: 'Забронировано',
@@ -1518,6 +1522,8 @@ const resources = {
           loadFailed: 'Kalendarni yuklab bo‘lmadi.',
           updateFailed: 'Kalendarni yangilab bo‘lmadi.',
           unverified: 'Kalendarni tahrirlash faqat tasdiqlangan kottejlar uchun mavjud.',
+          bookedReadonly: 'Band qilingan sanalar faqat ko‘rish uchun.',
+          noActions: 'Bu sana uchun amal mavjud emas.',
           legend: {
             available: 'Bo‘sh',
             booked: 'Band qilingan',
