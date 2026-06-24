@@ -2,7 +2,7 @@ import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { api } from "@/lib/api";
+import { api, fetchExchangeRate } from "@/lib/api";
 import { resolveImageUrl, cn } from "@/lib/utils";
 import { formatUzbekPhoneNumber, getPhoneHref } from "@/lib/phone";
 import { fetchAllPartners, type PartnerDetails } from "@/lib/partners";
@@ -1036,11 +1036,31 @@ export default function ApartmentDetailsUpdate() {
 
                 <div className="space-y-2">
                   <Label htmlFor="currency">{t("properties.currency")}</Label>
-                  <Select
+                    <Select
                     value={form.currency ?? ""}
-                    onValueChange={(value) =>
-                      handleChange("currency", value as "USD" | "UZS")
-                    }
+                    onValueChange={async (value) => {
+                      const newCurrency = value as "USD" | "UZS";
+                      if (form.currency === newCurrency || !form.price) {
+                        handleChange("currency", newCurrency);
+                        return;
+                      }
+                      try {
+                        const rate = await fetchExchangeRate();
+                        const currentPrice = Number.parseFloat(form.price);
+                        if (Number.isFinite(currentPrice)) {
+                          const converted =
+                            form.currency === "USD" && newCurrency === "UZS"
+                              ? String(Math.round(currentPrice * rate))
+                              : form.currency === "UZS" && newCurrency === "USD"
+                                ? String(Math.round(currentPrice / rate))
+                                : form.price;
+                          handleChange("price", converted);
+                        }
+                      } catch {
+                        /* rate fetch failed — change currency without converting */
+                      }
+                      handleChange("currency", newCurrency);
+                    }}
                   >
                     <SelectTrigger id="currency">
                       <SelectValue

@@ -9,7 +9,7 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { api } from "@/lib/api";
+import { api, fetchExchangeRate } from "@/lib/api";
 import { resolveImageUrl, cn } from "@/lib/utils";
 import { formatUzbekPhoneNumber, getPhoneHref } from "@/lib/phone";
 import { fetchAllPartners, type PartnerDetails } from "@/lib/partners";
@@ -925,6 +925,44 @@ export default function CottageDetailsUpdate() {
     [state.price],
   );
 
+  const handleCurrencyChange = useCallback(
+    async (newCurrency: "USD" | "UZS") => {
+      if (state.currency === newCurrency) return;
+      dispatch({ type: "SET_SAVED_MESSAGE", payload: null });
+      dispatch({ type: "SET_ERROR_MESSAGE", payload: null });
+      try {
+        const rate = await fetchExchangeRate();
+        const convert = (value: string | number) => {
+          const num = typeof value === "string" ? Number.parseFloat(value) : value;
+          if (!Number.isFinite(num)) return String(value);
+          if (state.currency === "USD" && newCurrency === "UZS") {
+            return String(Math.round(num * rate));
+          }
+          if (state.currency === "UZS" && newCurrency === "USD") {
+            return String(Math.round(num / rate));
+          }
+          return String(num);
+        };
+        const nextPrice = state.price.map((item) => ({
+          ...item,
+          price_per_person: convert(item.price_per_person),
+          price_on_working_days: convert(item.price_on_working_days),
+          price_on_weekends: convert(item.price_on_weekends),
+        }));
+        dispatch({ type: "SET_CURRENCY", payload: newCurrency });
+        dispatch({ type: "SET_PRICE", payload: nextPrice });
+      } catch {
+        dispatch({
+          type: "SET_ERROR_MESSAGE",
+          payload:
+            t("common.actionFailed") ??
+            "Failed to fetch exchange rate. Try again.",
+        });
+      }
+    },
+    [state.currency, state.price, t],
+  );
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!propertyId) return;
@@ -1537,18 +1575,14 @@ export default function CottageDetailsUpdate() {
                   <Button
                     type="button"
                     variant={state.currency === "USD" ? "default" : "outline"}
-                    onClick={() =>
-                      dispatch({ type: "SET_CURRENCY", payload: "USD" })
-                    }
+                    onClick={() => handleCurrencyChange("USD")}
                   >
                     USD
                   </Button>
                   <Button
                     type="button"
                     variant={state.currency === "UZS" ? "default" : "outline"}
-                    onClick={() =>
-                      dispatch({ type: "SET_CURRENCY", payload: "UZS" })
-                    }
+                    onClick={() => handleCurrencyChange("UZS")}
                   >
                     UZS
                   </Button>

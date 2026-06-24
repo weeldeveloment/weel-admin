@@ -56,4 +56,28 @@ api.interceptors.response.use(
   }
 )
 
+export async function fetchExchangeRate(): Promise<number> {
+  const response = await api.get<{ rate: string }>("/payment/exchange-rate/");
+  return Number.parseFloat(response.data.rate);
+}
+
+export async function convertPriceOnCurrencyChange(
+  currentCurrency: string,
+  newCurrency: string,
+  currentValue: string,
+): Promise<string> {
+  if (currentCurrency === newCurrency || !currentValue) return currentValue;
+  const rate = await fetchExchangeRate();
+  const numericValue = Number.parseFloat(currentValue);
+  if (!Number.isFinite(numericValue)) return currentValue;
+
+  if (currentCurrency === "USD" && newCurrency === "UZS") {
+    return String(Math.round(numericValue * rate));
+  }
+  if (currentCurrency === "UZS" && newCurrency === "USD") {
+    return String(Math.round(numericValue / rate));
+  }
+  return currentValue;
+}
+
 export default api
