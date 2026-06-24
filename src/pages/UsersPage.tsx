@@ -74,11 +74,6 @@ export default function UsersPage() {
         fetchAllPages<AdminPartner>('/admin-auth/users/partners/'),
         fetchAllPages<AdminClient>('/admin-auth/users/clients/'),
       ])
-      console.log('clientsData count:', clientsData?.length, 'partnersData count:', partnersData?.length)
-      if (clientsData?.length === 0) {
-        const check = await api.get('/admin-auth/users/clients/', { params: { page: 1, page_size: 10 } })
-        console.log('clients raw response:', JSON.stringify(check.data))
-      }
       setPartners(partnersData)
       setClients(clientsData)
     } catch (err: unknown) {
@@ -161,7 +156,6 @@ export default function UsersPage() {
                   </tr>
                 ) : (
                     paginatedUsers.map((user) => {
-                      console.log('Rendering user:', JSON.stringify(user, null, 2)) // Debug log to check user data
                       return (
                         <tr
                           key={user.id}

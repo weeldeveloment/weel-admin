@@ -443,10 +443,10 @@ function reducer(state: State, action: Action): State {
                 ? String(merged.region.id)
                 : null,
           district_id:
-            merged.property_location?.district?.id != null
-              ? String(merged.property_location.district.id)
-              : merged.district?.id != null
-                ? String(merged.district.id)
+            merged.property_location?.district?.guid != null
+              ? String(merged.property_location.district.guid)
+              : merged.district?.guid != null
+                ? String(merged.district.guid)
                 : null,
           prefecture_id: (() => {
             const prefectureId =
@@ -611,7 +611,7 @@ const fetchRegions = async (): Promise<LocationOption[]> => {
 const fetchDistricts = async (): Promise<LocationOption[]> => {
   const response = await api.get<DistrictList[]>("/property/admin/districts/");
   return (response.data ?? []).map((d) => ({
-    id: String(d.id ?? ""),
+    id: String(d.guid ?? ""),
     label: d.title ?? "",
     region_id: String(d.region_id ?? ""),
   }));
