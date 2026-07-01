@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useReducer, useState } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, Loader2, Trash2, Upload } from 'lucide-react'
+import { Building2, ChevronLeft, GripVertical, Loader2, Plus, Trash2, Upload } from 'lucide-react'
 import { api } from '@/lib/api'
-import { resolveImageUrl } from '@/lib/utils'
+import { resolveImageUrl, cn } from '@/lib/utils'
 import type { HotelOrganizationOption, PropertyItem } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,6 +22,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import HotelPmsSection from '@/components/HotelPmsSection'
+import HotelRoomsSection from '@/components/HotelRoomsSection'
 
 type HotelForm = {
   title: string
@@ -54,6 +56,9 @@ type State = {
   savedMessage: string | null
   errorMessage: string | null
   imageMessage: string | null
+  draggedIndex: number | null
+  dragOverIndex: number | null
+  isDragOver: boolean
 }
 
 type Action =
@@ -62,6 +67,11 @@ type Action =
   | { type: 'setSavedMessage'; value: string | null }
   | { type: 'setErrorMessage'; value: string | null }
   | { type: 'setImageMessage'; value: string | null }
+  | { type: 'setDraggedIndex'; value: number | null }
+  | { type: 'setDragOverIndex'; value: number | null }
+  | { type: 'setIsDragOver'; value: boolean }
+
+const MAX_IMAGES = 10
 
 const emptyForm: HotelForm = {
   title: '',
@@ -136,6 +146,12 @@ function reducer(state: State, action: Action): State {
       return { ...state, errorMessage: action.value }
     case 'setImageMessage':
       return { ...state, imageMessage: action.value }
+    case 'setDraggedIndex':
+      return { ...state, draggedIndex: action.value }
+    case 'setDragOverIndex':
+      return { ...state, dragOverIndex: action.value }
+    case 'setIsDragOver':
+      return { ...state, isDragOver: action.value }
     default:
       return state
   }
@@ -146,6 +162,9 @@ const initialState: State = {
   savedMessage: null,
   errorMessage: null,
   imageMessage: null,
+  draggedIndex: null,
+  dragOverIndex: null,
+  isDragOver: false,
 }
 
 const fetchHotel = async (id: string): Promise<PropertyItem> => {
@@ -165,7 +184,10 @@ export default function HotelDetailsUpdate() {
   const { t } = useTranslation()
   const isCreateMode = propertyId === 'create'
   const [state, dispatch] = useReducer(reducer, initialState)
-  const [uploading, setUploading] = useState(false)
+  const [pendingCreateImages, setPendingCreateImages] = useState<
+    Array<{ file: File; previewUrl: string }>
+  >([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const hotelQuery = useQuery({
     queryKey: ['hotel', propertyId],
@@ -184,8 +206,8 @@ export default function HotelDetailsUpdate() {
     }
   }, [hotelQuery.data])
 
+  const { form, savedMessage, errorMessage, imageMessage, draggedIndex, dragOverIndex, isDragOver } = state
   const hotel = hotelQuery.data
-  const form = state.form
 
   const selectedOrganization = useMemo(
     () => (organizationsQuery.data ?? []).find((item) => String(item.id) === form.organization_id) ?? null,
@@ -240,11 +262,22 @@ export default function HotelDetailsUpdate() {
       )
       return response.data
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       dispatch({ type: 'setSavedMessage', value: t('common.saved') })
       dispatch({ type: 'hydrate', payload: data })
       void queryClient.invalidateQueries({ queryKey: ['properties'] })
       if (isCreateMode && data.guid) {
+        for (const pending of pendingCreateImages) {
+          try {
+            const formData = new FormData()
+            formData.append('image', pending.file)
+            await api.post(`/property/admin/hotels/${encodeURIComponent(data.guid)}/images/`, formData)
+          } catch {
+            dispatch({ type: 'setImageMessage', value: t('common.actionFailed') })
+          }
+        }
+        pendingCreateImages.forEach((item) => URL.revokeObjectURL(item.previewUrl))
+        setPendingCreateImages([])
         navigate(`/properties/hotels/${encodeURIComponent(data.guid)}`, { replace: true })
       }
     },
@@ -263,33 +296,186 @@ export default function HotelDetailsUpdate() {
     },
   })
 
-  const handleImageUpload = async (file: File | null) => {
-    if (!file || !propertyId || isCreateMode) return
-    setUploading(true)
-    dispatch({ type: 'setImageMessage', value: null })
-    try {
+  const currentImageCount = isCreateMode
+    ? pendingCreateImages.length
+    : (hotel?.img?.length ?? 0)
+  const isMaxImages = currentImageCount >= MAX_IMAGES
+  const imageItems = isCreateMode
+    ? pendingCreateImages.map((item) => item.previewUrl)
+    : (hotel?.img ?? [])
+
+  const uploadImageMutation = useMutation({
+    mutationFn: async (file: File) => {
       const formData = new FormData()
       formData.append('image', file)
-      await api.post(`/property/admin/hotels/${encodeURIComponent(propertyId)}/images/`, formData)
+      await api.post(`/property/admin/hotels/${encodeURIComponent(propertyId!)}/images/`, formData)
+    },
+    onSuccess: () => {
+      void hotelQuery.refetch()
       dispatch({ type: 'setImageMessage', value: t('common.saved') })
-      await hotelQuery.refetch()
-    } catch {
+      setTimeout(() => dispatch({ type: 'setImageMessage', value: null }), 3000)
+    },
+    onError: () => {
       dispatch({ type: 'setImageMessage', value: t('common.actionFailed') })
-    } finally {
-      setUploading(false)
+      setTimeout(() => dispatch({ type: 'setImageMessage', value: null }), 3000)
+    },
+  })
+
+  const imagesUpdateMutation = useMutation({
+    mutationFn: async (updatedImages: string[]) => {
+      await api.patch(`/property/admin/hotels/${encodeURIComponent(propertyId!)}/`, { img: updatedImages })
+    },
+    onSuccess: () => {
+      void hotelQuery.refetch()
+    },
+    onError: () => {
+      dispatch({ type: 'setImageMessage', value: t('common.actionFailed') })
+      setTimeout(() => dispatch({ type: 'setImageMessage', value: null }), 3000)
+    },
+  })
+
+  const deleteImageMutation = useMutation({
+    mutationFn: async (imageUrl: string) => {
+      await api.delete(
+        `/property/admin/hotels/${encodeURIComponent(propertyId!)}/images/${encodeURIComponent(imageUrl)}/`,
+      )
+    },
+    onSuccess: () => {
+      void hotelQuery.refetch()
+      dispatch({ type: 'setImageMessage', value: t('common.saved') })
+      setTimeout(() => dispatch({ type: 'setImageMessage', value: null }), 3000)
+    },
+    onError: () => {
+      dispatch({ type: 'setImageMessage', value: t('common.actionFailed') })
+      setTimeout(() => dispatch({ type: 'setImageMessage', value: null }), 3000)
+    },
+  })
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (isMaxImages) {
+      dispatch({
+        type: 'setImageMessage',
+        value: t('properties.maxImagesReached') ?? `Maximum ${MAX_IMAGES} images allowed.`,
+      })
+      setTimeout(() => dispatch({ type: 'setImageMessage', value: null }), 3000)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
+    if (isCreateMode) {
+      const previewUrl = URL.createObjectURL(file)
+      setPendingCreateImages((prev) => [...prev, { file, previewUrl }])
+      dispatch({ type: 'setImageMessage', value: null })
+    } else {
+      uploadImageMutation.mutate(file)
+    }
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dispatch({ type: 'setIsDragOver', value: false })
+    if (isMaxImages) {
+      dispatch({
+        type: 'setImageMessage',
+        value: t('properties.maxImagesReached') ?? `Maximum ${MAX_IMAGES} images allowed.`,
+      })
+      setTimeout(() => dispatch({ type: 'setImageMessage', value: null }), 3000)
+      return
+    }
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith('image/'),
+    )
+    if (files.length === 0) return
+    if (isCreateMode) {
+      const newImages = files.map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }))
+      setPendingCreateImages((prev) => [...prev, ...newImages])
+    } else {
+      const file = files[0]
+      uploadImageMutation.mutate(file)
     }
   }
 
-  const handleDeleteImage = async (imageUrl: string) => {
-    if (!propertyId || isCreateMode) return
-    try {
-      await api.delete(
-        `/property/admin/hotels/${encodeURIComponent(propertyId)}/images/${encodeURIComponent(imageUrl)}/`,
-      )
-      await hotelQuery.refetch()
-    } catch {
-      dispatch({ type: 'setImageMessage', value: t('common.actionFailed') })
+  const handleDragOverZone = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!isDragOver && !isMaxImages) {
+      dispatch({ type: 'setIsDragOver', value: true })
     }
+  }
+
+  const handleDragLeaveZone = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return
+    dispatch({ type: 'setIsDragOver', value: false })
+  }
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    dispatch({ type: 'setDraggedIndex', value: index })
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', String(index))
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (draggedIndex !== index) {
+      dispatch({ type: 'setDragOverIndex', value: index })
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault()
+    const dragIndex = Number(e.dataTransfer.getData('text/plain'))
+    if (dragIndex === dropIndex || Number.isNaN(dragIndex)) {
+      dispatch({ type: 'setDraggedIndex', value: null })
+      dispatch({ type: 'setDragOverIndex', value: null })
+      return
+    }
+    if (isCreateMode) {
+      setPendingCreateImages((prev) => {
+        const reordered = [...prev]
+        const [removed] = reordered.splice(dragIndex, 1)
+        reordered.splice(dropIndex, 0, removed)
+        return reordered
+      })
+    } else {
+      const currentImages = hotel?.img ?? []
+      const newImages = [...currentImages]
+      const [removed] = newImages.splice(dragIndex, 1)
+      newImages.splice(dropIndex, 0, removed)
+      imagesUpdateMutation.mutate(newImages)
+    }
+    dispatch({ type: 'setDraggedIndex', value: null })
+    dispatch({ type: 'setDragOverIndex', value: null })
+  }
+
+  const handleDragEnd = () => {
+    dispatch({ type: 'setDraggedIndex', value: null })
+    dispatch({ type: 'setDragOverIndex', value: null })
+  }
+
+  const handleDeleteImage = (index: number) => {
+    if (isCreateMode) {
+      setPendingCreateImages((prev) => {
+        const removed = prev[index]
+        if (removed) {
+          URL.revokeObjectURL(removed.previewUrl)
+        }
+        return prev.filter((_, i) => i !== index)
+      })
+      return
+    }
+    const currentImages = hotel?.img ?? []
+    const imageUrl = currentImages[index]
+    if (!imageUrl) return
+    deleteImageMutation.mutate(imageUrl)
   }
 
   if (!isCreateMode && hotelQuery.isLoading) {
@@ -340,14 +526,14 @@ export default function HotelDetailsUpdate() {
         }}
         className="space-y-6"
       >
-        {state.savedMessage ? (
+        {savedMessage ? (
           <div className="rounded-md border bg-green-50 px-4 py-2 text-sm text-green-700">
-            {state.savedMessage}
+            {savedMessage}
           </div>
         ) : null}
-        {state.errorMessage ? (
+        {errorMessage ? (
           <div className="rounded-md border bg-red-50 px-4 py-2 text-sm text-red-700">
-            {state.errorMessage}
+            {errorMessage}
           </div>
         ) : null}
 
@@ -355,8 +541,11 @@ export default function HotelDetailsUpdate() {
           <TabsList>
             <TabsTrigger value="basic">{t('properties.tabs.basic')}</TabsTrigger>
             <TabsTrigger value="details">{t('properties.tabs.details')}</TabsTrigger>
+            <TabsTrigger value="partner">{t('properties.tabs.partner')}</TabsTrigger>
+            <TabsTrigger value="rooms">{t('properties.tabs.rooms')}</TabsTrigger>
             <TabsTrigger value="location">{t('properties.tabs.location')}</TabsTrigger>
             <TabsTrigger value="images">{t('properties.tabs.images')}</TabsTrigger>
+            <TabsTrigger value="pms">{t('nav.pms')}</TabsTrigger>
             <TabsTrigger value="settings">{t('properties.tabs.settings')}</TabsTrigger>
           </TabsList>
 
@@ -366,26 +555,6 @@ export default function HotelDetailsUpdate() {
                 <CardTitle className="text-base">{t('properties.basicInfo')}</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="organization_id">{t('properties.partnerInfo')}</Label>
-                  <Select
-                    value={form.organization_id}
-                    onValueChange={(value) =>
-                      dispatch({ type: 'setField', key: 'organization_id', value })
-                    }
-                  >
-                    <SelectTrigger id="organization_id">
-                      <SelectValue placeholder={t('properties.selectPartner')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(organizationsQuery.data ?? []).map((item) => (
-                        <SelectItem key={item.id} value={String(item.id)}>
-                          {item.name} ({item.schema_name})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="title">{t('properties.title')}</Label>
                   <Input
@@ -525,6 +694,73 @@ export default function HotelDetailsUpdate() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="partner" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{t('properties.partnerInfo')}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="organization_id">{t('properties.selectPartner')}</Label>
+                  <Select
+                    value={form.organization_id}
+                    onValueChange={(value) =>
+                      dispatch({ type: 'setField', key: 'organization_id', value })
+                    }
+                  >
+                    <SelectTrigger id="organization_id">
+                      <SelectValue placeholder={t('properties.selectPartner')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(organizationsQuery.data ?? []).map((item) => (
+                        <SelectItem key={item.id} value={String(item.id)}>
+                          {item.name} ({item.schema_name})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedOrganization ? (
+                  <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-semibold">{selectedOrganization.name}</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                      <div>
+                        <span className="text-xs text-muted-foreground">ID</span>
+                        <p className="font-medium">{selectedOrganization.id}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">Slug</span>
+                        <p className="font-medium">{selectedOrganization.slug}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">Schema</span>
+                        <p className="font-medium">{selectedOrganization.schema_name}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t('properties.noPartner')}</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="rooms" className="space-y-4">
+            {isCreateMode ? (
+              <Card>
+                <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                  {t('properties.pmsAfterCreate')}
+                </CardContent>
+              </Card>
+            ) : hotel ? (
+              <HotelRoomsSection hotelId={hotel.guid} />
+            ) : null}
+          </TabsContent>
+
           <TabsContent value="location" className="space-y-4">
             <Card>
               <CardHeader>
@@ -588,58 +824,152 @@ export default function HotelDetailsUpdate() {
           <TabsContent value="images" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">{t('properties.tabs.images')}</CardTitle>
+                <CardTitle className="text-base">
+                  {t('propertyDetails.sections.imageUpdater')}
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">
+                    ({currentImageCount} / {MAX_IMAGES})
+                  </span>
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {state.imageMessage ? (
-                  <div className="rounded-md border bg-muted/30 px-4 py-2 text-sm">
-                    {state.imageMessage}
+                {imageMessage ? (
+                  <div
+                    className={`rounded-md border px-4 py-2 text-sm ${
+                      imageMessage.includes(
+                        t('propertyDetails.messages.imageUpdateSuccess') ?? 'success',
+                      )
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-red-50 text-red-700'
+                    }`}
+                  >
+                    {imageMessage}
                   </div>
                 ) : null}
-                {isCreateMode ? (
-                  <p className="text-sm text-muted-foreground">{t('properties.imageUploadAfterCreate')}</p>
-                ) : (
-                  <>
-                    <div className="flex flex-wrap gap-4">
-                      {(hotel?.img ?? []).map((image) => (
-                        <div key={image} className="space-y-2">
+
+                <div
+                  className={cn(
+                    'relative rounded-lg transition-all',
+                    isDragOver && !isMaxImages && 'ring-2 ring-primary ring-offset-2 bg-primary/5',
+                  )}
+                  onDrop={handleFileDrop}
+                  onDragOver={handleDragOverZone}
+                  onDragLeave={handleDragLeaveZone}
+                >
+                  {isDragOver ? (
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 rounded-lg bg-primary/10 pointer-events-none">
+                      <Upload className="h-8 w-8 text-primary" />
+                      <span className="text-sm font-medium text-primary">
+                        {t('common.dropHere') ?? 'Drop image here'}
+                      </span>
+                    </div>
+                  ) : null}
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+                    {imageItems.map((src, index) => {
+                      const isDragged = draggedIndex === index
+                      const isDropTarget =
+                        dragOverIndex === index && draggedIndex !== index
+
+                      return (
+                        <div
+                          key={src}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragOver={(e) => handleDragOver(e, index)}
+                          onDrop={(e) => handleDrop(e, index)}
+                          onDragEnd={handleDragEnd}
+                          className={cn(
+                            'group relative aspect-[4/3] select-none overflow-hidden rounded-lg border bg-muted transition-all duration-200',
+                            isDragged &&
+                              'z-0 scale-95 opacity-40 ring-2 ring-primary/50',
+                            isDropTarget &&
+                              'z-10 scale-105 shadow-lg ring-2 ring-primary',
+                            !isDragged &&
+                              !isDropTarget &&
+                              'hover:ring-1 hover:ring-border',
+                          )}
+                        >
                           <img
-                            src={resolveImageUrl(image)}
-                            alt={hotel?.title}
-                            className="h-32 w-40 rounded-md object-cover"
+                            src={isCreateMode ? src : resolveImageUrl(src)}
+                            alt={`${hotel?.title} ${index + 1}`}
+                            className="pointer-events-none h-full w-full object-cover"
+                            draggable={false}
                           />
-                          <Button
+
+                          <div className="absolute left-1.5 top-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-[10px] font-bold text-white">
+                            {index + 1}
+                          </div>
+
+                          <div className="absolute right-1.5 top-1.5 z-10 opacity-0 transition-opacity group-hover:opacity-100">
+                            <div
+                              className="flex h-7 w-7 cursor-grab items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60 active:cursor-grabbing"
+                              title={t('properties.dragToReorder') ?? 'Drag to reorder'}
+                            >
+                              <GripVertical className="h-3.5 w-3.5" />
+                            </div>
+                          </div>
+
+                          <button
                             type="button"
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                            onClick={() => void handleDeleteImage(image)}
+                            onClick={() => handleDeleteImage(index)}
+                            disabled={deleteImageMutation.isPending || imagesUpdateMutation.isPending}
+                            className="absolute bottom-1.5 right-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/40 text-white opacity-70 transition-all hover:bg-red-500/90 hover:opacity-100 disabled:opacity-30"
+                            title={t('properties.deleteImage') ?? 'Delete image'}
                           >
-                            <Trash2 className="h-4 w-4" />
-                            {t('properties.deleteImage')}
-                          </Button>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
                         </div>
-                      ))}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="hotel-image-upload">Upload image</Label>
-                      <Input
-                        id="hotel-image-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={(event) => void handleImageUpload(event.target.files?.[0] ?? null)}
-                      />
-                      {uploading ? (
-                        <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Uploading...
-                        </div>
-                      ) : null}
-                    </div>
-                  </>
-                )}
+                      )
+                    })}
+
+                    {!isMaxImages ? (
+                      <label
+                        className={cn(
+                          'flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 transition-colors hover:border-primary/50 hover:bg-primary/10',
+                          uploadImageMutation.isPending &&
+                            'pointer-events-none opacity-60',
+                        )}
+                      >
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={handleFileSelect}
+                        />
+                        {uploadImageMutation.isPending ? (
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                        ) : (
+                          <Plus className="h-5 w-5 text-primary" />
+                        )}
+                        <span className="text-xs font-medium text-primary">
+                          {uploadImageMutation.isPending
+                            ? t('propertyDetails.actions.updatingImage')
+                            : t('propertyDetails.actions.updateImage')}
+                        </span>
+                      </label>
+                    ) : null}
+                  </div>
+                </div>
+
+                {isMaxImages ? (
+                  <p className="text-sm font-medium text-amber-600">
+                    {t('properties.maxImagesReached', { count: MAX_IMAGES })}
+                  </p>
+                ) : null}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="pms" className="space-y-4">
+            {isCreateMode ? (
+              <Card>
+                <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                  {t('properties.pmsAfterCreate')}
+                </CardContent>
+              </Card>
+            ) : hotel ? (
+              <HotelPmsSection hotelId={hotel.guid} />
+            ) : null}
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-4">

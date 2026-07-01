@@ -56,6 +56,112 @@ api.interceptors.response.use(
   }
 )
 
+// ── PMS Calendar API ─────────────────────────────────────────────
+
+import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSProperty, PMSRate, PMSRoomType } from "@/types/pms"
+
+async function adminAuthGet<T>(url: string, params?: Record<string, string | undefined>): Promise<T> {
+  const cleanParams: Record<string, string> = {}
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null) cleanParams[k] = v
+    }
+  }
+  const response = await api.get<T>(url, { params: cleanParams })
+  return response.data
+}
+
+async function adminAuthPost<T>(url: string, data?: unknown): Promise<T> {
+  const response = await api.post<T>(url, data)
+  return response.data
+}
+
+async function adminAuthPatch<T>(url: string, data?: unknown): Promise<T> {
+  const response = await api.patch<T>(url, data)
+  return response.data
+}
+
+// ── Properties ───────────────────────────────────────────────────
+
+export function fetchPmsProperties(): Promise<PMSProperty[]> {
+  return adminAuthGet<PMSProperty[]>("/admin-auth/hotels/")
+}
+
+// ── Room Types ────────────────────────────────────────────────────
+
+export function fetchPmsRoomTypes(propertyId: string): Promise<PMSRoomType[]> {
+  return adminAuthGet<PMSRoomType[]>(`/admin-auth/hotels/${propertyId}/room-types/`)
+}
+
+// ── Rooms ─────────────────────────────────────────────────────────
+
+export function fetchPmsRooms(propertyId: string, roomTypeId?: number): Promise<PMSRoom[]> {
+  return adminAuthGet<PMSRoom[]>(`/admin-auth/hotels/${propertyId}/rooms/`, {
+    room_type_id: roomTypeId?.toString(),
+  })
+}
+
+// ── Bookings ──────────────────────────────────────────────────────
+
+export function fetchPmsBookings(
+  propertyId: string,
+  params?: { status?: string; from_date?: string; to_date?: string },
+): Promise<PMSBooking[]> {
+  return adminAuthGet<PMSBooking[]>(
+    `/admin-auth/hotels/${propertyId}/bookings/`,
+    params as Record<string, string | undefined>,
+  )
+}
+
+export function fetchPmsBooking(propertyId: string, bookingId: number): Promise<PMSBooking> {
+  return adminAuthGet<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/`)
+}
+
+export function createPmsBooking(propertyId: string, data: Partial<PMSBooking> & { guest?: Record<string, unknown> }): Promise<PMSBooking> {
+  return adminAuthPost<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/create/`, data)
+}
+
+export function updatePmsBooking(propertyId: string, bookingId: number, data: Partial<PMSBooking>): Promise<PMSBooking> {
+  return adminAuthPatch<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/`, data)
+}
+
+export function movePmsBooking(propertyId: string, bookingId: number, data: { new_room_id: number; new_check_in?: string; new_check_out?: string }): Promise<PMSBooking> {
+  return adminAuthPost<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/move/`, data)
+}
+
+export function cancelPmsBooking(propertyId: string, bookingId: number): Promise<PMSBooking> {
+  return adminAuthPost<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/cancel/`)
+}
+
+export function checkInPmsBooking(propertyId: string, bookingId: number): Promise<PMSBooking> {
+  return adminAuthPost<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/check-in/`)
+}
+
+export function checkOutPmsBooking(propertyId: string, bookingId: number): Promise<PMSBooking> {
+  return adminAuthPost<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/check-out/`)
+}
+
+export function acceptPmsBooking(propertyId: string, bookingId: number): Promise<PMSBooking> {
+  return adminAuthPost<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/accept/`)
+}
+
+// ── Calendar ──────────────────────────────────────────────────────
+
+export function fetchPmsCalendarSlots(propertyId: string, fromDate: string, toDate: string): Promise<PMSCalendarSlot[]> {
+  return adminAuthGet<PMSCalendarSlot[]>(`/admin-auth/hotels/${propertyId}/calendar/`, {
+    from_date: fromDate,
+    to_date: toDate,
+  })
+}
+
+// ── Rates ─────────────────────────────────────────────────────────
+
+export function fetchPmsRates(propertyId: string, roomTypeId?: number): Promise<PMSRate[]> {
+  return adminAuthGet<PMSRate[]>(`/admin-auth/hotels/${propertyId}/rates/`, {
+    room_type_id: roomTypeId?.toString(),
+  })
+}
+
 export async function fetchExchangeRate(): Promise<number> {
   const response = await api.get<{ rate: string }>("/payment/exchange-rate/");
   return Number.parseFloat(response.data.rate);
