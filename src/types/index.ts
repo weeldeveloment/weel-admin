@@ -284,6 +284,13 @@ export interface PropertyItem {
     schema_name?: string | null
   } | null
   property_detail?: Record<string, unknown> | null
+  legal_info?: {
+    entity_name?: string | null
+    inn?: string | null
+    mfi?: string | null
+    bank_account?: string | null
+    vat_status?: string | null
+  } | null
 }
 
 export interface PropertyListResult {

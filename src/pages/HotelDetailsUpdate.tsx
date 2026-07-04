@@ -53,6 +53,11 @@ type HotelForm = {
   is_allowed_pets: boolean
   is_quiet_hours: boolean
   verification_status: string | null
+  entity_name: string
+  inn: string
+  mfi: string
+  bank_account: string
+  vat_status: string
 }
 
 type State = {
@@ -106,6 +111,11 @@ const emptyForm: HotelForm = {
   is_allowed_pets: false,
   is_quiet_hours: true,
   verification_status: null,
+  entity_name: '',
+  inn: '',
+  mfi: '',
+  bank_account: '',
+  vat_status: '',
 }
 
 function reducer(state: State, action: Action): State {
@@ -148,6 +158,11 @@ function reducer(state: State, action: Action): State {
           is_allowed_pets: item.is_allowed_pets ?? Boolean(detail.is_allowed_pets),
           is_quiet_hours: item.is_quiet_hours ?? Boolean(detail.is_quiet_hours ?? true),
           verification_status: item.verification_status ?? null,
+          entity_name: String(item.legal_info?.entity_name ?? ''),
+          inn: String(item.legal_info?.inn ?? ''),
+          mfi: String(item.legal_info?.mfi ?? ''),
+          bank_account: String(item.legal_info?.bank_account ?? ''),
+          vat_status: String(item.legal_info?.vat_status ?? ''),
         },
         errorMessage: null,
       }
@@ -269,6 +284,13 @@ export default function HotelDetailsUpdate() {
         is_allowed_pets: form.is_allowed_pets,
         is_quiet_hours: form.is_quiet_hours,
         verification_status: form.verification_status || null,
+        legal_info: {
+          entity_name: form.entity_name || '',
+          inn: form.inn || '',
+          mfi: form.mfi || '',
+          bank_account: form.bank_account || '',
+          vat_status: form.vat_status || '',
+        },
       }
 
       if (isCreateMode) {
@@ -641,6 +663,72 @@ export default function HotelDetailsUpdate() {
                       dispatch({ type: 'setField', key: 'check_out_time', value: event.target.value })
                     }
                   />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Legal Info</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="entity_name">Entity Name</Label>
+                  <Input
+                    id="entity_name"
+                    value={form.entity_name}
+                    onChange={(event) =>
+                      dispatch({ type: 'setField', key: 'entity_name', value: event.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="inn">INN</Label>
+                  <Input
+                    id="inn"
+                    value={form.inn}
+                    onChange={(event) =>
+                      dispatch({ type: 'setField', key: 'inn', value: event.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="mfi">MFI</Label>
+                  <Input
+                    id="mfi"
+                    value={form.mfi}
+                    onChange={(event) =>
+                      dispatch({ type: 'setField', key: 'mfi', value: event.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bank_account">Bank Account</Label>
+                  <Input
+                    id="bank_account"
+                    value={form.bank_account}
+                    onChange={(event) =>
+                      dispatch({ type: 'setField', key: 'bank_account', value: event.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vat_status">VAT Status</Label>
+                  <Select
+                    value={form.vat_status}
+                    onValueChange={(value) =>
+                      dispatch({ type: 'setField', key: 'vat_status', value })
+                    }
+                  >
+                    <SelectTrigger id="vat_status">
+                      <SelectValue placeholder="Select VAT status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="registered">Registered</SelectItem>
+                      <SelectItem value="not_registered">Not Registered</SelectItem>
+                      <SelectItem value="exempt">Exempt</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
