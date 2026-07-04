@@ -12,6 +12,9 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className
         )}
         ref={ref}
+        data-gramm="false"
+        data-gramm_editor="false"
+        data-ms-editor="false"
         {...props}
       />
     )
