@@ -30,7 +30,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isAuthEndpoint =
+      originalRequest.url?.includes('/admin-auth/login/') ||
+      originalRequest.url?.includes('/admin-auth/token/refresh/')
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true
 
       try {

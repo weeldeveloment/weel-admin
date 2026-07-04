@@ -45,14 +45,19 @@ type HotelForm = {
   description_en: string
   amenities: string
   is_active: boolean
+  is_verified: boolean
+  is_archived: boolean
+  is_recommended: boolean
   is_testing: boolean
   is_allowed_alcohol: boolean
   is_allowed_pets: boolean
   is_quiet_hours: boolean
+  verification_status: string | null
 }
 
 type State = {
   form: HotelForm
+  hasHydrated: boolean
   savedMessage: string | null
   errorMessage: string | null
   imageMessage: string | null
@@ -93,10 +98,14 @@ const emptyForm: HotelForm = {
   description_en: '',
   amenities: '',
   is_active: true,
+  is_verified: false,
+  is_archived: false,
+  is_recommended: false,
   is_testing: false,
   is_allowed_alcohol: false,
   is_allowed_pets: false,
   is_quiet_hours: true,
+  verification_status: null,
 }
 
 function reducer(state: State, action: Action): State {
@@ -106,6 +115,7 @@ function reducer(state: State, action: Action): State {
       const detail = (item.property_detail as Record<string, unknown> | undefined) ?? {}
       return {
         ...state,
+        hasHydrated: true,
         form: {
           title: item.title ?? '',
           organization_id: item.organization?.id ? String(item.organization.id) : item.organization_id ? String(item.organization_id) : '',
@@ -130,10 +140,14 @@ function reducer(state: State, action: Action): State {
               ? (detail.amenities as string[]).join(', ')
               : '',
           is_active: item.is_active ?? true,
+          is_verified: item.is_verified ?? false,
+          is_archived: item.is_archived ?? false,
+          is_recommended: item.is_recommended ?? false,
           is_testing: item.is_testing ?? false,
           is_allowed_alcohol: item.is_allowed_alcohol ?? Boolean(detail.is_allowed_alcohol),
           is_allowed_pets: item.is_allowed_pets ?? Boolean(detail.is_allowed_pets),
           is_quiet_hours: item.is_quiet_hours ?? Boolean(detail.is_quiet_hours ?? true),
+          verification_status: item.verification_status ?? null,
         },
         errorMessage: null,
       }
@@ -159,6 +173,7 @@ function reducer(state: State, action: Action): State {
 
 const initialState: State = {
   form: emptyForm,
+  hasHydrated: false,
   savedMessage: null,
   errorMessage: null,
   imageMessage: null,
@@ -188,6 +203,7 @@ export default function HotelDetailsUpdate() {
     Array<{ file: File; previewUrl: string }>
   >([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const savedMessageTimerRef = useRef<number | null>(null)
 
   const hotelQuery = useQuery({
     queryKey: ['hotel', propertyId],
@@ -201,10 +217,10 @@ export default function HotelDetailsUpdate() {
   })
 
   useEffect(() => {
-    if (hotelQuery.data) {
+    if (hotelQuery.data && !state.hasHydrated) {
       dispatch({ type: 'hydrate', payload: hotelQuery.data })
     }
-  }, [hotelQuery.data])
+  }, [hotelQuery.data, state.hasHydrated])
 
   const { form, savedMessage, errorMessage, imageMessage, draggedIndex, dragOverIndex, isDragOver } = state
   const hotel = hotelQuery.data
@@ -245,10 +261,14 @@ export default function HotelDetailsUpdate() {
           .map((value) => value.trim())
           .filter(Boolean),
         is_active: form.is_active,
+        is_verified: form.is_verified,
+        is_archived: form.is_archived,
+        is_recommended: form.is_recommended,
         is_testing: form.is_testing,
         is_allowed_alcohol: form.is_allowed_alcohol,
         is_allowed_pets: form.is_allowed_pets,
         is_quiet_hours: form.is_quiet_hours,
+        verification_status: form.verification_status || null,
       }
 
       if (isCreateMode) {
@@ -263,8 +283,6 @@ export default function HotelDetailsUpdate() {
       return response.data
     },
     onSuccess: async (data) => {
-      dispatch({ type: 'setSavedMessage', value: t('common.saved') })
-      dispatch({ type: 'hydrate', payload: data })
       void queryClient.invalidateQueries({ queryKey: ['properties'] })
       if (isCreateMode && data.guid) {
         for (const pending of pendingCreateImages) {
@@ -279,6 +297,15 @@ export default function HotelDetailsUpdate() {
         pendingCreateImages.forEach((item) => URL.revokeObjectURL(item.previewUrl))
         setPendingCreateImages([])
         navigate(`/properties/hotels/${encodeURIComponent(data.guid)}`, { replace: true })
+      } else {
+        const updated = await fetchHotel(propertyId!)
+        queryClient.setQueryData(['hotel', propertyId], updated)
+        dispatch({ type: 'hydrate', payload: updated })
+        dispatch({ type: 'setSavedMessage', value: t('common.saved') })
+        if (savedMessageTimerRef.current) window.clearTimeout(savedMessageTimerRef.current)
+        savedMessageTimerRef.current = window.setTimeout(() => {
+          dispatch({ type: 'setSavedMessage', value: null })
+        }, 3000)
       }
     },
     onError: () => {
@@ -989,6 +1016,33 @@ export default function HotelDetailsUpdate() {
                 </label>
                 <label className="flex items-center gap-2 text-sm">
                   <Checkbox
+                    checked={form.is_verified}
+                    onCheckedChange={(value) =>
+                      dispatch({ type: 'setField', key: 'is_verified', value: Boolean(value) })
+                    }
+                  />
+                  <span>{t('properties.isVerified')}</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={form.is_archived}
+                    onCheckedChange={(value) =>
+                      dispatch({ type: 'setField', key: 'is_archived', value: Boolean(value) })
+                    }
+                  />
+                  <span>{t('properties.isArchived')}</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={form.is_recommended}
+                    onCheckedChange={(value) =>
+                      dispatch({ type: 'setField', key: 'is_recommended', value: Boolean(value) })
+                    }
+                  />
+                  <span>{t('properties.isRecommended')}</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox
                     checked={form.is_testing}
                     onCheckedChange={(value) =>
                       dispatch({ type: 'setField', key: 'is_testing', value: Boolean(value) })
@@ -1023,6 +1077,29 @@ export default function HotelDetailsUpdate() {
                   />
                   <span>{t('properties.quietHours')}</span>
                 </label>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="verification_status">
+                    {t('properties.verificationStatus')}
+                  </Label>
+                  <Select
+                    value={form.verification_status ?? ''}
+                    onValueChange={(value) =>
+                      dispatch({ type: 'setField', key: 'verification_status', value: value || null })
+                    }
+                  >
+                    <SelectTrigger id="verification_status">
+                      <SelectValue placeholder={t('properties.selectVerificationStatus')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(['cancelled', 'accepted', 'waiting'] as const).map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {t(`propertyDetails.status.${status}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

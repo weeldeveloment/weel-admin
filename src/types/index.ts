@@ -257,6 +257,7 @@ export interface PropertyItem {
   is_recommended?: boolean
   is_testing?: boolean
   is_active?: boolean
+  verification_status?: string | null
   latitude?: string | null
   longitude?: string | null
   address?: string | null
