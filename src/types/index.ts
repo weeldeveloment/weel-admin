@@ -177,6 +177,55 @@ export interface AdminStory {
   body?: string | null
 }
 
+export type ActivityCategory = 'extreme' | 'relax' | 'water' | 'land'
+
+export interface Activity {
+  id: number
+  guid: string
+  partner_user_id: number
+  name: string
+  description: string
+  category: ActivityCategory
+  address: string | null
+  latitude: string | null
+  longitude: string | null
+  buffer_minutes: number
+  requires_prepayment: boolean
+  is_active: boolean
+  created_at: string
+}
+
+export interface ActivityTariff {
+  id: number
+  guid: string
+  name: string
+  duration_minutes: number
+  price: string
+  is_active: boolean
+}
+
+export interface ActivityResource {
+  id: number
+  guid: string
+  label: string
+  status: 'active' | 'maintenance' | 'broken'
+}
+
+export interface ActivityBooking {
+  id: number
+  guid: string
+  starts_at: string
+  ends_at: string
+  blocked_until: string
+  price_snapshot: string
+  status: 'pending_payment' | 'confirmed' | 'completed' | 'cancelled' | 'expired'
+}
+
+export interface ActivityResourceCalendarRow {
+  resource: ActivityResource
+  bookings: ActivityBooking[]
+}
+
 export interface Banner {
   guid: string
   html_source: string

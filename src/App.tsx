@@ -9,6 +9,8 @@ import ChatPage from './pages/ChatPage'
 import BookingsPage from './pages/BookingsPage'
 import Partner from './pages/Partner'
 import PropertiesPage from './pages/PropertiesPage'
+import ActivitiesPage from './pages/ActivitiesPage'
+import ActivityCalendarPage from './pages/ActivityCalendarPage'
 import CottageDetailsUpdate from './pages/CottageDetailsUpdate'
 import ApartmentDetailsUpdate from './pages/ApartmentDetailsUpdate'
 import HotelDetailsUpdate from './pages/HotelDetailsUpdate'
@@ -59,6 +61,8 @@ function App() {
         <Route path="properties/apartments/:propertyId" element={<ApartmentDetailsUpdate />} />
         <Route path="properties/hotels/:propertyId" element={<HotelDetailsUpdate />} />
         <Route path="properties/:propertyType/:propertyId" element={<Navigate to="/properties" replace />} />
+        <Route path="activities" element={<ActivitiesPage />} />
+        <Route path="activities/:guid/calendar" element={<ActivityCalendarPage />} />
         <Route path="stories" element={<StoriesModerationPage />} />
         <Route path="news" element={<NewsManagementPage />} />
         <Route path="banners" element={<BannerManagementPage />} />
