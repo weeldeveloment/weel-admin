@@ -61,7 +61,7 @@ const resources = {
       },
       users: {
         title: 'Users',
-        subtitle: 'Manage and view all clients and partners',
+        subtitle: 'Manage and view all clients, partners, and hotel owners',
         loading: 'Loading users...',
         error: 'Failed to fetch users',
         table: {
@@ -75,10 +75,12 @@ const resources = {
         tabs: {
           clients: 'Clients',
           partners: 'Partners',
+          hotelOwners: 'Hotel Owners',
         },
         type: {
           client: 'Client',
           partner: 'Partner',
+          pms: 'Hotel Owner',
         },
         status: {
           active: 'Active',
@@ -681,7 +683,7 @@ const resources = {
       },
       users: {
         title: 'Пользователи',
-        subtitle: 'Управляйте клиентами и партнёрами',
+        subtitle: 'Управляйте клиентами, партнёрами и отельерами',
         loading: 'Загрузка пользователей...',
         error: 'Не удалось получить пользователей',
         table: {
@@ -695,10 +697,12 @@ const resources = {
         tabs: {
           clients: 'Клиенты',
           partners: 'Партнёры',
+          hotelOwners: 'Отельеры',
         },
         type: {
           client: 'Клиент',
           partner: 'Партнёр',
+          pms: 'Отельер',
         },
         status: {
           active: 'Активен',
@@ -1301,7 +1305,7 @@ const resources = {
       },
       users: {
         title: 'Foydalanuvchilar',
-        subtitle: 'Mijoz va hamkorlarni boshqaring',
+        subtitle: 'Mijozlar, hamkorlar va mehmonxona egalarini boshqaring',
         loading: 'Foydalanuvchilar yuklanmoqda...',
         error: 'Foydalanuvchilarni olishda xatolik',
         table: {
@@ -1315,10 +1319,12 @@ const resources = {
         tabs: {
           clients: 'Mijozlar',
           partners: 'Hamkorlar',
+          hotelOwners: 'Mehmonxona egalari',
         },
         type: {
           client: 'Mijoz',
           partner: 'Hamkor',
+          pms: 'Mehmonxona egasi',
         },
         status: {
           active: 'Faol',

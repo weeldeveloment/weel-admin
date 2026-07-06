@@ -141,6 +141,15 @@ export interface AdminPartner {
   is_verified?: boolean
 }
 
+export interface AdminPmsUser {
+  id: string | number
+  first_name?: string
+  last_name?: string
+  full_name?: string
+  phone_number?: string
+  created_at?: string
+}
+
 export interface StoryMedia {
   guid: string
   media_type: string

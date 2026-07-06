@@ -7,7 +7,7 @@ import { MessageSquare, Search, ChevronLeft, ChevronRight, Users } from 'lucide-
 import { useNavigate } from 'react-router-dom'
 import api from '@/lib/api'
 import { useTranslation } from 'react-i18next'
-import { AdminClient, AdminPartner, PaginatedResponse } from '@/types'
+import { AdminClient, AdminPartner, AdminPmsUser, PaginatedResponse } from '@/types'
 import { formatUzbekPhoneNumber, getPhoneHref } from '@/lib/phone'
 import ErrorAlert from '@/components/ErrorAlert'
 
@@ -53,16 +53,19 @@ export default function UsersPage() {
   const { t } = useTranslation()
   const [clients, setClients] = useState<AdminClient[]>([])
   const [partners, setPartners] = useState<AdminPartner[]>([])
+  const [pmsUsers, setPmsUsers] = useState<AdminPmsUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [clientsPage, setClientsPage] = useState(1)
   const [partnersPage, setPartnersPage] = useState(1)
+  const [pmsPage, setPmsPage] = useState(1)
   const ITEMS_PER_PAGE = 10
 
   useEffect(() => {
     setClientsPage(1)
     setPartnersPage(1)
+    setPmsPage(1)
   }, [searchQuery])
 
   const fetchUsers = useCallback(async () => {
@@ -70,12 +73,14 @@ export default function UsersPage() {
       setLoading(true)
       setError(null)
 
-      const [partnersData, clientsData] = await Promise.all([
+      const [partnersData, clientsData, pmsData] = await Promise.all([
         fetchAllPages<AdminPartner>('/admin-auth/users/partners/'),
         fetchAllPages<AdminClient>('/admin-auth/users/clients/'),
+        fetchAllPages<AdminPmsUser>('/admin-auth/users/pms/'),
       ])
       setPartners(partnersData)
       setClients(clientsData)
+      setPmsUsers(pmsData)
     } catch (err: unknown) {
       console.error('Error fetching users:', err)
       setError(getApiErrorMessage(err))
@@ -88,7 +93,7 @@ export default function UsersPage() {
     void fetchUsers()
   }, [fetchUsers])
 
-  const filterUsers = (users: AdminClient[] | AdminPartner[]) => {
+  const filterUsers = (users: AdminClient[] | AdminPartner[] | AdminPmsUser[]) => {
     if (!searchQuery.trim()) return users
     return users.filter(
       (user) =>
@@ -99,14 +104,14 @@ export default function UsersPage() {
     )
   }
 
-  const getPaginatedUsers = (users: AdminClient[] | AdminPartner[], page: number) => {
+  const getPaginatedUsers = (users: AdminClient[] | AdminPartner[] | AdminPmsUser[], page: number) => {
     const filtered = filterUsers(users)
     const startIdx = (page - 1) * ITEMS_PER_PAGE
     const endIdx = startIdx + ITEMS_PER_PAGE
     return filtered.slice(startIdx, endIdx)
   }
 
-  const getTotalPages = (users: AdminClient[] | AdminPartner[]) => {
+  const getTotalPages = (users: AdminClient[] | AdminPartner[] | AdminPmsUser[]) => {
     const filtered = filterUsers(users)
     return Math.ceil(filtered.length / ITEMS_PER_PAGE)
   }
@@ -117,8 +122,8 @@ export default function UsersPage() {
     page, 
     onPageChange 
   }: { 
-    users: AdminClient[] | AdminPartner[]
-    type: 'client' | 'partner'
+    users: AdminClient[] | AdminPartner[] | AdminPmsUser[]
+    type: 'client' | 'partner' | 'pms'
     page: number
     onPageChange: (page: number) => void
   }) => {
@@ -174,7 +179,7 @@ export default function UsersPage() {
                                 <p className="font-semibold text-foreground text-sm truncate">
                                   {user.first_name}
                                 </p>
-                                <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : t('users.type.partner')}</p>
+                                <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : type === 'partner' ? t('users.type.partner') : t('users.type.pms')}</p>
                               </div>
                             </div>
                           </td>
@@ -342,6 +347,13 @@ export default function UsersPage() {
             <Users className="h-4 w-4 mr-2" />
             {t('users.tabs.partners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(partners).length}</span>
           </TabsTrigger>
+          <TabsTrigger
+            value="pms"
+            className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground shrink-0"
+          >
+            <Users className="h-4 w-4 mr-2" />
+            {t('users.tabs.hotelOwners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(pmsUsers).length}</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="clients">
@@ -359,6 +371,15 @@ export default function UsersPage() {
             type="partner" 
             page={partnersPage}
             onPageChange={setPartnersPage}
+          />
+        </TabsContent>
+
+        <TabsContent value="pms">
+          <UserTable 
+            users={pmsUsers} 
+            type="pms" 
+            page={pmsPage}
+            onPageChange={setPmsPage}
           />
         </TabsContent>
       </Tabs>
