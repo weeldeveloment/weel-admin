@@ -62,7 +62,6 @@ type HotelForm = {
 
 type State = {
   form: HotelForm
-  hasHydrated: boolean
   savedMessage: string | null
   errorMessage: string | null
   imageMessage: string | null
@@ -72,7 +71,7 @@ type State = {
 }
 
 type Action =
-  | { type: 'hydrate'; payload: PropertyItem }
+  | { type: 'resetForm'; payload: HotelForm }
   | { type: 'setField'; key: keyof HotelForm; value: HotelForm[keyof HotelForm] }
   | { type: 'setSavedMessage'; value: string | null }
   | { type: 'setErrorMessage'; value: string | null }
@@ -83,90 +82,89 @@ type Action =
 
 const MAX_IMAGES = 10
 
-const emptyForm: HotelForm = {
-  title: '',
-  organization_id: '',
-  tenant_schema: '',
-  address: '',
-  city: '',
-  country: 'UZ',
-  latitude: '',
-  longitude: '',
-  currency: 'USD',
-  timezone: 'Asia/Tashkent',
-  cancellation_policy: '',
-  check_in_time: '',
-  check_out_time: '',
-  star_rating: '',
-  description_ru: '',
-  description_uz: '',
-  description_en: '',
-  amenities: '',
-  is_active: true,
-  is_verified: false,
-  is_archived: false,
-  is_recommended: false,
-  is_testing: false,
-  is_allowed_alcohol: false,
-  is_allowed_pets: false,
-  is_quiet_hours: true,
-  verification_status: null,
-  entity_name: '',
-  inn: '',
-  mfi: '',
-  bank_account: '',
-  vat_status: '',
+function createInitialForm(item: PropertyItem | null): HotelForm {
+  if (!item) {
+    return {
+      title: '',
+      organization_id: '',
+      tenant_schema: '',
+      address: '',
+      city: '',
+      country: 'UZ',
+      latitude: '',
+      longitude: '',
+      currency: 'USD',
+      timezone: 'Asia/Tashkent',
+      cancellation_policy: '',
+      check_in_time: '',
+      check_out_time: '',
+      star_rating: '',
+      description_ru: '',
+      description_uz: '',
+      description_en: '',
+      amenities: '',
+      is_active: true,
+      is_verified: false,
+      is_archived: false,
+      is_recommended: false,
+      is_testing: false,
+      is_allowed_alcohol: false,
+      is_allowed_pets: false,
+      is_quiet_hours: true,
+      verification_status: null,
+      entity_name: '',
+      inn: '',
+      mfi: '',
+      bank_account: '',
+      vat_status: '',
+    }
+  }
+
+  const detail = (item.property_detail as Record<string, unknown> | undefined) ?? {}
+  return {
+    title: item.title ?? '',
+    organization_id: item.organization?.id ? String(item.organization.id) : item.organization_id ? String(item.organization_id) : '',
+    tenant_schema: item.organization?.schema_name ?? item.tenant_schema ?? '',
+    address: item.address ?? String(detail.address ?? ''),
+    city: item.city ?? '',
+    country: item.country ?? 'UZ',
+    latitude: item.latitude ?? '',
+    longitude: item.longitude ?? '',
+    currency: (item.currency as 'USD' | 'UZS') ?? 'USD',
+    timezone: String(detail.timezone ?? item.timezone ?? 'Asia/Tashkent'),
+    cancellation_policy: String(detail.cancellation_policy ?? item.cancellation_policy ?? ''),
+    check_in_time: String(detail.check_in_time ?? item.check_in_time ?? ''),
+    check_out_time: String(detail.check_out_time ?? item.check_out_time ?? ''),
+    star_rating: item.star_rating != null ? String(item.star_rating) : detail.star_rating != null ? String(detail.star_rating) : '',
+    description_ru: item.description_ru ?? String(detail.description_ru ?? ''),
+    description_uz: item.description_uz ?? String(detail.description_uz ?? ''),
+    description_en: item.description_en ?? String(detail.description_en ?? ''),
+    amenities: Array.isArray(item.amenities)
+      ? item.amenities.join(', ')
+      : Array.isArray(detail.amenities)
+        ? (detail.amenities as string[]).join(', ')
+        : '',
+    is_active: item.is_active ?? true,
+    is_verified: item.is_verified ?? false,
+    is_archived: item.is_archived ?? false,
+    is_recommended: item.is_recommended ?? false,
+    is_testing: item.is_testing ?? false,
+    is_allowed_alcohol: item.is_allowed_alcohol ?? Boolean(detail.is_allowed_alcohol),
+    is_allowed_pets: item.is_allowed_pets ?? Boolean(detail.is_allowed_pets),
+    is_quiet_hours: item.is_quiet_hours ?? Boolean(detail.is_quiet_hours ?? true),
+    verification_status: item.verification_status ?? null,
+    entity_name: String(item.legal_info?.entity_name ?? ''),
+    inn: String(item.legal_info?.inn ?? ''),
+    mfi: String(item.legal_info?.mfi ?? ''),
+    bank_account: String(item.legal_info?.bank_account ?? ''),
+    vat_status: String(item.legal_info?.vat_status ?? ''),
+  }
 }
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'hydrate': {
-      const item = action.payload
-      const detail = (item.property_detail as Record<string, unknown> | undefined) ?? {}
-      return {
-        ...state,
-        hasHydrated: true,
-        form: {
-          title: item.title ?? '',
-          organization_id: item.organization?.id ? String(item.organization.id) : item.organization_id ? String(item.organization_id) : '',
-          tenant_schema: item.organization?.schema_name ?? item.tenant_schema ?? '',
-          address: item.address ?? String(detail.address ?? ''),
-          city: item.city ?? '',
-          country: item.country ?? 'UZ',
-          latitude: item.latitude ?? '',
-          longitude: item.longitude ?? '',
-          currency: (item.currency as 'USD' | 'UZS') ?? 'USD',
-          timezone: String(detail.timezone ?? item.timezone ?? 'Asia/Tashkent'),
-          cancellation_policy: String(detail.cancellation_policy ?? item.cancellation_policy ?? ''),
-          check_in_time: String(detail.check_in_time ?? item.check_in_time ?? ''),
-          check_out_time: String(detail.check_out_time ?? item.check_out_time ?? ''),
-          star_rating: item.star_rating != null ? String(item.star_rating) : detail.star_rating != null ? String(detail.star_rating) : '',
-          description_ru: item.description_ru ?? String(detail.description_ru ?? ''),
-          description_uz: item.description_uz ?? String(detail.description_uz ?? ''),
-          description_en: item.description_en ?? String(detail.description_en ?? ''),
-          amenities: Array.isArray(item.amenities)
-            ? item.amenities.join(', ')
-            : Array.isArray(detail.amenities)
-              ? (detail.amenities as string[]).join(', ')
-              : '',
-          is_active: item.is_active ?? true,
-          is_verified: item.is_verified ?? false,
-          is_archived: item.is_archived ?? false,
-          is_recommended: item.is_recommended ?? false,
-          is_testing: item.is_testing ?? false,
-          is_allowed_alcohol: item.is_allowed_alcohol ?? Boolean(detail.is_allowed_alcohol),
-          is_allowed_pets: item.is_allowed_pets ?? Boolean(detail.is_allowed_pets),
-          is_quiet_hours: item.is_quiet_hours ?? Boolean(detail.is_quiet_hours ?? true),
-          verification_status: item.verification_status ?? null,
-          entity_name: String(item.legal_info?.entity_name ?? ''),
-          inn: String(item.legal_info?.inn ?? ''),
-          mfi: String(item.legal_info?.mfi ?? ''),
-          bank_account: String(item.legal_info?.bank_account ?? ''),
-          vat_status: String(item.legal_info?.vat_status ?? ''),
-        },
-        errorMessage: null,
-      }
-    }
+    case 'resetForm':
+      return { ...state, form: action.payload, savedMessage: null, errorMessage: null }
     case 'setField':
       return { ...state, form: { ...state.form, [action.key]: action.value } }
     case 'setSavedMessage':
@@ -187,8 +185,7 @@ function reducer(state: State, action: Action): State {
 }
 
 const initialState: State = {
-  form: emptyForm,
-  hasHydrated: false,
+  form: createInitialForm(null),
   savedMessage: null,
   errorMessage: null,
   imageMessage: null,
@@ -213,7 +210,6 @@ export default function HotelDetailsUpdate() {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const isCreateMode = propertyId === 'create'
-  const [state, dispatch] = useReducer(reducer, initialState)
   const [pendingCreateImages, setPendingCreateImages] = useState<
     Array<{ file: File; previewUrl: string }>
   >([])
@@ -231,11 +227,14 @@ export default function HotelDetailsUpdate() {
     queryFn: fetchOrganizations,
   })
 
+  const [state, dispatch] = useReducer(reducer, {
+    ...initialState,
+    form: createInitialForm(hotelQuery.data ?? null),
+  })
+
   useEffect(() => {
-    if (hotelQuery.data && !state.hasHydrated) {
-      dispatch({ type: 'hydrate', payload: hotelQuery.data })
-    }
-  }, [hotelQuery.data, state.hasHydrated])
+    dispatch({ type: 'resetForm', payload: createInitialForm(hotelQuery.data ?? null) })
+  }, [hotelQuery.data])
 
   const { form, savedMessage, errorMessage, imageMessage, draggedIndex, dragOverIndex, isDragOver } = state
   const hotel = hotelQuery.data
@@ -244,12 +243,6 @@ export default function HotelDetailsUpdate() {
     () => (organizationsQuery.data ?? []).find((item) => String(item.id) === form.organization_id) ?? null,
     [organizationsQuery.data, form.organization_id],
   )
-
-  useEffect(() => {
-    if (selectedOrganization && form.tenant_schema !== selectedOrganization.schema_name) {
-      dispatch({ type: 'setField', key: 'tenant_schema', value: selectedOrganization.schema_name })
-    }
-  }, [selectedOrganization, form.tenant_schema])
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -322,7 +315,7 @@ export default function HotelDetailsUpdate() {
       } else {
         const updated = await fetchHotel(propertyId!)
         queryClient.setQueryData(['hotel', propertyId], updated)
-        dispatch({ type: 'hydrate', payload: updated })
+        dispatch({ type: 'resetForm', payload: createInitialForm(updated) })
         dispatch({ type: 'setSavedMessage', value: t('common.saved') })
         if (savedMessageTimerRef.current) window.clearTimeout(savedMessageTimerRef.current)
         savedMessageTimerRef.current = window.setTimeout(() => {
