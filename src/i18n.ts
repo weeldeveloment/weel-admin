@@ -474,6 +474,7 @@ const resources = {
         },
         preview: {
           title: 'Banner Preview',
+          rendered: 'Rendered preview',
         },
         createDialog: {
           title: 'Create Banner',
@@ -1132,6 +1133,7 @@ const resources = {
         },
         preview: {
           title: 'Просмотр баннера',
+          rendered: 'Предпросмотр HTML',
         },
         createDialog: {
           title: 'Создать баннер',
@@ -1790,6 +1792,7 @@ const resources = {
         },
         preview: {
           title: 'Bannerni ko‘rish',
+          rendered: 'HTMLni oldindan ko‘rish',
         },
         createDialog: {
           title: 'Banner yaratish',

@@ -478,12 +478,27 @@ export default function BannerManagementPage() {
 
       {/* Preview Dialog */}
       <Dialog open={!!previewBanner} onOpenChange={() => setPreviewBanner(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t('banners.preview.title')}</DialogTitle>
           </DialogHeader>
           {previewBanner && (
             <div className="space-y-4">
+              {previewBanner.html_source && (
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-2">{t('banners.preview.rendered')}</h4>
+                  <div className="rounded-lg border border-border overflow-hidden bg-white">
+                    <iframe
+                      srcDoc={previewBanner.html_source}
+                      title="Banner HTML Preview"
+                      sandbox="allow-scripts"
+                      className="w-full border-0"
+                      style={{ height: '250px' }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {previewBanner.image && (
                 <div className="flex justify-center">
                   <img
