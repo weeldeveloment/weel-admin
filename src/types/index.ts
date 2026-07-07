@@ -349,6 +349,18 @@ export interface PropertyItem {
     bank_account?: string | null
     vat_status?: string | null
   } | null
+  partner_user?: {
+    id: number
+    first_name?: string | null
+    last_name?: string | null
+    username?: string | null
+    phone_number?: string | null
+    email?: string | null
+    avatar?: string | null
+    role?: string | null
+    is_active?: boolean
+    is_verified?: boolean
+  } | null
 }
 
 export interface PropertyListResult {

@@ -2,9 +2,11 @@ import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Building2, ChevronLeft, GripVertical, Loader2, Plus, Trash2, Upload } from 'lucide-react'
+import { Building2, ChevronLeft, GripVertical, Loader2, Phone, Plus, Trash2, Upload } from 'lucide-react'
 import { api } from '@/lib/api'
 import { resolveImageUrl, cn } from '@/lib/utils'
+import { fetchAllPartners } from '@/lib/partners'
+import { formatUzbekPhoneNumber, getPhoneHref } from '@/lib/phone'
 import type { HotelOrganizationOption, PropertyItem } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,6 +30,7 @@ import HotelRoomsSection from '@/components/HotelRoomsSection'
 type HotelForm = {
   title: string
   organization_id: string
+  partner_user_id: string
   tenant_schema: string
   address: string
   city: string
@@ -87,6 +90,7 @@ function createInitialForm(item: PropertyItem | null): HotelForm {
     return {
       title: '',
       organization_id: '',
+      partner_user_id: '',
       tenant_schema: '',
       address: '',
       city: '',
@@ -124,6 +128,7 @@ function createInitialForm(item: PropertyItem | null): HotelForm {
   return {
     title: item.title ?? '',
     organization_id: item.organization?.id ? String(item.organization.id) : item.organization_id ? String(item.organization_id) : '',
+    partner_user_id: item.partner_user?.id ? String(item.partner_user.id) : '',
     tenant_schema: item.organization?.schema_name ?? item.tenant_schema ?? '',
     address: item.address ?? String(detail.address ?? ''),
     city: item.city ?? '',
@@ -227,6 +232,15 @@ export default function HotelDetailsUpdate() {
     queryFn: fetchOrganizations,
   })
 
+  const partnersQuery = useQuery({
+    queryKey: ['all-partners', 'hotel'],
+    queryFn: fetchAllPartners,
+    enabled: isCreateMode,
+  })
+
+  const [partnerSearchTerm, setPartnerSearchTerm] = useState('')
+  const [selectedPartnerId, setSelectedPartnerId] = useState('') 
+
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
     form: createInitialForm(hotelQuery.data ?? null),
@@ -239,6 +253,34 @@ export default function HotelDetailsUpdate() {
   const { form, savedMessage, errorMessage, imageMessage, draggedIndex, dragOverIndex, isDragOver } = state
   const hotel = hotelQuery.data
 
+  const filteredPartnerOptions = useMemo(() => {
+    const all = partnersQuery.data ?? []
+    const searchTerm = partnerSearchTerm.trim().toLowerCase()
+    if (!searchTerm) return all
+    return all.filter((partner) => {
+      const searchable = [
+        partner.full_name, partner.first_name, partner.last_name,
+        partner.username, partner.phone_number,
+        partner.email, String(partner.id),
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+      return searchable.includes(searchTerm)
+    })
+  }, [partnersQuery.data, partnerSearchTerm])
+
+  const selectedPartner = useMemo(
+    () => (partnersQuery.data ?? []).find((p) => String(p.id) === selectedPartnerId) ?? null,
+    [partnersQuery.data, selectedPartnerId],
+  )
+
+  useEffect(() => {
+    if (selectedPartner) {
+      dispatch({ type: 'setField', key: 'partner_user_id', value: String(selectedPartner.id) })
+    }
+  }, [selectedPartner])
+
   const selectedOrganization = useMemo(
     () => (organizationsQuery.data ?? []).find((item) => String(item.id) === form.organization_id) ?? null,
     [organizationsQuery.data, form.organization_id],
@@ -249,6 +291,7 @@ export default function HotelDetailsUpdate() {
       const payload = {
         title: form.title,
         organization_id: form.organization_id ? Number(form.organization_id) : null,
+        partner_user_id: form.partner_user_id ? Number(form.partner_user_id) : null,
         tenant_schema: form.tenant_schema,
         address: form.address || null,
         city: form.city || null,
@@ -809,7 +852,7 @@ export default function HotelDetailsUpdate() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="organization_id">{t('properties.selectPartner')}</Label>
+                  <Label htmlFor="organization_id">Organization</Label>
                   <Select
                     value={form.organization_id}
                     onValueChange={(value) =>
@@ -850,9 +893,207 @@ export default function HotelDetailsUpdate() {
                       </div>
                     </div>
                   </div>
-                ) : (
+                ) : null}
+
+                {!isCreateMode && hotel?.partner_user ? (
+                  <div className="rounded-lg border bg-muted/30 p-4">
+                    <p className="mb-3 text-sm font-medium text-muted-foreground">
+                      {t('properties.partnerInfo')}
+                    </p>
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <div className="space-y-1 md:col-span-2">
+                        <div className="flex items-center gap-3">
+                          {hotel.partner_user.avatar ? (
+                            <img
+                              src={resolveImageUrl(hotel.partner_user.avatar)}
+                              alt=""
+                              className="h-12 w-12 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-sm font-bold text-muted-foreground">
+                              {(
+                                hotel.partner_user.first_name?.[0] ??
+                                hotel.partner_user.username?.[0] ??
+                                '?'
+                              ).toUpperCase()}
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-medium">
+                              {[
+                                hotel.partner_user.first_name,
+                                hotel.partner_user.last_name,
+                              ]
+                                .filter(Boolean)
+                                .join(' ') ||
+                                hotel.partner_user.username ||
+                                '-'}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {hotel.partner_user.username ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const partnerId = hotel.partner_user?.id
+                                    if (partnerId) navigate(`/partner/${partnerId}`)
+                                  }}
+                                  className="text-xs text-primary hover:underline"
+                                >
+                                  @{hotel.partner_user.username}
+                                </button>
+                              ) : (
+                                '-'
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">
+                          {t('properties.partnerId')}
+                        </Label>
+                        <p className="text-sm font-medium">{hotel.partner_user.id}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">
+                          {t('properties.partnerRole')}
+                        </Label>
+                        <p className="text-sm font-medium">
+                          {hotel.partner_user.role ?? '-'}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">
+                          {t('properties.partnerPhone')}
+                        </Label>
+                        {hotel.partner_user.phone_number ? (
+                          <a
+                            href={getPhoneHref(hotel.partner_user.phone_number)}
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                          >
+                            <Phone className="h-3.5 w-3.5" />
+                            {formatUzbekPhoneNumber(hotel.partner_user.phone_number)}
+                          </a>
+                        ) : (
+                          <p className="text-sm font-medium">-</p>
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">
+                          {t('properties.partnerEmail')}
+                        </Label>
+                        <p className="text-sm font-medium">
+                          {hotel.partner_user.email ?? '-'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={
+                            hotel.partner_user.is_active ? 'default' : 'secondary'
+                          }
+                        >
+                          {hotel.partner_user.is_active
+                            ? t('properties.partnerActive')
+                            : t('properties.partnerInactive')}
+                        </Badge>
+                        {hotel.partner_user.is_verified && (
+                          <Badge variant="outline">
+                            {t('properties.partnerVerified')}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+
+                {isCreateMode ? (
+                  <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Partner User
+                    </p>
+                    <div className="space-y-2">
+                      <Input
+                        value={partnerSearchTerm}
+                        onChange={(e) => setPartnerSearchTerm(e.target.value)}
+                        placeholder={
+                          t('properties.partnerSearchPlaceholder') ??
+                          'Search partner by name, username, phone...'
+                        }
+                      />
+                      <Select
+                        value={selectedPartnerId}
+                        onValueChange={(value) => {
+                          setSelectedPartnerId(value)
+                          dispatch({ type: 'setField', key: 'partner_user_id', value })
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={
+                              t('properties.selectPartner') ??
+                              'Select an existing partner'
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {filteredPartnerOptions.map((partner) => {
+                            const name =
+                              partner.full_name ||
+                              [partner.first_name, partner.last_name]
+                                .filter(Boolean)
+                                .join(' ') ||
+                              partner.username ||
+                              String(partner.id)
+                            const phone = partner.phone_number
+                              ? ` • ${partner.phone_number}`
+                              : ''
+                            return (
+                              <SelectItem
+                                key={partner.id}
+                                value={String(partner.id)}
+                              >
+                                {`${name}${phone}`}
+                              </SelectItem>
+                            )
+                          })}
+                        </SelectContent>
+                      </Select>
+                      {!partnersQuery.isLoading && !partnersQuery.isError && filteredPartnerOptions.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t('properties.noPartnerMatches')}
+                        </p>
+                      ) : null}
+                      {partnersQuery.isLoading ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t('common.loading')}
+                        </p>
+                      ) : null}
+                      {partnersQuery.isError ? (
+                        <p className="text-xs text-red-600">
+                          {t('properties.partnerLoadFailed') ?? 'Failed to load partners.'}
+                        </p>
+                      ) : null}
+                    </div>
+                    {selectedPartner ? (
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">
+                          {selectedPartner.full_name ||
+                            [selectedPartner.first_name, selectedPartner.last_name]
+                              .filter(Boolean)
+                              .join(' ') ||
+                            selectedPartner.username ||
+                            '-'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {selectedPartner.phone_number || '-'}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : !hotel?.partner_user ? (
                   <p className="text-sm text-muted-foreground">{t('properties.noPartner')}</p>
-                )}
+                ) : null}
               </CardContent>
             </Card>
           </TabsContent>
