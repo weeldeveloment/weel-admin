@@ -17,6 +17,7 @@ import HotelDetailsUpdate from './pages/HotelDetailsUpdate'
 import StoriesModerationPage from './pages/StoriesModerationPage'
 import NewsManagementPage from './pages/NewsManagementPage'
 import BannerManagementPage from './pages/BannerManagementPage'
+import PropertyTypeIconsPage from './pages/PropertyTypeIconsPage'
 
 function App() {
   const { isAuthenticated, isLoading, checkAuth } = useAuthStore()
@@ -66,6 +67,7 @@ function App() {
         <Route path="stories" element={<StoriesModerationPage />} />
         <Route path="news" element={<NewsManagementPage />} />
         <Route path="banners" element={<BannerManagementPage />} />
+        <Route path="property-type-icons" element={<PropertyTypeIconsPage />} />
       </Route>
     </Routes>
   )

@@ -16,7 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Users, MessageSquare, LogOut, Home, Building2, BookOpen, Newspaper, Image, MountainSnow } from 'lucide-react'
+import { Users, MessageSquare, LogOut, Home, Building2, BookOpen, Newspaper, Image, MountainSnow, Paintbrush } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeToggle } from './ThemeToggle'
@@ -35,6 +35,7 @@ export default function Layout() {
     { icon: Newspaper, label: t('nav.news'), path: '/news' },
     { icon: Image, label: t('nav.banners'), path: '/banners' },
     { icon: MessageSquare, label: t('nav.chat'), path: '/chat' },
+    { icon: Paintbrush, label: t('nav.propertyTypeIcons'), path: '/property-type-icons' },
   ]
 
   return (

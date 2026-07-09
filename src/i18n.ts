@@ -46,6 +46,7 @@ const resources = {
         news: 'News',
         banners: 'Banners',
         chat: 'Chat',
+        propertyTypeIcons: 'Property Type Icons',
         pms: 'PMS Calendar',
       },
       activities: {
@@ -501,6 +502,32 @@ const resources = {
           description: 'Banners will appear here when you create them',
         },
       },
+      propertyTypeIcons: {
+        title: 'Property Type Icons',
+        subtitle: 'Manage icons for property types displayed in the app',
+        loading: 'Loading property types...',
+        empty: 'No property types found',
+        kinds: {
+          apartment: 'Apartment',
+          cottage: 'Cottage',
+          hotel: 'Hotel',
+        },
+        actions: {
+          changeIcon: 'Change Icon',
+          upload: 'Upload',
+        },
+        uploadDialog: {
+          title: 'Upload Icon',
+          description: 'Upload a new icon for {{type}}',
+          currentIcon: 'Current icon',
+          chooseFile: 'Choose file',
+          formatHint: 'Supported formats: SVG, PNG',
+        },
+        form: {
+          errorNoFile: 'Please select a file to upload',
+          errorUploadFailed: 'Failed to upload icon',
+        },
+      },
       dashboard: {
         title: 'Dashboard',
         welcome: 'Welcome to Weel Admin Panel',
@@ -705,6 +732,7 @@ const resources = {
         news: 'Новости',
         banners: 'Баннеры',
         chat: 'Чат',
+        propertyTypeIcons: 'Иконки типов',
         pms: 'PMS Календарь',
       },
       activities: {
@@ -1160,6 +1188,32 @@ const resources = {
           description: 'Баннеры появятся здесь, когда вы их создадите',
         },
       },
+      propertyTypeIcons: {
+        title: 'Иконки типов объектов',
+        subtitle: 'Управление иконками типов объектов, отображаемых в приложении',
+        loading: 'Загрузка типов объектов...',
+        empty: 'Типы объектов не найдены',
+        kinds: {
+          apartment: 'Квартира',
+          cottage: 'Дача',
+          hotel: 'Отель',
+        },
+        actions: {
+          changeIcon: 'Сменить иконку',
+          upload: 'Загрузить',
+        },
+        uploadDialog: {
+          title: 'Загрузить иконку',
+          description: 'Загрузите новую иконку для {{type}}',
+          currentIcon: 'Текущая иконка',
+          chooseFile: 'Выберите файл',
+          formatHint: 'Поддерживаемые форматы: SVG, PNG',
+        },
+        form: {
+          errorNoFile: 'Пожалуйста, выберите файл для загрузки',
+          errorUploadFailed: 'Не удалось загрузить иконку',
+        },
+      },
       dashboard: {
         title: 'Дашборд',
         welcome: 'Добро пожаловать в админ-панель Weel',
@@ -1364,6 +1418,7 @@ const resources = {
         news: 'Yangiliklar',
         banners: 'Bannerlar',
         chat: 'Chat',
+        propertyTypeIcons: 'Turlar ikonkalari',
         pms: 'PMS Kalendar',
       },
       activities: {
@@ -1817,6 +1872,32 @@ const resources = {
         empty: {
           title: 'Bannerlar topilmadi',
           description: 'Bannerlar siz yaratganingizda shu yerda paydo bo‘ladi',
+        },
+      },
+      propertyTypeIcons: {
+        title: 'Turlar ikonkalari',
+        subtitle: 'Ilovada ko‘rsatiladigan turlar uchun ikonkalarni boshqarish',
+        loading: 'Turlar yuklanmoqda...',
+        empty: 'Turlar topilmadi',
+        kinds: {
+          apartment: 'Kvartira',
+          cottage: 'Dacha',
+          hotel: 'Mehmonxona',
+        },
+        actions: {
+          changeIcon: 'Ikonkani o‘zgartirish',
+          upload: 'Yuklash',
+        },
+        uploadDialog: {
+          title: 'Ikonka yuklash',
+          description: '{{type}} uchun yangi ikonka yuklang',
+          currentIcon: 'Joriy ikonka',
+          chooseFile: 'Faylni tanlang',
+          formatHint: 'Qo‘llab-quvvatlanadigan formatlar: SVG, PNG',
+        },
+        form: {
+          errorNoFile: 'Iltimos, yuklash uchun faylni tanlang',
+          errorUploadFailed: 'Ikonkani yuklash amalga oshmadi',
         },
       },
       dashboard: {
