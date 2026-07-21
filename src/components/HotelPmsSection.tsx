@@ -14,7 +14,7 @@ import {
 } from "@/hooks/useCalendarMutations"
 
 import { format, subDays } from "date-fns"
-import type { PMSBooking, CalendarView } from "@/types/pms"
+import { STATUS_ACTION_TO_BOOKING_STATUS, type PMSBooking, type CalendarView, type PMSBookingStatus, type PMSBookingStatusAction } from "@/types/pms"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import FullCalendar from "@fullcalendar/react"
@@ -37,6 +37,13 @@ const fullCalendarViewMap: Record<CalendarView, string> = {
   day: "hotelDay",
   week: "hotelWeek",
   month: "hotelMonth",
+}
+
+const undoStatusActionMap: Partial<Record<PMSBookingStatus, PMSBookingStatusAction>> = {
+  confirmed: "confirm",
+  checked_in: "check_in",
+  checked_out: "check_out",
+  cancelled: "cancel",
 }
 
 export default function HotelPmsSection({ hotelId }: { hotelId: string | undefined }) {
@@ -76,26 +83,36 @@ export default function HotelPmsSection({ hotelId }: { hotelId: string | undefin
     calendarRef.current?.getApi()?.gotoDate(newDate)
   }
 
-  const handleUndo = () => {
+  const updateBookingCaches = (bookingId: number, updates: Partial<PMSBooking>) => {
+    queryClient.setQueriesData<PMSBooking[]>(
+      { queryKey: calendarKeys.bookingsRoot(propertyId ?? "") },
+      (old) => old?.map((b) => (b.id === bookingId ? { ...b, ...updates } : b)),
+    )
+  }
+
+  const handleUndo = async () => {
     const stack = state.undoStack
     const lastAction = stack[stack.length - 1]
     if (!lastAction) return
-    actions.popUndo()
 
     if (lastAction.type === "move" || lastAction.type === "resize") {
       const data = lastAction.data as { bookingId: number; prevRoomId?: number; prevCheckIn: string; prevCheckOut: string }
-      queryClient.setQueryData<PMSBooking[]>(calendarKeys.bookings(propertyId ?? ""), (old) =>
-        old?.map((b) =>
-          b.id === data.bookingId
-            ? { ...b, room_id: data.prevRoomId ?? b.room_id, check_in: data.prevCheckIn, check_out: data.prevCheckOut }
-            : b,
-        ),
-      )
+      if (!data.prevRoomId) return
+      await moveMutation.mutateAsync({
+        bookingId: data.bookingId,
+        data: {
+          new_room_id: data.prevRoomId,
+          new_check_in: data.prevCheckIn,
+          new_check_out: data.prevCheckOut,
+        },
+      })
+      actions.popUndo()
     } else if (lastAction.type === "status") {
-      const data = lastAction.data as { bookingId: number; prevStatus: string }
-      queryClient.setQueryData<PMSBooking[]>(calendarKeys.bookings(propertyId ?? ""), (old) =>
-        old?.map((b) => (b.id === data.bookingId ? { ...b, status: data.prevStatus } : b)),
-      )
+      const data = lastAction.data as { bookingId: number; prevStatus: PMSBookingStatus }
+      const reverseAction = undoStatusActionMap[data.prevStatus]
+      if (!reverseAction) return
+      await statusMutation.mutateAsync({ bookingId: data.bookingId, status: reverseAction })
+      actions.popUndo()
     }
   }
 
@@ -145,7 +162,8 @@ export default function HotelPmsSection({ hotelId }: { hotelId: string | undefin
 
   const syncSelectedBooking = (bookingId: number) => {
     const booking = queryClient
-      .getQueryData<PMSBooking[]>(calendarKeys.bookings(propertyId ?? ""))
+      .getQueriesData<PMSBooking[]>({ queryKey: calendarKeys.bookingsRoot(propertyId ?? "") })
+      .flatMap(([, data]) => data ?? [])
       ?.find((b) => b.id === bookingId)
     if (booking) actions.selectBooking(booking)
   }
@@ -242,19 +260,19 @@ export default function HotelPmsSection({ hotelId }: { hotelId: string | undefin
     actions.selectBooking(updated)
   }
 
-  const handleStatusChange = async (bookingId: number, status: string) => {
+  const handleStatusChange = async (bookingId: number, status: PMSBookingStatusAction) => {
     const prevBooking = bookings.find((b) => b.id === bookingId)
-    queryClient.setQueryData<PMSBooking[]>(calendarKeys.bookings(propertyId ?? ""), (old) =>
-      old?.map((b) => (b.id === bookingId ? { ...b, status } : b)),
-    )
+    updateBookingCaches(bookingId, { status: STATUS_ACTION_TO_BOOKING_STATUS[status] })
     try {
       await statusMutation.mutateAsync({ bookingId, status })
       syncSelectedBooking(bookingId)
-      actions.pushUndo({
-        type: "status",
-        data: { bookingId, prevStatus: prevBooking?.status },
-        bookingId,
-      })
+      if (prevBooking?.status && undoStatusActionMap[prevBooking.status]) {
+        actions.pushUndo({
+          type: "status",
+          data: { bookingId, prevStatus: prevBooking.status },
+          bookingId,
+        })
+      }
     } catch {
       // Error handled by parent
     }

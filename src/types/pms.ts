@@ -1,3 +1,9 @@
+export type PMSRoomCondition = "clean" | "dirty" | "inspection" | "maintenance"
+export type PMSRoomAvailability = "available" | "occupied" | "blocked" | "held"
+export type PMSBookingStatus = "new" | "confirmed" | "checked_in" | "checked_out" | "cancelled" | "no_show"
+export type PMSBookingStatusAction = "cancel" | "check_in" | "check_out" | "confirm"
+export type PMSPaymentStatus = "pending" | "paid" | "partial" | "refunded"
+
 export interface PMSProperty {
   id: number
   guid: string
@@ -38,8 +44,8 @@ export interface PMSRoom {
   bedroom_count: number
   capacity: number
   amenities: string[]
-  condition: string
-  availability: string
+  condition: PMSRoomCondition
+  availability: PMSRoomAvailability
   meal_plan: string
   is_active: boolean
 }
@@ -52,19 +58,20 @@ export interface PMSBooking {
   booking_number: string
   check_in: string
   check_out: string
-  status: string
+  status: PMSBookingStatus
   source: string
   meal_plan: string
   adult_count: number
   child_count: number
   rate: string | null
   currency: string
-  payment_status: string
+  payment_status: PMSPaymentStatus
   total_cost: string | null
   notes: string | null
   room_number: string | null
   guest_first_name: string | null
   guest_last_name: string | null
+  voucher_number: string | null
   created_at: string
   updated_at: string
 }
@@ -151,7 +158,7 @@ export type CalendarAction =
   | { type: "OPEN_QUICK_BOOKING"; payload: CalendarUIState["quickBookingInitial"] }
   | { type: "CLOSE_QUICK_BOOKING" }
 
-export const STATUS_COLORS: Record<string, string> = {
+export const STATUS_COLORS: Record<PMSBookingStatus, string> = {
   new: "#22c55e",
   confirmed: "#3b82f6",
   checked_in: "#0ea5e9",
@@ -160,11 +167,18 @@ export const STATUS_COLORS: Record<string, string> = {
   no_show: "#f59e0b",
 }
 
-export const STATUS_LABELS: Record<string, string> = {
+export const STATUS_LABELS: Record<PMSBookingStatus, string> = {
   new: "New",
   confirmed: "Confirmed",
   checked_in: "Checked In",
   checked_out: "Checked Out",
   cancelled: "Cancelled",
   no_show: "No Show",
+}
+
+export const STATUS_ACTION_TO_BOOKING_STATUS: Record<PMSBookingStatusAction, PMSBookingStatus> = {
+  cancel: "cancelled",
+  check_in: "checked_in",
+  check_out: "checked_out",
+  confirm: "confirmed",
 }

@@ -15,7 +15,7 @@ import {
 } from "@/hooks/useCalendarMutations"
 
 import { format, subDays } from "date-fns"
-import type { PMSBooking, CalendarView } from "@/types/pms"
+import { STATUS_ACTION_TO_BOOKING_STATUS, type PMSBooking, type CalendarView, type PMSBookingStatus, type PMSBookingStatusAction } from "@/types/pms"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -93,7 +93,7 @@ export default function ChessboardPage() {
 
     if (lastAction.type === "move" || lastAction.type === "resize") {
       const data = lastAction.data as { bookingId: number; prevRoomId?: number; prevCheckIn: string; prevCheckOut: string }
-      queryClient.setQueryData<PMSBooking[]>(calendarKeys.bookings(propertyId ?? ""), (old) =>
+      queryClient.setQueriesData<PMSBooking[]>({ queryKey: calendarKeys.bookingsRoot(propertyId ?? "") }, (old) =>
         old?.map((b) =>
           b.id === data.bookingId
             ? { ...b, room_id: data.prevRoomId ?? b.room_id, check_in: data.prevCheckIn, check_out: data.prevCheckOut }
@@ -101,8 +101,8 @@ export default function ChessboardPage() {
         ),
       )
     } else if (lastAction.type === "status") {
-      const data = lastAction.data as { bookingId: number; prevStatus: string }
-      queryClient.setQueryData<PMSBooking[]>(calendarKeys.bookings(propertyId ?? ""), (old) =>
+      const data = lastAction.data as { bookingId: number; prevStatus: PMSBookingStatus }
+      queryClient.setQueriesData<PMSBooking[]>({ queryKey: calendarKeys.bookingsRoot(propertyId ?? "") }, (old) =>
         old?.map((b) => (b.id === data.bookingId ? { ...b, status: data.prevStatus } : b)),
       )
     }
@@ -154,7 +154,8 @@ export default function ChessboardPage() {
 
   const syncSelectedBooking = (bookingId: number) => {
     const booking = queryClient
-      .getQueryData<PMSBooking[]>(calendarKeys.bookings(propertyId ?? ""))
+      .getQueriesData<PMSBooking[]>({ queryKey: calendarKeys.bookingsRoot(propertyId ?? "") })
+      .flatMap(([, data]) => data ?? [])
       ?.find((b) => b.id === bookingId)
     if (booking) actions.selectBooking(booking)
   }
@@ -256,11 +257,11 @@ export default function ChessboardPage() {
     actions.selectBooking(updated)
   }
 
-  const handleStatusChange = async (bookingId: number, status: string) => {
+  const handleStatusChange = async (bookingId: number, status: PMSBookingStatusAction) => {
     if (propertyId) {
       const prevBooking = bookings.find((b) => b.id === bookingId)
-      queryClient.setQueryData<PMSBooking[]>(calendarKeys.bookings(propertyId), (old) =>
-        old?.map((b) => (b.id === bookingId ? { ...b, status } : b)),
+      queryClient.setQueriesData<PMSBooking[]>({ queryKey: calendarKeys.bookingsRoot(propertyId) }, (old) =>
+        old?.map((b) => (b.id === bookingId ? { ...b, status: STATUS_ACTION_TO_BOOKING_STATUS[status] } : b)),
       )
       try {
         await statusMutation.mutateAsync({ bookingId, status })

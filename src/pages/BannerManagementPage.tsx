@@ -83,22 +83,25 @@ export default function BannerManagementPage() {
     return params
   }, [page, searchQuery])
 
-  const fetchBanners = useCallback(async () => {
+  const fetchBanners = useCallback(async (signal?: AbortSignal) => {
     try {
       setLoading(true)
       setError(null)
       const response = await api.get<PaginatedResponse<Banner>>('/story/admin/banners/', {
         params: buildParams(),
+        signal,
       })
+      if (signal?.aborted) return
       const data = response.data
       setBannerList(data.results ?? [])
       setTotalCount(data.count ?? 0)
       setTotalPages(Math.ceil((data.count ?? 0) / ITEMS_PER_PAGE))
     } catch (err: unknown) {
+      if (signal?.aborted) return
       console.error('Error fetching banners:', err)
       setError(getApiErrorMessage(err) ?? 'Failed to load banners')
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) setLoading(false)
     }
   }, [buildParams])
 
@@ -107,7 +110,9 @@ export default function BannerManagementPage() {
   }, [searchQuery])
 
   useEffect(() => {
-    void fetchBanners()
+    const controller = new AbortController()
+    void fetchBanners(controller.signal)
+    return () => controller.abort()
   }, [fetchBanners])
 
   const resetForm = () => {
@@ -491,7 +496,8 @@ export default function BannerManagementPage() {
                     <iframe
                       srcDoc={previewBanner.html_source}
                       title="Banner HTML Preview"
-                      sandbox="allow-scripts"
+                      sandbox=""
+                      referrerPolicy="no-referrer"
                       className="w-full border-0"
                       style={{ height: '250px' }}
                     />

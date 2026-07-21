@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { Message, WebSocketMessage } from '@/types'
+import { getAccessToken } from '@/lib/authTokens'
 
 interface UseChatWebSocketOptions {
   onMessage?: (message: Message) => void
@@ -27,7 +28,11 @@ function isReadPayload(value: unknown): value is ReadPayload {
   return true
 }
 
-const WS_URL = 'wss://dev.weel.uz/ws/chat/'
+const WS_URL = import.meta.env.VITE_WS_URL
+
+if (!WS_URL) {
+  throw new Error('Missing required VITE_WS_URL environment variable.')
+}
 
 export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
   const wsRef = useRef<WebSocket | null>(null)
@@ -60,7 +65,7 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
   }, [])
 
   const connect = useCallback(() => {
-    const token = localStorage.getItem('access_token')
+    const token = getAccessToken()
     if (!token) return
     if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
       return
@@ -143,9 +148,10 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
     return true
   }, [])
 
-  const sendMessage = useCallback((receiverId: number, receiverType: 'partner' | 'client', content: string): void => {
+  const sendMessage = useCallback((receiverId: number, receiverType: 'partner' | 'client', content: string): boolean => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      return
+      optionsRef.current.onError?.('Chat connection is not open')
+      return false
     }
 
     wsRef.current.send(JSON.stringify({
@@ -156,6 +162,7 @@ export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
         content,
       },
     }))
+    return true
   }, [])
 
   useEffect(() => {

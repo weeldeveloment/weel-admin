@@ -11,7 +11,9 @@ export const calendarKeys = {
   all: ["calendar"] as const,
   properties: () => [...calendarKeys.all, "properties"] as const,
   roomTypes: (propertyId: string) => [...calendarKeys.all, "roomTypes", propertyId] as const,
-  bookings: (propertyId: string) => [...calendarKeys.all, "bookings", propertyId] as const,
+  bookingsRoot: (propertyId: string) => [...calendarKeys.all, "bookings", propertyId] as const,
+  bookings: (propertyId: string, dateFrom: string, dateTo: string) =>
+    [...calendarKeys.bookingsRoot(propertyId), dateFrom, dateTo] as const,
   rooms: (propertyId: string) => [...calendarKeys.all, "rooms", propertyId] as const,
   calendarSlots: (propertyId: string, dateFrom: string, dateTo: string) =>
     [...calendarKeys.all, "slots", propertyId, dateFrom, dateTo] as const,
@@ -27,7 +29,7 @@ export function usePropertiesQuery() {
 
 export function useBookingsQuery(propertyId: string | null, dateFrom?: string, dateTo?: string) {
   return useQuery({
-    queryKey: calendarKeys.bookings(propertyId ?? ""),
+    queryKey: calendarKeys.bookings(propertyId ?? "", dateFrom ?? "", dateTo ?? ""),
     queryFn: () => fetchPmsBookings(propertyId!, { from_date: dateFrom, to_date: dateTo }),
     enabled: !!propertyId,
   })

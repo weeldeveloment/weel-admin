@@ -46,8 +46,6 @@ import {
   Trash2,
   Plus,
   Loader2,
-  Copy,
-  Check,
   Phone,
   Upload,
   ChevronLeft,
@@ -59,52 +57,6 @@ type LocationOption = {
   region_id?: string;
   district_guid?: string;
 };
-
-function CopyBlock({ label, data }: { label: string; data: unknown }) {
-  const [state, dispatch] = useReducer(
-    (prev: { copied: boolean }, next: Partial<{ copied: boolean }>) => ({
-      ...prev,
-      ...next,
-    }),
-    { copied: false },
-  );
-  const json = JSON.stringify(data, null, 2);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(json);
-      dispatch({ copied: true });
-      setTimeout(() => dispatch({ copied: false }), 1500);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  return (
-    <div>
-      <div className="mb-1 flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {label}
-        </p>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          {state.copied ? (
-            <Check className="h-3 w-3 text-green-600" />
-          ) : (
-            <Copy className="h-3 w-3" />
-          )}
-          {state.copied ? "Copied" : "Copy"}
-        </button>
-      </div>
-      <pre className="max-h-64 overflow-auto rounded-md border bg-black/5 p-3 text-xs">
-        {json}
-      </pre>
-    </div>
-  );
-}
 
 const MAX_IMAGES = 10;
 
@@ -390,6 +342,7 @@ export default function ApartmentDetailsUpdate() {
   const [pendingCreateImages, setPendingCreateImages] = useState<
     Array<{ file: File; previewUrl: string }>
   >([]);
+  const pendingCreateImagesRef = useRef(pendingCreateImages);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const { form, savedMessage, imageMessage, draggedIndex, dragOverIndex, isDragOver } = state;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -490,6 +443,16 @@ export default function ApartmentDetailsUpdate() {
     if (!apartmentQuery.data) return;
     dispatch({ type: "loadFromApartment", apartment: apartmentQuery.data });
   }, [apartmentQuery.data]);
+
+  useEffect(() => {
+    pendingCreateImagesRef.current = pendingCreateImages;
+  }, [pendingCreateImages]);
+
+  useEffect(() => {
+    return () => {
+      pendingCreateImagesRef.current.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+    };
+  }, []);
 
   const updateMutation = useMutation({
     mutationFn: (payload: ApartmentAdminUpdate) => {
@@ -1845,16 +1808,6 @@ export default function ApartmentDetailsUpdate() {
                 : t("common.save")}
           </Button>
         </div>
-
-        <details className="rounded-lg border bg-muted/30">
-          <summary className="cursor-pointer px-4 py-2 text-sm font-medium text-muted-foreground">
-            {t("propertyDetails.raw.title") ?? "Raw Property Data"} (Debug)
-          </summary>
-          <div className="space-y-3 p-4 pt-0">
-            <CopyBlock label="API Response" data={apartment} />
-            <CopyBlock label="Form State" data={form} />
-          </div>
-        </details>
 
         {!isCreateMode && (
           <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

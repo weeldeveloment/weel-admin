@@ -108,6 +108,8 @@ export default function PropertiesTable({ partnerId, onCountChange }: Properties
       navigate(`/properties/apartments/${property.guid}`)
     } else if (propertyType.includes('cottage')) {
       navigate(`/properties/cottages/${property.guid}`)
+    } else if (propertyType.includes('hotel')) {
+      navigate(`/properties/hotels/${property.guid}`)
     }
   }
 

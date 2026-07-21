@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useState } from "react"
+import type { ReactNode } from "react"
 import {
   Dialog,
   DialogContent,
@@ -33,28 +34,32 @@ import {
   Loader2,
   Pencil,
   Save,
+  TicketCheck,
+  Ticket,
 } from "lucide-react"
 import { format, parseISO } from "date-fns"
-import type { PMSBooking } from "@/types/pms"
+import type { PMSBooking, PMSBookingStatus, PMSBookingStatusAction, PMSPaymentStatus } from "@/types/pms"
 import { cn } from "@/lib/utils"
 
 interface BookingDetailModalProps {
   booking: PMSBooking | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onStatusChange: (bookingId: number, status: string) => Promise<void>
+  onStatusChange: (bookingId: number, status: PMSBookingStatusAction) => Promise<void>
   onUpdate: (bookingId: number, booking: Partial<PMSBooking>) => Promise<void>
   onClose: () => void
 }
 
-const statusConfig: Record<string, { label: string; color: string }> = {
+const statusConfig: Record<PMSBookingStatus, { label: string; color: string }> = {
   new: { label: "New", color: "bg-green-100 text-green-700 border-green-200" },
+  confirmed: { label: "Confirmed", color: "bg-sky-100 text-sky-700 border-sky-200" },
   checked_in: { label: "Checked In", color: "bg-blue-100 text-blue-700 border-blue-200" },
   checked_out: { label: "Checked Out", color: "bg-gray-100 text-gray-700 border-gray-200" },
   cancelled: { label: "Cancelled", color: "bg-red-100 text-red-700 border-red-200" },
+  no_show: { label: "No Show", color: "bg-amber-100 text-amber-700 border-amber-200" },
 }
 
-const paymentStatusConfig: Record<string, { color: string }> = {
+const paymentStatusConfig: Record<PMSPaymentStatus, { color: string }> = {
   pending: { color: "bg-yellow-100 text-yellow-700 border-yellow-200" },
   paid: { color: "bg-green-100 text-green-700 border-green-200" },
   partial: { color: "bg-orange-100 text-orange-700 border-orange-200" },
@@ -63,11 +68,11 @@ const paymentStatusConfig: Record<string, { color: string }> = {
 
 const mealPlans = ["RO", "BB", "HB", "FB", "AI", "UAI"]
 const sources = ["direct", "ota", "b2b", "walk_in"]
-const paymentStatuses = Object.keys(paymentStatusConfig)
+const paymentStatuses = Object.keys(paymentStatusConfig) as PMSPaymentStatus[]
 
-interface ModalState { pendingStatus: string | null }
+interface ModalState { pendingStatus: PMSBookingStatusAction | null }
 
-function modalReducer(state: ModalState, action: { type: "SET_PENDING"; status: string | null }): ModalState {
+function modalReducer(state: ModalState, action: { type: "SET_PENDING"; status: PMSBookingStatusAction | null }): ModalState {
   switch (action.type) {
     case "SET_PENDING": return { ...state, pendingStatus: action.status }
     default: return state
@@ -137,10 +142,15 @@ export default function BookingDetailModal({
     ? Math.ceil((new Date(booking.check_out).getTime() - new Date(booking.check_in).getTime()) / (1000 * 60 * 60 * 24))
     : 0
 
-  const availableActions = [
-    { status: "checked_in", label: "Check In", icon: <LogIn className="h-4 w-4 mr-2" />, condition: booking.status === "new" },
-    { status: "checked_out", label: "Check Out", icon: <LogOut className="h-4 w-4 mr-2" />, condition: booking.status === "checked_in" },
-    { status: "cancelled", label: "Cancel", icon: <XCircle className="h-4 w-4 mr-2" />, condition: booking.status !== "cancelled" && booking.status !== "checked_out" },
+  const availableActions: {
+    status: PMSBookingStatusAction
+    label: string
+    icon: ReactNode
+    condition: boolean
+  }[] = [
+    { status: "check_in", label: "Check In", icon: <LogIn className="h-4 w-4 mr-2" />, condition: booking.status === "new" },
+    { status: "check_out", label: "Check Out", icon: <LogOut className="h-4 w-4 mr-2" />, condition: booking.status === "checked_in" },
+    { status: "cancel", label: "Cancel", icon: <XCircle className="h-4 w-4 mr-2" />, condition: booking.status !== "cancelled" && booking.status !== "checked_out" },
   ]
 
   const updateField = (field: keyof BookingEditForm, value: string) => {
@@ -319,10 +329,33 @@ export default function BookingDetailModal({
                 </h4>
                 <div className="bg-muted/50 rounded-lg p-3 space-y-1">
                   <p className="text-sm font-medium">{booking.room_number || `#${booking.room_id}`}</p>
-                  <p className="text-xs text-muted-foreground">Rate: {booking.rate || "-"}</p>
+              <p className="text-xs text-muted-foreground">Rate: {booking.rate || "-"}</p>
+                  </div>
                 </div>
-              </div>
               <Separator />
+              {(booking.status === "confirmed" || booking.status === "checked_in") && (
+                <>
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <TicketCheck className="h-4 w-4 text-muted-foreground" />Voucher
+                    </h4>
+                    <div className="rounded-lg border-2 border-dashed border-green-300 bg-green-50 p-3 space-y-1">
+                      {booking.voucher_number ? (
+                        <>
+                          <p className="text-sm font-bold text-green-700">{booking.voucher_number}</p>
+                          <p className="text-xs text-green-600 flex items-center gap-1">
+                            <Ticket className="h-3 w-3" />
+                            Confirmed &mdash; guest may check in
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">No voucher generated yet</p>
+                      )}
+                    </div>
+                  </div>
+                  <Separator />
+                </>
+              )}
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-muted-foreground" />Payment
@@ -386,7 +419,7 @@ export default function BookingDetailModal({
                       key={action.status}
                       size="sm"
                       disabled={isPending || !!pendingStatus}
-                      variant={action.status === "cancelled" ? "destructive" : "default"}
+                      variant={action.status === "cancel" ? "destructive" : "default"}
                       onClick={async () => {
                         modalDispatch({ type: "SET_PENDING", status: action.status })
                         try {

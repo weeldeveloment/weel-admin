@@ -1,6 +1,11 @@
 import { create } from 'zustand'
 import { User, AuthResponse } from '@/types'
 import api from '@/lib/api'
+import {
+  clearAuthTokens,
+  getAccessToken,
+  setAuthTokens,
+} from '@/lib/authTokens'
 
 const isAdminUser = (user: User) =>
   user.role === 'admin' || Boolean(user.is_staff) || Boolean(user.is_superuser)
@@ -9,11 +14,6 @@ const normalizeAdminUser = (user: User): User => ({
   ...user,
   role: 'admin',
 })
-
-const clearAuthTokens = () => {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
-}
 
 const fetchAdminUser = async () => {
   const response = await api.get<User>('/admin-auth/me/')
@@ -47,8 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw new Error('Login response did not include authentication tokens.')
       }
 
-      localStorage.setItem('access_token', access)
-      localStorage.setItem('refresh_token', refresh)
+      setAuthTokens(access, refresh)
 
       const user = await fetchAdminUser()
 
@@ -71,7 +70,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   checkAuth: async () => {
-    const token = localStorage.getItem('access_token')
+    const token = getAccessToken()
     
     if (!token) {
       set({ isLoading: false, isAuthenticated: false })

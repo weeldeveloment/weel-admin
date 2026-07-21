@@ -28,22 +28,26 @@ export default function ActivitiesPage() {
   const [error, setError] = useState<string | null>(null)
   const [togglingGuid, setTogglingGuid] = useState<string | null>(null)
 
-  const fetchActivities = useCallback(async () => {
+  const fetchActivities = useCallback(async (signal?: AbortSignal) => {
     try {
       setLoading(true)
       setError(null)
-      const response = await api.get<Activity[]>('/admin-auth/activities/')
+      const response = await api.get<Activity[]>('/admin-auth/activities/', { signal })
+      if (signal?.aborted) return
       setActivities(response.data)
     } catch (err: unknown) {
+      if (signal?.aborted) return
       console.error('Error fetching activities:', err)
       setError(getApiErrorMessage(err) ?? t('activities.error'))
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) setLoading(false)
     }
   }, [t])
 
   useEffect(() => {
-    void fetchActivities()
+    const controller = new AbortController()
+    void fetchActivities(controller.signal)
+    return () => controller.abort()
   }, [fetchActivities])
 
   const toggleActive = async (activity: Activity) => {

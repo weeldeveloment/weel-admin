@@ -19,57 +19,56 @@ import PropertyTabContent from '@/components/PropertyTabContent'
 type ViewMode = 'grid' | 'list'
 type VerifiedFilter = 'all' | 'verified' | 'unverified'
 
-const extractListResult = (payload: unknown): PropertyListResult => {
-  if (Array.isArray(payload)) {
-    return {
-      items: payload as PropertyItem[],
-      count: payload.length,
-      next: null,
-      previous: null,
-    }
-  }
+interface PropertyFilters {
+  search: string
+  verified: VerifiedFilter
+  dateFrom: string
+  dateTo: string
+}
 
-  if (payload && typeof payload === 'object' && Array.isArray((payload as PaginatedResponse<PropertyItem>).results)) {
-    const parsed = payload as PaginatedResponse<PropertyItem>
-    return {
-      items: parsed.results ?? [],
-      count: typeof parsed.count === 'number' ? parsed.count : (parsed.results?.length ?? 0),
-      next: parsed.next ?? null,
-      previous: parsed.previous ?? null,
-    }
+const extractListResult = (payload: PaginatedResponse<PropertyItem>): PropertyListResult => {
+  if (!Array.isArray(payload.results) || typeof payload.count !== 'number') {
+    throw new Error('Invalid property list response')
   }
 
   return {
-    items: [],
-    count: 0,
-    next: null,
-    previous: null,
+    items: payload.results,
+    count: payload.count,
+    next: payload.next ?? null,
+    previous: payload.previous ?? null,
   }
 }
 
 const fetchPropertiesByType = async (
   type: PropertyTab,
   page: number,
-  search: string
+  filters: PropertyFilters
 ): Promise<PropertyListResult> => {
   const endpoint = '/property/admin/all/'
   const propertyTypeValue =
     type === 'cottages' ? 'cottage' : type === 'apartments' ? 'apartment' : 'hotel'
   const params: Record<string, string | number> = {
     page,
-    page_size: 12,
+    limit: 12,
     property_type: propertyTypeValue,
   }
-  if (search) params.search = search
+  if (filters.search) params.search = filters.search
+  if (filters.verified !== 'all') params.is_verified = String(filters.verified === 'verified')
+  if (filters.dateFrom) params.created_from = filters.dateFrom
+  if (filters.dateTo) params.created_to = filters.dateTo
   const response = await api.get(endpoint, { params })
   return extractListResult(response.data)
 }
 
-const getNextPageFromUrl = (nextUrl: string | null): number | undefined => {
-  if (!nextUrl) return undefined
+const getNextPageFromUrl = (nextUrl: string | number | null): number | undefined => {
+  if (nextUrl === null || nextUrl === undefined) return undefined
+
+  if (typeof nextUrl === 'number') {
+    return Number.isFinite(nextUrl) && nextUrl > 0 ? nextUrl : undefined
+  }
 
   try {
-    const parsed = new URL(nextUrl, window.location.origin)
+    const parsed = new URL(String(nextUrl), window.location.origin)
     const page = parsed.searchParams.get('page')
     if (!page) return undefined
 
@@ -102,26 +101,53 @@ export default function PropertiesPage() {
   const cottagesLoadMoreRef = useRef<HTMLDivElement>(null)
   const apartmentsLoadMoreRef = useRef<HTMLDivElement>(null)
   const hotelsLoadMoreRef = useRef<HTMLDivElement>(null)
+  const cottageFilters = useMemo<PropertyFilters>(
+    () => ({
+      search: cottagesSearch,
+      verified: cottagesVerified,
+      dateFrom: cottagesDateFrom,
+      dateTo: cottagesDateTo,
+    }),
+    [cottagesSearch, cottagesVerified, cottagesDateFrom, cottagesDateTo]
+  )
+  const apartmentFilters = useMemo<PropertyFilters>(
+    () => ({
+      search: apartmentsSearch,
+      verified: apartmentsVerified,
+      dateFrom: apartmentsDateFrom,
+      dateTo: apartmentsDateTo,
+    }),
+    [apartmentsSearch, apartmentsVerified, apartmentsDateFrom, apartmentsDateTo]
+  )
+  const hotelFilters = useMemo<PropertyFilters>(
+    () => ({
+      search: hotelsSearch,
+      verified: hotelsVerified,
+      dateFrom: hotelsDateFrom,
+      dateTo: hotelsDateTo,
+    }),
+    [hotelsSearch, hotelsVerified, hotelsDateFrom, hotelsDateTo]
+  )
 
   const cottagesQuery = useInfiniteQuery({
-    queryKey: ['properties', 'cottages', cottagesSearch],
-    queryFn: ({ pageParam }) => fetchPropertiesByType('cottages', pageParam, cottagesSearch),
+    queryKey: ['properties', 'cottages', cottageFilters],
+    queryFn: ({ pageParam }) => fetchPropertiesByType('cottages', pageParam, cottageFilters),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => getNextPageFromUrl(lastPage.next),
     enabled: activeTab === 'cottages',
   })
 
   const apartmentsQuery = useInfiniteQuery({
-    queryKey: ['properties', 'apartments', apartmentsSearch],
-    queryFn: ({ pageParam }) => fetchPropertiesByType('apartments', pageParam, apartmentsSearch),
+    queryKey: ['properties', 'apartments', apartmentFilters],
+    queryFn: ({ pageParam }) => fetchPropertiesByType('apartments', pageParam, apartmentFilters),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => getNextPageFromUrl(lastPage.next),
     enabled: activeTab === 'apartments',
   })
 
   const hotelsQuery = useInfiniteQuery({
-    queryKey: ['properties', 'hotels', hotelsSearch],
-    queryFn: ({ pageParam }) => fetchPropertiesByType('hotels', pageParam, hotelsSearch),
+    queryKey: ['properties', 'hotels', hotelFilters],
+    queryFn: ({ pageParam }) => fetchPropertiesByType('hotels', pageParam, hotelFilters),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => getNextPageFromUrl(lastPage.next),
     enabled: activeTab === 'hotels',
@@ -141,48 +167,6 @@ export default function PropertiesPage() {
     () => hotelsQuery.data?.pages.flatMap((page) => page.items) ?? [],
     [hotelsQuery.data]
   )
-
-  const filteredCottageItems = useMemo(() => {
-    return cottageItems.filter((item) => {
-      if (cottagesVerified !== 'all') {
-        const isVerified = item.is_verified ?? false
-        if (cottagesVerified === 'verified' && !isVerified) return false
-        if (cottagesVerified === 'unverified' && isVerified) return false
-      }
-      const itemDate = item.created_at?.split('T')[0]
-      if (cottagesDateFrom && itemDate && itemDate < cottagesDateFrom) return false
-      if (cottagesDateTo && itemDate && itemDate > cottagesDateTo) return false
-      return true
-    })
-  }, [cottageItems, cottagesVerified, cottagesDateFrom, cottagesDateTo])
-
-  const filteredApartmentItems = useMemo(() => {
-    return apartmentItems.filter((item) => {
-      if (apartmentsVerified !== 'all') {
-        const isVerified = item.is_verified ?? false
-        if (apartmentsVerified === 'verified' && !isVerified) return false
-        if (apartmentsVerified === 'unverified' && isVerified) return false
-      }
-      const itemDate = item.created_at?.split('T')[0]
-      if (apartmentsDateFrom && itemDate && itemDate < apartmentsDateFrom) return false
-      if (apartmentsDateTo && itemDate && itemDate > apartmentsDateTo) return false
-      return true
-    })
-  }, [apartmentItems, apartmentsVerified, apartmentsDateFrom, apartmentsDateTo])
-
-  const filteredHotelItems = useMemo(() => {
-    return hotelItems.filter((item) => {
-      if (hotelsVerified !== 'all') {
-        const isActive = item.is_active ?? false
-        if (hotelsVerified === 'verified' && !isActive) return false
-        if (hotelsVerified === 'unverified' && isActive) return false
-      }
-      const itemDate = item.created_at?.split('T')[0]
-      if (hotelsDateFrom && itemDate && itemDate < hotelsDateFrom) return false
-      if (hotelsDateTo && itemDate && itemDate > hotelsDateTo) return false
-      return true
-    })
-  }, [hotelItems, hotelsVerified, hotelsDateFrom, hotelsDateTo])
 
   const openCreateDialog = (initialType: PropertyTab) => {
     setCreateType(initialType)
@@ -219,7 +203,7 @@ export default function PropertiesPage() {
             dateTo={cottagesDateTo}
             onDateToChange={setCottagesDateTo}
             query={cottagesQuery}
-            filteredItems={filteredCottageItems}
+            items={cottageItems}
             loadMoreRef={cottagesLoadMoreRef}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
@@ -239,7 +223,7 @@ export default function PropertiesPage() {
             dateTo={apartmentsDateTo}
             onDateToChange={setApartmentsDateTo}
             query={apartmentsQuery}
-            filteredItems={filteredApartmentItems}
+            items={apartmentItems}
             loadMoreRef={apartmentsLoadMoreRef}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
@@ -259,7 +243,7 @@ export default function PropertiesPage() {
             dateTo={hotelsDateTo}
             onDateToChange={setHotelsDateTo}
             query={hotelsQuery}
-            filteredItems={filteredHotelItems}
+            items={hotelItems}
             loadMoreRef={hotelsLoadMoreRef}
             viewMode={viewMode}
             onViewModeChange={setViewMode}

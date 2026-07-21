@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -71,9 +71,6 @@ const ConversationItem = memo(
         <div className="flex min-w-0 items-start gap-3">
           <div className="relative flex-shrink-0">
             <Avatar className="h-12 w-12">
-              <AvatarImage
-                src={`https://api.dicebear.com/7.x/initials/svg?seed=${fullName}`}
-              />
               <AvatarFallback>
                 {fallbackInitials}
               </AvatarFallback>
@@ -195,6 +192,7 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [messageInput, setMessageInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
   const [mobileShowChat, setMobileShowChat] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
@@ -270,12 +268,19 @@ export default function ChatPage() {
     queryFn: async (): Promise<ChatConversation[]> => {
       const response = await api.get('/chat/conversations/');
       const items = response.data as ChatConversationApi[];
-      return items.map((conv) => ({
-        conversation_id: conv.conversation_id ?? 0,
-        counterpart: conv.counterpart ?? conv.partner ?? ({} as Actor),
-        last_message: conv.last_message,
-        unread_count: conv.unread_count ?? 0,
-      }));
+      return items.flatMap((conv) => {
+        const counterpart = conv.counterpart ?? conv.partner
+        if (!counterpart?.id || !counterpart.full_name || !counterpart.role) {
+          return []
+        }
+
+        return [{
+          conversation_id: conv.conversation_id ?? Number(`${counterpart.id}${counterpart.role === 'client' ? '1' : '0'}`),
+          counterpart: counterpart as Actor,
+          last_message: conv.last_message,
+          unread_count: conv.unread_count ?? 0,
+        }]
+      });
     },
     refetchInterval: 30000,
   });
@@ -312,6 +317,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     setMessageInput('');
+    setChatError(null);
   }, [partnerId]);
 
   useEffect(() => {
@@ -334,11 +340,16 @@ export default function ChatPage() {
     if (!messageInput.trim() || !partnerId || isSending) return;
 
     setIsSending(true);
-    sendMessageViaWs(parseInt(partnerId), counterpartRole, messageInput.trim());
-    setMessageInput('');
-    scrollToBottom();
+    setChatError(null);
+    const sent = sendMessageViaWs(parseInt(partnerId), counterpartRole, messageInput.trim());
+    if (sent) {
+      setMessageInput('');
+      scrollToBottom();
+    } else {
+      setChatError(t('chat.sendFailed', 'Message was not sent. Reconnect and try again.'));
+    }
     setIsSending(false);
-  }, [messageInput, partnerId, isSending, counterpartRole, sendMessageViaWs]);
+  }, [messageInput, partnerId, isSending, counterpartRole, sendMessageViaWs, t]);
 
   const filteredConversations = conversations.filter((conv) =>
     conv.counterpart.full_name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -429,9 +440,6 @@ export default function ChatPage() {
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
                   <Avatar className="h-10 w-10">
-                    <AvatarImage
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${activeCounterpartName ?? ''}`}
-                    />
                     <AvatarFallback>
                       {(activeCounterpartName ?? '').slice(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -507,6 +515,9 @@ export default function ChatPage() {
                     className="pr-10"
                     disabled={isSending}
                   />
+                  {chatError ? (
+                    <p className="mt-1 text-xs text-destructive">{chatError}</p>
+                  ) : null}
                 </div>
 
                 <Button

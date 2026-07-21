@@ -218,6 +218,7 @@ export default function HotelDetailsUpdate() {
   const [pendingCreateImages, setPendingCreateImages] = useState<
     Array<{ file: File; previewUrl: string }>
   >([])
+  const pendingCreateImagesRef = useRef(pendingCreateImages)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const savedMessageTimerRef = useRef<number | null>(null)
 
@@ -249,6 +250,16 @@ export default function HotelDetailsUpdate() {
   useEffect(() => {
     dispatch({ type: 'resetForm', payload: createInitialForm(hotelQuery.data ?? null) })
   }, [hotelQuery.data])
+
+  useEffect(() => {
+    pendingCreateImagesRef.current = pendingCreateImages
+  }, [pendingCreateImages])
+
+  useEffect(() => {
+    return () => {
+      pendingCreateImagesRef.current.forEach((item) => URL.revokeObjectURL(item.previewUrl))
+    }
+  }, [])
 
   const { form, savedMessage, errorMessage, imageMessage, draggedIndex, dragOverIndex, isDragOver } = state
   const hotel = hotelQuery.data

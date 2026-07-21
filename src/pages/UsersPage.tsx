@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -24,43 +25,59 @@ const getApiErrorMessage = (err: unknown): string | null => {
   return null
 }
 
-const fetchAllPages = async <T,>(endpoint: string): Promise<T[]> => {
-  const pageSize = 100
-  let page = 1
-  const allItems: T[] = []
+interface UserPage<T> {
+  results: T[]
+  count: number
+}
 
-  while (true) {
-    const response = await api.get<PaginatedResponse<T> | T[]>(endpoint, {
-      params: { page, page_size: pageSize },
-    })
+const fetchUserPage = async <T,>(endpoint: string, page: number, search: string): Promise<UserPage<T>> => {
+  const response = await api.get<PaginatedResponse<T> | T[]>(endpoint, {
+    params: {
+      page,
+      page_size: 10,
+      search: search.trim() || undefined,
+    },
+  })
 
-    if (Array.isArray(response.data)) {
-      return response.data
-    }
-
-    const { results, next } = response.data
-    allItems.push(...(results ?? []))
-
-    if (!next) break
-    page += 1
+  if (Array.isArray(response.data)) {
+    return { results: response.data, count: response.data.length }
   }
 
-  return allItems
+  return {
+    results: response.data.results ?? [],
+    count: response.data.count ?? 0,
+  }
 }
 
 export default function UsersPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const [clients, setClients] = useState<AdminClient[]>([])
-  const [partners, setPartners] = useState<AdminPartner[]>([])
-  const [pmsUsers, setPmsUsers] = useState<AdminPmsUser[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [clientsPage, setClientsPage] = useState(1)
   const [partnersPage, setPartnersPage] = useState(1)
   const [pmsPage, setPmsPage] = useState(1)
   const ITEMS_PER_PAGE = 10
+
+  const clientsQuery = useQuery({
+    queryKey: ['adminUsers', 'clients', clientsPage, searchQuery],
+    queryFn: () => fetchUserPage<AdminClient>('/admin-auth/users/clients/', clientsPage, searchQuery),
+  })
+
+  const partnersQuery = useQuery({
+    queryKey: ['adminUsers', 'partners', partnersPage, searchQuery],
+    queryFn: () => fetchUserPage<AdminPartner>('/admin-auth/users/partners/', partnersPage, searchQuery),
+  })
+
+  const pmsQuery = useQuery({
+    queryKey: ['adminUsers', 'pms', pmsPage, searchQuery],
+    queryFn: () => fetchUserPage<AdminPmsUser>('/admin-auth/users/pms/', pmsPage, searchQuery),
+  })
+
+  const loading = clientsQuery.isLoading || partnersQuery.isLoading || pmsQuery.isLoading
+  const error =
+    getApiErrorMessage(clientsQuery.error) ??
+    getApiErrorMessage(partnersQuery.error) ??
+    getApiErrorMessage(pmsQuery.error)
 
   useEffect(() => {
     setClientsPage(1)
@@ -68,68 +85,21 @@ export default function UsersPage() {
     setPmsPage(1)
   }, [searchQuery])
 
-  const fetchUsers = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const [partnersData, clientsData, pmsData] = await Promise.all([
-        fetchAllPages<AdminPartner>('/admin-auth/users/partners/'),
-        fetchAllPages<AdminClient>('/admin-auth/users/clients/'),
-        fetchAllPages<AdminPmsUser>('/admin-auth/users/pms/'),
-      ])
-      setPartners(partnersData)
-      setClients(clientsData)
-      setPmsUsers(pmsData)
-    } catch (err: unknown) {
-      console.error('Error fetching users:', err)
-      setError(getApiErrorMessage(err))
-    } finally {
-      setLoading(false)
-    }
-  }, [t])
-
-  useEffect(() => {
-    void fetchUsers()
-  }, [fetchUsers])
-
-  const filterUsers = (users: AdminClient[] | AdminPartner[] | AdminPmsUser[]) => {
-    if (!searchQuery.trim()) return users
-    return users.filter(
-      (user) =>
-        user.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.phone_number?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }
-
-  const getPaginatedUsers = (users: AdminClient[] | AdminPartner[] | AdminPmsUser[], page: number) => {
-    const filtered = filterUsers(users)
-    const startIdx = (page - 1) * ITEMS_PER_PAGE
-    const endIdx = startIdx + ITEMS_PER_PAGE
-    return filtered.slice(startIdx, endIdx)
-  }
-
-  const getTotalPages = (users: AdminClient[] | AdminPartner[] | AdminPmsUser[]) => {
-    const filtered = filterUsers(users)
-    return Math.ceil(filtered.length / ITEMS_PER_PAGE)
-  }
-
   const UserTable = ({ 
     users, 
+    totalUsers,
     type, 
     page, 
     onPageChange 
   }: { 
     users: AdminClient[] | AdminPartner[] | AdminPmsUser[]
+    totalUsers: number
     type: 'client' | 'partner' | 'pms'
     page: number
     onPageChange: (page: number) => void
   }) => {
-    const paginatedUsers = getPaginatedUsers(users, page)
-    const totalPages = getTotalPages(users)
-    const totalUsers = filterUsers(users).length
+    const paginatedUsers = users
+    const totalPages = Math.ceil(totalUsers / ITEMS_PER_PAGE)
 
     return (
       <div className="space-y-6">
@@ -152,7 +122,7 @@ export default function UsersPage() {
                       <div className="flex flex-col items-center justify-center gap-3">
                         <Users className="h-10 md:h-12 w-10 md:w-12 text-muted-foreground" />
                         <p className="text-sm text-muted-foreground font-medium">
-                          {filterUsers(users).length === 0 && searchQuery
+                          {users.length === 0 && searchQuery
                             ? t('users.empty.noneSearch')
                             : t('users.empty.none')}
                         </p>
@@ -170,7 +140,6 @@ export default function UsersPage() {
                           <td className="px-4 md:px-6 py-3 md:py-4">
                             <div className="flex items-center gap-3">
                               <Avatar className="h-9 md:h-10 w-9 md:w-10 ring-2 ring-border flex-shrink-0">
-                                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.first_name}`} />
                                 <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs font-semibold">
                                   {(user.first_name ?? '')[0]?.toUpperCase() ?? ''}
                                 </AvatarFallback>
@@ -316,7 +285,14 @@ export default function UsersPage() {
 
       {/* Error Alert */}
       {error && (
-        <ErrorAlert message={error} onRetry={fetchUsers} />
+        <ErrorAlert
+          message={error}
+          onRetry={() => {
+            void clientsQuery.refetch()
+            void partnersQuery.refetch()
+            void pmsQuery.refetch()
+          }}
+        />
       )}
 
       {/* Search Bar */}
@@ -338,27 +314,28 @@ export default function UsersPage() {
             className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground shrink-0"
           >
             <Users className="h-4 w-4 mr-2" />
-            {t('users.tabs.clients')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(clients).length}</span>
+            {t('users.tabs.clients')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{clientsQuery.data?.count ?? 0}</span>
           </TabsTrigger>
           <TabsTrigger
             value="partners"
             className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground shrink-0"
           >
             <Users className="h-4 w-4 mr-2" />
-            {t('users.tabs.partners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(partners).length}</span>
+            {t('users.tabs.partners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{partnersQuery.data?.count ?? 0}</span>
           </TabsTrigger>
           <TabsTrigger
             value="pms"
             className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground shrink-0"
           >
             <Users className="h-4 w-4 mr-2" />
-            {t('users.tabs.hotelOwners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{filterUsers(pmsUsers).length}</span>
+            {t('users.tabs.hotelOwners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{pmsQuery.data?.count ?? 0}</span>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="clients">
           <UserTable 
-            users={clients} 
+            users={clientsQuery.data?.results ?? []}
+            totalUsers={clientsQuery.data?.count ?? 0}
             type="client" 
             page={clientsPage}
             onPageChange={setClientsPage}
@@ -367,7 +344,8 @@ export default function UsersPage() {
 
         <TabsContent value="partners">
           <UserTable 
-            users={partners} 
+            users={partnersQuery.data?.results ?? []}
+            totalUsers={partnersQuery.data?.count ?? 0}
             type="partner" 
             page={partnersPage}
             onPageChange={setPartnersPage}
@@ -376,7 +354,8 @@ export default function UsersPage() {
 
         <TabsContent value="pms">
           <UserTable 
-            users={pmsUsers} 
+            users={pmsQuery.data?.results ?? []}
+            totalUsers={pmsQuery.data?.count ?? 0}
             type="pms" 
             page={pmsPage}
             onPageChange={setPmsPage}

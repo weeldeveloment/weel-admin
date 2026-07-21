@@ -8,15 +8,17 @@ import { useTranslation } from "react-i18next"
 import { cn } from "@/lib/utils"
 
 const conditionStyles: Record<string, string> = {
-  good: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  clean: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  dirty: "bg-amber-50 text-amber-700 border-amber-200",
+  inspection: "bg-sky-50 text-sky-700 border-sky-200",
   maintenance: "bg-amber-50 text-amber-700 border-amber-200",
-  renovation: "bg-rose-50 text-rose-700 border-rose-200",
 }
 
 const availabilityStyles: Record<string, string> = {
   available: "bg-emerald-50 text-emerald-700",
   occupied: "bg-amber-50 text-amber-700",
-  maintenance: "bg-rose-50 text-rose-700",
+  blocked: "bg-rose-50 text-rose-700",
+  held: "bg-sky-50 text-sky-700",
 }
 
 export default function HotelRoomsSection({ hotelId }: { hotelId: string | undefined }) {

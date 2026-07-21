@@ -84,22 +84,25 @@ export default function StoriesModerationPage() {
     return params
   }, [page, ordering, searchQuery, activeTab])
 
-  const fetchStories = useCallback(async () => {
+  const fetchStories = useCallback(async (signal?: AbortSignal) => {
     try {
       setLoading(true)
       setError(null)
       const response = await api.get<PaginatedResponse<AdminStory>>('/story/admin/stories/', {
         params: buildParams(),
+        signal,
       })
+      if (signal?.aborted) return
       const data = response.data
       setStories(data.results ?? [])
       setTotalCount(data.count ?? 0)
       setTotalPages(Math.ceil((data.count ?? 0) / ITEMS_PER_PAGE))
     } catch (err: unknown) {
+      if (signal?.aborted) return
       console.error('Error fetching stories:', err)
       setError(getApiErrorMessage(err) ?? t('stories.error'))
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) setLoading(false)
     }
   }, [buildParams, t])
 
@@ -108,7 +111,9 @@ export default function StoriesModerationPage() {
   }, [searchQuery, activeTab, ordering])
 
   useEffect(() => {
-    void fetchStories()
+    const controller = new AbortController()
+    void fetchStories(controller.signal)
+    return () => controller.abort()
   }, [fetchStories])
 
   const handleModerate = async (story: AdminStory, approve: boolean) => {

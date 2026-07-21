@@ -102,22 +102,25 @@ export default function NewsManagementPage() {
     return params
   }, [page, ordering, searchQuery])
 
-  const fetchNews = useCallback(async () => {
+  const fetchNews = useCallback(async (signal?: AbortSignal) => {
     try {
       setLoading(true)
       setError(null)
       const response = await api.get<PaginatedResponse<AdminNews>>('/story/admin/news/', {
         params: buildParams(),
+        signal,
       })
+      if (signal?.aborted) return
       const data = response.data
       setNewsList(data.results ?? [])
       setTotalCount(data.count ?? 0)
       setTotalPages(Math.ceil((data.count ?? 0) / ITEMS_PER_PAGE))
     } catch (err: unknown) {
+      if (signal?.aborted) return
       console.error('Error fetching news:', err)
       setError(getApiErrorMessage(err) ?? 'Failed to load news')
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) setLoading(false)
     }
   }, [buildParams])
 
@@ -126,7 +129,9 @@ export default function NewsManagementPage() {
   }, [searchQuery, activeTab, ordering])
 
   useEffect(() => {
-    void fetchNews()
+    const controller = new AbortController()
+    void fetchNews(controller.signal)
+    return () => controller.abort()
   }, [fetchNews])
 
   const resetForm = () => {

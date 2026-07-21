@@ -11,6 +11,18 @@ export default defineConfig(({ mode }) => {
       modulePreload: {
         polyfill: false,
       },
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return
+            if (id.includes("@fullcalendar")) return "vendor-fullcalendar"
+            if (id.includes("@radix-ui")) return "vendor-radix"
+            if (id.includes("@tanstack")) return "vendor-query"
+            if (id.includes("date-fns")) return "vendor-date"
+            return "vendor"
+          },
+        },
+      },
     },
     resolve: {
       alias: {

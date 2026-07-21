@@ -35,7 +35,7 @@ interface PropertyTabContentProps {
     hasNextPage: boolean
     fetchNextPage: () => void
   }
-  filteredItems: PropertyItem[]
+  items: PropertyItem[]
   loadMoreRef: React.RefObject<HTMLDivElement>
   viewMode: ViewMode
   onViewModeChange: (mode: ViewMode) => void
@@ -53,7 +53,7 @@ export default function PropertyTabContent({
   dateTo,
   onDateToChange,
   query,
-  filteredItems,
+  items,
   loadMoreRef,
   viewMode,
   onViewModeChange,
@@ -172,12 +172,12 @@ export default function PropertyTabContent({
       <div className="space-y-4">
         {query.isLoading ? <p className="text-sm text-muted-foreground">{t('properties.loading', { type: tabLabel })}</p> : null}
         {query.isError ? <p className="text-sm text-red-600">{t('properties.loadFailed', { type: tabLabel })}</p> : null}
-        {query.isSuccess && !query.isFetchingNextPage && filteredItems.length === 0 ? (
+        {query.isSuccess && !query.isFetchingNextPage && items.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t('properties.noFound', { type: tabLabel })}</p>
         ) : null}
-        {filteredItems.length > 0 ? (
+        {items.length > 0 ? (
           <ul className={listContainerClass}>
-            {filteredItems.map((item) => (
+            {items.map((item) => (
               <li key={item.guid}>
                 <PropertyCard item={item} viewMode={viewMode} type={tab} />
               </li>

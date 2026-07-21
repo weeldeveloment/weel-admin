@@ -1,7 +1,14 @@
 import axios from 'axios'
+import { clearAuthTokens, getAccessToken, getRefreshToken, setAuthTokens } from './authTokens'
 
-export const API_URL = import.meta.env.VITE_API_URL ?? ""
+export const API_URL = import.meta.env.VITE_API_URL
+
+if (!API_URL) {
+  throw new Error('Missing required VITE_API_URL environment variable.')
+}
+
 const API_BASE = `${API_URL}/api`
+let refreshAccessTokenPromise: Promise<string> | null = null
 
 export const api = axios.create({
   baseURL: API_BASE,
@@ -12,7 +19,7 @@ export const api = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token')
+  const token = getAccessToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -29,6 +36,7 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
+    if (!originalRequest) return Promise.reject(error)
 
     const isAuthEndpoint =
       originalRequest.url?.includes('/admin-auth/login/') ||
@@ -38,19 +46,31 @@ api.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        const refreshToken = localStorage.getItem('refresh_token')
-        const response = await axios.post(`${API_BASE}/admin-auth/token/refresh/`, {
-          refresh: refreshToken,
-        })
+        const refreshToken = getRefreshToken()
+        if (!refreshToken) {
+          throw new Error('Missing refresh token.')
+        }
 
-        const { access } = response.data
-        localStorage.setItem('access_token', access)
+        refreshAccessTokenPromise ??= axios
+          .post<{ access: string }>(`${API_BASE}/admin-auth/token/refresh/`, {
+            refresh: refreshToken,
+          })
+          .then((response) => {
+            const { access } = response.data
+            if (!access) throw new Error('Refresh response did not include access token.')
+            setAuthTokens(access)
+            return access
+          })
+          .finally(() => {
+            refreshAccessTokenPromise = null
+          })
+
+        const access = await refreshAccessTokenPromise
         
         originalRequest.headers.Authorization = `Bearer ${access}`
         return api(originalRequest)
       } catch (refreshError) {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
+        clearAuthTokens()
         window.location.href = '/login'
         return Promise.reject(refreshError)
       }
@@ -147,6 +167,12 @@ export function checkOutPmsBooking(propertyId: string, bookingId: number): Promi
 
 export function acceptPmsBooking(propertyId: string, bookingId: number): Promise<PMSBooking> {
   return adminAuthPost<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/accept/`)
+}
+
+export function updatePmsBookingVoucher(propertyId: string, bookingId: number, voucherNumber?: string): Promise<PMSBooking> {
+  return adminAuthPost<PMSBooking>(`/admin-auth/hotels/${propertyId}/bookings/${bookingId}/voucher/`, {
+    voucher_number: voucherNumber,
+  })
 }
 
 // ── Calendar ──────────────────────────────────────────────────────
