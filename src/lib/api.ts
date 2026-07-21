@@ -82,7 +82,7 @@ api.interceptors.response.use(
 
 // ── PMS Calendar API ─────────────────────────────────────────────
 
-import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSProperty, PMSRate, PMSRoomType } from "@/types/pms"
+import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSProperty, PMSRate, PMSRoomType, PMSRoomCondition } from "@/types/pms"
 
 async function adminAuthGet<T>(url: string, params?: Record<string, string | undefined>): Promise<T> {
   const cleanParams: Record<string, string> = {}
@@ -123,6 +123,10 @@ export function fetchPmsRooms(propertyId: string, roomTypeId?: number): Promise<
   return adminAuthGet<PMSRoom[]>(`/admin-auth/hotels/${propertyId}/rooms/`, {
     room_type_id: roomTypeId?.toString(),
   })
+}
+
+export function updatePmsRoom(propertyId: string, roomId: number, data: { condition: PMSRoomCondition }): Promise<PMSRoom> {
+  return adminAuthPatch<PMSRoom>(`/admin-auth/hotels/${propertyId}/rooms/${roomId}/`, data)
 }
 
 // ── Bookings ──────────────────────────────────────────────────────
