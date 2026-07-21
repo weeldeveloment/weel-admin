@@ -14,8 +14,8 @@ RUN bun install --frozen-lockfile
 COPY . .
 
 # Accept build-time overrides for Vite envs
-ARG VITE_API_URL=""
-ARG VITE_WS_URL=""
+ARG VITE_API_URL="https://dev.weel.uz"
+ARG VITE_WS_URL="wss://dev.weel.uz"
 ARG CACHEBUST=""
 ARG DEPLOY_VERSION=""
 ENV VITE_API_URL=${VITE_API_URL} \
