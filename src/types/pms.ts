@@ -44,9 +44,13 @@ export interface PMSRoom {
   bedroom_count: number
   capacity: number
   amenities: string[]
+  photos: string[]
+  cover_photo_index: number
   condition: PMSRoomCondition
   availability: PMSRoomAvailability
   meal_plan: string
+  base_price: string | null
+  currency: string
   is_active: boolean
 }
 

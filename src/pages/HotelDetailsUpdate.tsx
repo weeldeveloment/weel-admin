@@ -1,4 +1,4 @@
-import { lazy, useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -26,7 +26,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import HotelPmsSection from '@/components/HotelPmsSection'
 import HotelRoomsSection from '@/components/HotelRoomsSection'
-const RoomInspectionPage = lazy(() => import('./RoomInspectionPage'))
+import LocationPicker from '@/components/LocationPicker'
 
 type HotelForm = {
   title: string
@@ -640,7 +640,6 @@ export default function HotelDetailsUpdate() {
             <TabsTrigger value="details">{t('properties.tabs.details')}</TabsTrigger>
             <TabsTrigger value="partner">{t('properties.tabs.partner')}</TabsTrigger>
             <TabsTrigger value="rooms">{t('properties.tabs.rooms')}</TabsTrigger>
-            <TabsTrigger value="inspection">{t('inspection.title')}</TabsTrigger>
             <TabsTrigger value="location">{t('properties.tabs.location')}</TabsTrigger>
             <TabsTrigger value="images">{t('properties.tabs.images')}</TabsTrigger>
             <TabsTrigger value="pms">{t('nav.pms')}</TabsTrigger>
@@ -1123,18 +1122,6 @@ export default function HotelDetailsUpdate() {
             ) : null}
           </TabsContent>
 
-          <TabsContent value="inspection" className="space-y-4">
-            {isCreateMode ? (
-              <Card>
-                <CardContent className="py-8 text-center text-sm text-muted-foreground">
-                  {t('properties.pmsAfterCreate')}
-                </CardContent>
-              </Card>
-            ) : hotel ? (
-              <RoomInspectionPage hotelId={hotel.guid} />
-            ) : null}
-          </TabsContent>
-
           <TabsContent value="location" className="space-y-4">
             <Card>
               <CardHeader>
@@ -1161,24 +1148,14 @@ export default function HotelDetailsUpdate() {
                     }
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="latitude">{t('properties.latitude')}</Label>
-                  <Input
-                    id="latitude"
-                    value={form.latitude}
-                    onChange={(event) =>
-                      dispatch({ type: 'setField', key: 'latitude', value: event.target.value })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="longitude">{t('properties.longitude')}</Label>
-                  <Input
-                    id="longitude"
-                    value={form.longitude}
-                    onChange={(event) =>
-                      dispatch({ type: 'setField', key: 'longitude', value: event.target.value })
-                    }
+                <div className="space-y-2 md:col-span-2">
+                  <LocationPicker
+                    latitude={form.latitude}
+                    longitude={form.longitude}
+                    onChange={(lat, lng) => {
+                      dispatch({ type: 'setField', key: 'latitude', value: lat })
+                      dispatch({ type: 'setField', key: 'longitude', value: lng })
+                    }}
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">

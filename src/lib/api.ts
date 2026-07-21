@@ -82,7 +82,24 @@ api.interceptors.response.use(
 
 // ── PMS Calendar API ─────────────────────────────────────────────
 
-import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSProperty, PMSRate, PMSRoomType, PMSRoomCondition } from "@/types/pms"
+import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSProperty, PMSRate, PMSRoomType, PMSRoomCondition, PMSRoomAvailability } from "@/types/pms"
+
+export type PMSRoomUpdate = {
+  condition?: PMSRoomCondition
+  availability?: PMSRoomAvailability
+  room_number?: string
+  display_name?: string | null
+  floor?: number
+  area?: string | null
+  bedroom_count?: number
+  capacity?: number
+  meal_plan?: string
+  base_price?: string | null
+  currency?: string
+  is_active?: boolean
+  photos?: string[]
+  cover_photo_index?: number
+}
 
 async function adminAuthGet<T>(url: string, params?: Record<string, string | undefined>): Promise<T> {
   const cleanParams: Record<string, string> = {}
@@ -125,15 +142,29 @@ export function fetchPmsRooms(propertyId: string, roomTypeId?: number): Promise<
   })
 }
 
-export function updatePmsRoom(propertyId: string, roomId: number, data: { condition: PMSRoomCondition }): Promise<PMSRoom> {
+export function fetchPmsRoom(propertyId: string, roomId: number): Promise<PMSRoom> {
+  return adminAuthGet<PMSRoom>(`/admin-auth/hotels/${propertyId}/rooms/${roomId}/`)
+}
+
+export function updatePmsRoom(propertyId: string, roomId: number, data: PMSRoomUpdate): Promise<PMSRoom> {
   return adminAuthPatch<PMSRoom>(`/admin-auth/hotels/${propertyId}/rooms/${roomId}/`, data)
+}
+
+export async function uploadRoomImage(propertyId: string, roomId: number, file: File): Promise<{ image_url: string }> {
+  const formData = new FormData()
+  formData.append("image", file)
+  const response = await api.post<{ image_url: string }>(
+    `/admin-auth/hotels/${propertyId}/rooms/${roomId}/images/`,
+    formData,
+  )
+  return response.data
 }
 
 // ── Bookings ──────────────────────────────────────────────────────
 
 export function fetchPmsBookings(
   propertyId: string,
-  params?: { status?: string; from_date?: string; to_date?: string },
+  params?: { status?: string; from_date?: string; to_date?: string; room_id?: number },
 ): Promise<PMSBooking[]> {
   return adminAuthGet<PMSBooking[]>(
     `/admin-auth/hotels/${propertyId}/bookings/`,
