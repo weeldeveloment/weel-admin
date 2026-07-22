@@ -28,11 +28,7 @@ function isReadPayload(value: unknown): value is ReadPayload {
   return true
 }
 
-const WS_URL = import.meta.env.VITE_WS_URL
-
-if (!WS_URL) {
-  throw new Error('Missing required VITE_WS_URL environment variable.')
-}
+const WS_URL = import.meta.env.VITE_WS_URL || 'wss://dev.weel.uz'
 
 export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
   const wsRef = useRef<WebSocket | null>(null)

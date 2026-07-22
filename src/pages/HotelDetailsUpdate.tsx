@@ -600,7 +600,7 @@ export default function HotelDetailsUpdate() {
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">
       <div className="mb-4 flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/properties')}>
+        <Button variant="ghost" size="icon" onClick={() => navigate('/properties?tab=hotels')}>
           <ChevronLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-xl font-bold md:text-2xl">

@@ -1257,7 +1257,7 @@ export default function CottageDetailsUpdate() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate("/properties")}
+          onClick={() => navigate('/properties?tab=cottages')}
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>

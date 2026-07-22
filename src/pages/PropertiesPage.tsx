@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -82,7 +82,16 @@ const getNextPageFromUrl = (nextUrl: string | number | null): number | undefined
 export default function PropertiesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<PropertyTab>('cottages')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [activeTab, setActiveTab] = useState<PropertyTab>(
+    (searchParams.get('tab') as PropertyTab) || 'cottages'
+  )
+
+  const handleTabChange = (value: string) => {
+    const tab = value as PropertyTab
+    setActiveTab(tab)
+    setSearchParams({ tab }, { replace: true })
+  }
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [createType, setCreateType] = useState<PropertyTab>('cottages')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
@@ -182,7 +191,7 @@ export default function PropertiesPage() {
     <div className="flex h-full min-h-0 flex-col overflow-y-auto p-4 md:p-6">
       <Tabs
         value={activeTab}
-        onValueChange={(value) => setActiveTab(value as PropertyTab)}
+        onValueChange={handleTabChange}
         className="flex min-h-0 flex-col"
       >
         <TabsList>
