@@ -68,8 +68,8 @@ export default function Partner() {
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-foreground md:text-3xl">Partner Details</h1>
-            <p className="text-sm text-muted-foreground md:text-base">Partner ID: {partnerId}</p>
+            <h1 className="text-2xl font-bold text-foreground md:text-3xl">Owner Details</h1>
+            <p className="text-sm text-muted-foreground md:text-base">Owner ID: {partnerId}</p>
           </div>
         </div>
 
@@ -88,7 +88,7 @@ export default function Partner() {
         {!isLoading && !error && !partner && (
           <Card>
             <CardContent className="pt-6 text-sm text-muted-foreground">
-              Partner not found in /admin-auth/users/partners/ response.
+              Owner not found in admin user responses.
             </CardContent>
           </Card>
         )}
@@ -96,7 +96,7 @@ export default function Partner() {
         {!isLoading && !error && partner && (
           <Tabs defaultValue="details" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="details">Partner Details</TabsTrigger>
+              <TabsTrigger value="details">Owner Details</TabsTrigger>
               <TabsTrigger value="properties">Properties ({displayedPropertiesCount})</TabsTrigger>
             </TabsList>
 

@@ -31,7 +31,7 @@ import LocationPicker from '@/components/LocationPicker'
 type HotelForm = {
   title: string
   organization_id: string
-  partner_user_id: string
+  owner_user_id: string
   tenant_schema: string
   address: string
   city: string
@@ -91,7 +91,7 @@ function createInitialForm(item: PropertyItem | null): HotelForm {
     return {
       title: '',
       organization_id: '',
-      partner_user_id: '',
+      owner_user_id: '',
       tenant_schema: '',
       address: '',
       city: '',
@@ -129,7 +129,7 @@ function createInitialForm(item: PropertyItem | null): HotelForm {
   return {
     title: item.title ?? '',
     organization_id: item.organization?.id ? String(item.organization.id) : item.organization_id ? String(item.organization_id) : '',
-    partner_user_id: item.partner_user?.id ? String(item.partner_user.id) : '',
+    owner_user_id: item.owner_user?.id ? String(item.owner_user.id) : '',
     tenant_schema: item.organization?.schema_name ?? item.tenant_schema ?? '',
     address: item.address ?? String(detail.address ?? ''),
     city: item.city ?? '',
@@ -289,7 +289,7 @@ export default function HotelDetailsUpdate() {
 
   useEffect(() => {
     if (selectedPartner) {
-      dispatch({ type: 'setField', key: 'partner_user_id', value: String(selectedPartner.id) })
+      dispatch({ type: 'setField', key: 'owner_user_id', value: String(selectedPartner.id) })
     }
   }, [selectedPartner])
 
@@ -303,7 +303,7 @@ export default function HotelDetailsUpdate() {
       const payload = {
         title: form.title,
         organization_id: form.organization_id ? Number(form.organization_id) : null,
-        partner_user_id: form.partner_user_id ? Number(form.partner_user_id) : null,
+        owner_user_id: form.owner_user_id ? Number(form.owner_user_id) : null,
         tenant_schema: form.tenant_schema,
         address: form.address || null,
         city: form.city || null,
@@ -907,7 +907,7 @@ export default function HotelDetailsUpdate() {
                   </div>
                 ) : null}
 
-                {!isCreateMode && hotel?.partner_user ? (
+                {!isCreateMode && hotel?.owner_user ? (
                   <div className="rounded-lg border bg-muted/30 p-4">
                     <p className="mb-3 text-sm font-medium text-muted-foreground">
                       {t('properties.partnerInfo')}
@@ -915,17 +915,17 @@ export default function HotelDetailsUpdate() {
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div className="space-y-1 md:col-span-2">
                         <div className="flex items-center gap-3">
-                          {hotel.partner_user.avatar ? (
+                          {hotel.owner_user.avatar ? (
                             <img
-                              src={resolveImageUrl(hotel.partner_user.avatar)}
+                              src={resolveImageUrl(hotel.owner_user.avatar)}
                               alt=""
                               className="h-12 w-12 rounded-full object-cover"
                             />
                           ) : (
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-sm font-bold text-muted-foreground">
                               {(
-                                hotel.partner_user.first_name?.[0] ??
-                                hotel.partner_user.username?.[0] ??
+                                hotel.owner_user.first_name?.[0] ??
+                                hotel.owner_user.username?.[0] ??
                                 '?'
                               ).toUpperCase()}
                             </div>
@@ -933,25 +933,25 @@ export default function HotelDetailsUpdate() {
                           <div>
                             <p className="font-medium">
                               {[
-                                hotel.partner_user.first_name,
-                                hotel.partner_user.last_name,
+                                hotel.owner_user.first_name,
+                                hotel.owner_user.last_name,
                               ]
                                 .filter(Boolean)
                                 .join(' ') ||
-                                hotel.partner_user.username ||
+                                hotel.owner_user.username ||
                                 '-'}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {hotel.partner_user.username ? (
+                              {hotel.owner_user.username ? (
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    const partnerId = hotel.partner_user?.id
+                                    const partnerId = hotel.owner_user?.id
                                     if (partnerId) navigate(`/partner/${partnerId}`)
                                   }}
                                   className="text-xs text-primary hover:underline"
                                 >
-                                  @{hotel.partner_user.username}
+                                  @{hotel.owner_user.username}
                                 </button>
                               ) : (
                                 '-'
@@ -965,27 +965,27 @@ export default function HotelDetailsUpdate() {
                         <Label className="text-xs text-muted-foreground">
                           {t('properties.partnerId')}
                         </Label>
-                        <p className="text-sm font-medium">{hotel.partner_user.id}</p>
+                        <p className="text-sm font-medium">{hotel.owner_user.id}</p>
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs text-muted-foreground">
                           {t('properties.partnerRole')}
                         </Label>
                         <p className="text-sm font-medium">
-                          {hotel.partner_user.role ?? '-'}
+                          {hotel.owner_user.role ?? '-'}
                         </p>
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs text-muted-foreground">
                           {t('properties.partnerPhone')}
                         </Label>
-                        {hotel.partner_user.phone_number ? (
+                        {hotel.owner_user.phone_number ? (
                           <a
-                            href={getPhoneHref(hotel.partner_user.phone_number)}
+                            href={getPhoneHref(hotel.owner_user.phone_number)}
                             className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                           >
                             <Phone className="h-3.5 w-3.5" />
-                            {formatUzbekPhoneNumber(hotel.partner_user.phone_number)}
+                            {formatUzbekPhoneNumber(hotel.owner_user.phone_number)}
                           </a>
                         ) : (
                           <p className="text-sm font-medium">-</p>
@@ -996,20 +996,20 @@ export default function HotelDetailsUpdate() {
                           {t('properties.partnerEmail')}
                         </Label>
                         <p className="text-sm font-medium">
-                          {hotel.partner_user.email ?? '-'}
+                          {hotel.owner_user.email ?? '-'}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge
                           variant={
-                            hotel.partner_user.is_active ? 'default' : 'secondary'
+                            hotel.owner_user.is_active ? 'default' : 'secondary'
                           }
                         >
-                          {hotel.partner_user.is_active
+                          {hotel.owner_user.is_active
                             ? t('properties.partnerActive')
                             : t('properties.partnerInactive')}
                         </Badge>
-                        {hotel.partner_user.is_verified && (
+                        {hotel.owner_user.is_verified && (
                           <Badge variant="outline">
                             {t('properties.partnerVerified')}
                           </Badge>
@@ -1022,7 +1022,7 @@ export default function HotelDetailsUpdate() {
                 {isCreateMode ? (
                   <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
                     <p className="text-sm font-medium text-muted-foreground">
-                      Partner User
+                      Owner User
                     </p>
                     <div className="space-y-2">
                       <Input
@@ -1037,7 +1037,7 @@ export default function HotelDetailsUpdate() {
                         value={selectedPartnerId}
                         onValueChange={(value) => {
                           setSelectedPartnerId(value)
-                          dispatch({ type: 'setField', key: 'partner_user_id', value })
+                          dispatch({ type: 'setField', key: 'owner_user_id', value })
                         }}
                       >
                         <SelectTrigger>
@@ -1103,7 +1103,7 @@ export default function HotelDetailsUpdate() {
                       </div>
                     ) : null}
                   </div>
-                ) : !hotel?.partner_user ? (
+                ) : !hotel?.owner_user ? (
                   <p className="text-sm text-muted-foreground">{t('properties.noPartner')}</p>
                 ) : null}
               </CardContent>

@@ -189,6 +189,7 @@ export default function PropertiesTable({ partnerId, onCountChange }: Properties
                 <SelectItem value="all-types">All Types</SelectItem>
                 <SelectItem value="apartment">Apartment</SelectItem>
                 <SelectItem value="cottage">Cottage</SelectItem>
+                <SelectItem value="hotel">Hotel</SelectItem>
               </SelectContent>
             </Select>
             <div className="flex items-center rounded-md border self-start">
@@ -232,7 +233,7 @@ export default function PropertiesTable({ partnerId, onCountChange }: Properties
         {!isLoading && !isError && filteredProperties.length === 0 && (
           <CardContent className="pt-6 text-sm text-muted-foreground">
             {allProperties.length === 0 
-              ? 'This partner has no properties.' 
+              ? 'This owner has no properties.' 
               : 'No properties match the selected filters.'}
           </CardContent>
         )}

@@ -135,7 +135,7 @@ export default function UsersPage() {
                         <tr
                           key={user.id}
                           className="hover:bg-accent/40 transition-colors duration-150 group"
-                          onClick={() => type === 'partner' ? navigate(`/partner/${user.id}`) : null}
+                          onClick={() => type === 'client' ? null : navigate(`/partner/${user.id}`)}
                         >
                           <td className="px-4 md:px-6 py-3 md:py-4">
                             <div className="flex items-center gap-3">

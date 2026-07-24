@@ -70,13 +70,13 @@ const extractPartnersArray = (payload: unknown): unknown[] => {
   return []
 }
 
-export const fetchAllPartners = async (): Promise<PartnerDetails[]> => {
+const fetchUsers = async <T>(url: string): Promise<PartnerDetails[]> => {
   const pageSize = 100
   let page = 1
-  const allPartners: PartnerDetails[] = []
+  const users: PartnerDetails[] = []
 
   while (true) {
-    const response = await api.get<AdminPartnersResponse>('/admin-auth/users/partners/', {
+    const response = await api.get<T>(url, {
       params: { page, page_size: pageSize },
     })
 
@@ -84,13 +84,22 @@ export const fetchAllPartners = async (): Promise<PartnerDetails[]> => {
       .map(normalizePartner)
       .filter((partner): partner is PartnerDetails => partner !== null)
 
-    allPartners.push(...partners)
+    users.push(...partners)
 
     if (!isRecord(response.data) || !response.data.next) break
     page += 1
   }
 
-  return allPartners
+  return users
+}
+
+export const fetchAllPartners = async (): Promise<PartnerDetails[]> => {
+  const [partners, pmsUsers] = await Promise.all([
+    fetchUsers<AdminPartnersResponse>('/admin-auth/users/partners/'),
+    fetchUsers('/admin-auth/users/pms/'),
+  ])
+
+  return [...partners, ...pmsUsers]
 }
 
 export const fetchPartnerById = async (partnerId: string): Promise<PartnerDetails | null> => {
@@ -104,7 +113,7 @@ export interface PartnerProperty {
   price?: string | null
   currency?: string | null
   property_type?: string | null
-  type?: 'apartment' | 'cottage'
+  type?: 'apartment' | 'cottage' | 'hotel'
   status?: string
   img: string[]
   raw: Record<string, unknown>
@@ -181,7 +190,7 @@ const normalizeProperty = (value: PartnerPropertyPayload, type?: string): Partne
     price: extractPrice(value.price),
     currency: value.currency ?? null,
     property_type: extractPropertyType(value.property_type),
-    type: (type as 'apartment' | 'cottage') || undefined,
+    type: (type as 'apartment' | 'cottage' | 'hotel') || undefined,
     img: Array.isArray(value.img) ? value.img : [],
     status: value.status,
     raw: value,
@@ -195,7 +204,7 @@ const isPaginatedPropertiesResponse = (
 }
 
 export const fetchPartnerProperties = async (
-  partnerId: string,
+  ownerId: string,
   options?: {
     page?: number
     limit?: number
@@ -204,13 +213,13 @@ export const fetchPartnerProperties = async (
   }
 ): Promise<PartnerPropertiesResponse> => {
   const params: {
-    partner_id: string
+    owner_id: string
     limit: number
     page: number
     search?: string
     sort?: string
   } = {
-    partner_id: partnerId,
+    owner_id: ownerId,
     limit: options?.limit || 10,
     page: options?.page || 1,
   }

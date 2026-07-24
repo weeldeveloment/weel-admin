@@ -349,7 +349,7 @@ export interface PropertyItem {
     bank_account?: string | null
     vat_status?: string | null
   } | null
-  partner_user?: {
+  owner_user?: {
     id: number
     first_name?: string | null
     last_name?: string | null
