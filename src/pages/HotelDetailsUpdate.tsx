@@ -237,7 +237,6 @@ export default function HotelDetailsUpdate() {
   const partnersQuery = useQuery({
     queryKey: ['all-partners', 'hotel'],
     queryFn: fetchAllPartners,
-    enabled: isCreateMode,
   })
 
   const [partnerSearchTerm, setPartnerSearchTerm] = useState('')
@@ -292,6 +291,14 @@ export default function HotelDetailsUpdate() {
       dispatch({ type: 'setField', key: 'owner_user_id', value: String(selectedPartner.id) })
     }
   }, [selectedPartner])
+
+  useEffect(() => {
+    if (!hotel?.owner_user?.id) {
+      setSelectedPartnerId('')
+      return
+    }
+    setSelectedPartnerId(String(hotel.owner_user.id))
+  }, [hotel?.owner_user?.id])
 
   const selectedOrganization = useMemo(
     () => (organizationsQuery.data ?? []).find((item) => String(item.id) === form.organization_id) ?? null,
@@ -907,6 +914,90 @@ export default function HotelDetailsUpdate() {
                   </div>
                 ) : null}
 
+                <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Owner User
+                  </p>
+                  <div className="space-y-2">
+                    <Input
+                      value={partnerSearchTerm}
+                      onChange={(e) => setPartnerSearchTerm(e.target.value)}
+                      placeholder={
+                        t('properties.partnerSearchPlaceholder') ??
+                        'Search partner by name, username, phone...'
+                      }
+                    />
+                    <Select
+                      value={selectedPartnerId}
+                      onValueChange={(value) => {
+                        setSelectedPartnerId(value)
+                        dispatch({ type: 'setField', key: 'owner_user_id', value })
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            t('properties.selectPartner') ??
+                            'Select an existing partner'
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredPartnerOptions.map((partner) => {
+                          const name =
+                            partner.full_name ||
+                            [partner.first_name, partner.last_name]
+                              .filter(Boolean)
+                              .join(' ') ||
+                            partner.username ||
+                            String(partner.id)
+                          const phone = partner.phone_number
+                            ? ` • ${partner.phone_number}`
+                            : ''
+                          return (
+                            <SelectItem
+                              key={partner.id}
+                              value={String(partner.id)}
+                            >
+                              {`${name}${phone}`}
+                            </SelectItem>
+                          )
+                        })}
+                      </SelectContent>
+                    </Select>
+                    {!partnersQuery.isLoading && !partnersQuery.isError && filteredPartnerOptions.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        {t('properties.noPartnerMatches')}
+                      </p>
+                    ) : null}
+                    {partnersQuery.isLoading ? (
+                      <p className="text-xs text-muted-foreground">
+                        {t('common.loading')}
+                      </p>
+                    ) : null}
+                    {partnersQuery.isError ? (
+                      <p className="text-xs text-red-600">
+                        {t('properties.partnerLoadFailed') ?? 'Failed to load partners.'}
+                      </p>
+                    ) : null}
+                  </div>
+                  {selectedPartner ? (
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">
+                        {selectedPartner.full_name ||
+                          [selectedPartner.first_name, selectedPartner.last_name]
+                            .filter(Boolean)
+                            .join(' ') ||
+                          selectedPartner.username ||
+                          '-'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {selectedPartner.phone_number || '-'}
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+
                 {!isCreateMode && hotel?.owner_user ? (
                   <div className="rounded-lg border bg-muted/30 p-4">
                     <p className="mb-3 text-sm font-medium text-muted-foreground">
@@ -1019,91 +1110,7 @@ export default function HotelDetailsUpdate() {
                   </div>
                 ) : null}
 
-                {isCreateMode ? (
-                  <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Owner User
-                    </p>
-                    <div className="space-y-2">
-                      <Input
-                        value={partnerSearchTerm}
-                        onChange={(e) => setPartnerSearchTerm(e.target.value)}
-                        placeholder={
-                          t('properties.partnerSearchPlaceholder') ??
-                          'Search partner by name, username, phone...'
-                        }
-                      />
-                      <Select
-                        value={selectedPartnerId}
-                        onValueChange={(value) => {
-                          setSelectedPartnerId(value)
-                          dispatch({ type: 'setField', key: 'owner_user_id', value })
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue
-                            placeholder={
-                              t('properties.selectPartner') ??
-                              'Select an existing partner'
-                            }
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {filteredPartnerOptions.map((partner) => {
-                            const name =
-                              partner.full_name ||
-                              [partner.first_name, partner.last_name]
-                                .filter(Boolean)
-                                .join(' ') ||
-                              partner.username ||
-                              String(partner.id)
-                            const phone = partner.phone_number
-                              ? ` • ${partner.phone_number}`
-                              : ''
-                            return (
-                              <SelectItem
-                                key={partner.id}
-                                value={String(partner.id)}
-                              >
-                                {`${name}${phone}`}
-                              </SelectItem>
-                            )
-                          })}
-                        </SelectContent>
-                      </Select>
-                      {!partnersQuery.isLoading && !partnersQuery.isError && filteredPartnerOptions.length === 0 ? (
-                        <p className="text-xs text-muted-foreground">
-                          {t('properties.noPartnerMatches')}
-                        </p>
-                      ) : null}
-                      {partnersQuery.isLoading ? (
-                        <p className="text-xs text-muted-foreground">
-                          {t('common.loading')}
-                        </p>
-                      ) : null}
-                      {partnersQuery.isError ? (
-                        <p className="text-xs text-red-600">
-                          {t('properties.partnerLoadFailed') ?? 'Failed to load partners.'}
-                        </p>
-                      ) : null}
-                    </div>
-                    {selectedPartner ? (
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium">
-                          {selectedPartner.full_name ||
-                            [selectedPartner.first_name, selectedPartner.last_name]
-                              .filter(Boolean)
-                              .join(' ') ||
-                            selectedPartner.username ||
-                            '-'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {selectedPartner.phone_number || '-'}
-                        </p>
-                      </div>
-                    ) : null}
-                  </div>
-                ) : !hotel?.owner_user ? (
+                {!hotel?.owner_user && !selectedPartner ? (
                   <p className="text-sm text-muted-foreground">{t('properties.noPartner')}</p>
                 ) : null}
               </CardContent>
