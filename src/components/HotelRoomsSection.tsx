@@ -105,15 +105,20 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
       queryClient.setQueryData<PMSRoom[]>(["calendar", "rooms", propertyId ?? ""], (old) =>
         old?.map((r) => (r.id === updatedRoom.id ? { ...r, ...updatedRoom } : r)),
       )
-      setSelectedRoom((prev) => (prev ? { ...prev, ...updatedRoom } : prev))
     },
   })
+
+  const updateSelectedRoom = (data: PMSRoomUpdate) => {
+    if (!selectedRoom) return
+    setSelectedRoom((prev) => (prev ? { ...prev, ...data } : prev))
+    updateMutation.mutate(data)
+  }
 
   const imageUploadMutation = useMutation({
     mutationFn: (file: File) => uploadRoomImage(propertyId!, selectedRoom!.id, file),
     onSuccess: ({ image_url }) => {
       const updatedPhotos = [...(selectedRoom?.photos ?? []), image_url]
-      updateMutation.mutate({ photos: updatedPhotos })
+      updateSelectedRoom({ photos: updatedPhotos })
     },
   })
 
@@ -128,13 +133,11 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
   }
 
   const handleConditionChange = (condition: PMSRoomCondition) => {
-    if (!selectedRoom) return
-    updateMutation.mutate({ condition })
+    updateSelectedRoom({ condition })
   }
 
   const handleFieldChange = (field: string, value: unknown) => {
-    if (!selectedRoom) return
-    updateMutation.mutate({ [field]: value } as PMSRoomUpdate)
+    updateSelectedRoom({ [field]: value } as PMSRoomUpdate)
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,12 +152,11 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
     const updatedPhotos = selectedRoom.photos.filter((_photo: string, i: number) => i !== index)
     let coverIndex = selectedRoom.cover_photo_index ?? 0
     if (coverIndex >= updatedPhotos.length) coverIndex = 0
-    updateMutation.mutate({ photos: updatedPhotos, cover_photo_index: coverIndex })
+    updateSelectedRoom({ photos: updatedPhotos, cover_photo_index: coverIndex })
   }
 
   const handleSetCover = (index: number) => {
-    if (!selectedRoom) return
-    updateMutation.mutate({ cover_photo_index: index })
+    updateSelectedRoom({ cover_photo_index: index })
   }
 
   if (loading) {
