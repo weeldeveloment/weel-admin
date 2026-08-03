@@ -4,7 +4,7 @@ import { calendarKeys, useRoomsQuery, useRoomTypesQuery } from "@/hooks/useCalen
 import { createPmsRoom, fetchPmsBookings, updatePmsRoom, uploadRoomImage } from "@/lib/api"
 import type { PMSRoomCreate, PMSRoomUpdate } from "@/lib/api"
 import { resolveImageUrl } from "@/lib/utils"
-import type { PMSBooking, PMSRoom, PMSRoomCondition, PMSRoomType } from "@/types/pms"
+import type { PMSBooking, PMSRoom, PMSRoomBed, PMSRoomCondition, PMSRoomType } from "@/types/pms"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -66,6 +66,7 @@ const CONDITION_ICONS: Record<PMSRoomCondition, typeof CheckCircle2> = {
 
 const MEAL_PLANS = ["RO", "BB", "HB", "FB", "AI", "UAI"]
 const CURRENCIES = ["USD", "UZS"]
+const BED_TYPE_KEYS = ["single", "twin", "double", "king", "sofa", "bunk", "kids", "extra"] as const
 
 type SheetTab = "details" | "images" | "bookings"
 
@@ -76,6 +77,7 @@ type RoomCreateDraft = {
   floor: string
   area: string
   bedroom_count: string
+  beds: PMSRoomBed[]
   capacity: string
   meal_plan: string
   base_price: string
@@ -92,6 +94,7 @@ const createEmptyRoomDraft = (): RoomCreateDraft => ({
   floor: "1",
   area: "",
   bedroom_count: "1",
+  beds: [{ type: "", quantity: 1 }],
   capacity: "2",
   meal_plan: "BB",
   base_price: "",
@@ -115,6 +118,26 @@ function getApiErrorMessage(error: unknown, fallback: string): string {
   return fallback
 }
 
+function toRoomUpdate(room: PMSRoom): PMSRoomUpdate {
+  return {
+    condition: room.condition,
+    availability: room.availability,
+    room_number: room.room_number,
+    display_name: room.display_name,
+    floor: room.floor,
+    area: room.area,
+    bedroom_count: room.bedroom_count,
+    beds: room.beds,
+    capacity: room.capacity,
+    meal_plan: room.meal_plan,
+    base_price: room.base_price,
+    currency: room.currency,
+    is_active: room.is_active,
+    photos: room.photos,
+    cover_photo_index: room.cover_photo_index,
+  }
+}
+
 export default function HotelRoomsSection({ hotelId }: { hotelId: string | undefined }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -130,6 +153,7 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
   const [selectedRoom, setSelectedRoom] = useState<PMSRoom | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<SheetTab>("details")
+  const [showEditBedErrors, setShowEditBedErrors] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const roomTypeMap = useMemo(() => {
@@ -147,19 +171,18 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
   })
 
   const updateMutation = useMutation({
-    mutationFn: (data: PMSRoomUpdate) =>
-      updatePmsRoom(propertyId!, selectedRoom!.id, data),
+    mutationFn: () => updatePmsRoom(propertyId!, selectedRoom!.id, toRoomUpdate(selectedRoom!)),
     onSuccess: (updatedRoom) => {
       queryClient.setQueryData<PMSRoom[]>(calendarKeys.rooms(propertyId ?? ""), (old) =>
         old?.map((r) => (r.id === updatedRoom.id ? { ...r, ...updatedRoom } : r)),
       )
+      handleCloseSheet()
     },
   })
 
   const updateSelectedRoom = (data: PMSRoomUpdate) => {
     if (!selectedRoom) return
     setSelectedRoom((prev) => (prev ? { ...prev, ...data } : prev))
-    updateMutation.mutate(data)
   }
 
   const imageUploadMutation = useMutation({
@@ -171,13 +194,22 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
   })
 
   const handleOpenSheet = (room: PMSRoom) => {
-    setSelectedRoom(room)
+    setSelectedRoom({
+      ...room,
+      beds: room.beds?.length ? room.beds.map((bed) => ({ ...bed })) : [{ type: "", quantity: 1 }],
+      photos: [...room.photos],
+      amenities: [...room.amenities],
+    })
     setActiveTab("details")
+    setShowEditBedErrors(false)
+    updateMutation.reset()
   }
 
   const handleCloseSheet = () => {
     setSelectedRoom(null)
     setActiveTab("details")
+    setShowEditBedErrors(false)
+    updateMutation.reset()
   }
 
   const handleConditionChange = (condition: PMSRoomCondition) => {
@@ -205,6 +237,16 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
 
   const handleSetCover = (index: number) => {
     updateSelectedRoom({ cover_photo_index: index })
+  }
+
+  const handleSaveRoom = () => {
+    if (!selectedRoom) return
+    if (selectedRoom.beds.some((bed) => !bed.type)) {
+      setShowEditBedErrors(true)
+      setActiveTab("details")
+      return
+    }
+    updateMutation.mutate()
   }
 
   const handleRoomCreated = (room: PMSRoom) => {
@@ -306,6 +348,11 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
 
           {selectedRoom && (
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SheetTab)} className="mt-4">
+              {updateMutation.isError ? (
+                <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  {getApiErrorMessage(updateMutation.error, t("common.actionFailed"))}
+                </div>
+              ) : null}
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="details">{t("inspection.tabs.details")}</TabsTrigger>
                 <TabsTrigger value="images">{t("inspection.tabs.images")}</TabsTrigger>
@@ -396,6 +443,15 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
                     />
                   </div>
                 </div>
+
+                <BedConfigurationFields
+                  beds={selectedRoom.beds}
+                  showErrors={showEditBedErrors}
+                  onChange={(beds) => {
+                    setShowEditBedErrors(false)
+                    handleFieldChange("beds", beds)
+                  }}
+                />
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -574,9 +630,102 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
             <Button variant="outline" onClick={handleCloseSheet}>
               {t("inspection.dialog.cancel")}
             </Button>
+            <Button onClick={handleSaveRoom} disabled={updateMutation.isPending}>
+              {updateMutation.isPending
+                ? t("inspection.dialog.saving")
+                : t("inspection.dialog.save")}
+            </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
+    </div>
+  )
+}
+
+function BedConfigurationFields({
+  beds,
+  showErrors,
+  onChange,
+}: {
+  beds: PMSRoomBed[]
+  showErrors: boolean
+  onChange: (beds: PMSRoomBed[]) => void
+}) {
+  const { t } = useTranslation()
+
+  const updateBed = (index: number, update: Partial<PMSRoomBed>) => {
+    onChange(beds.map((bed, bedIndex) => (bedIndex === index ? { ...bed, ...update } : bed)))
+  }
+
+  const addBed = () => onChange([...beds, { type: "", quantity: 1 }])
+  const removeBed = (index: number) => {
+    if (beds.length === 1) return
+    onChange(beds.filter((_bed, bedIndex) => bedIndex !== index))
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label>{t("inspection.beds.title")}</Label>
+        <Button type="button" variant="outline" size="sm" className="gap-1" onClick={addBed}>
+          <Plus className="h-4 w-4" />
+          {t("inspection.beds.add")}
+        </Button>
+      </div>
+      <div className="space-y-2">
+        {beds.map((bed, index) => {
+          const hasError = showErrors && !bed.type
+          const quantityId = `bed-quantity-${index}`
+          return (
+            <div key={index} className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Select value={bed.type} onValueChange={(type) => updateBed(index, { type })}>
+                  <SelectTrigger
+                    className={cn("flex-1", hasError && "border-destructive ring-1 ring-destructive")}
+                    aria-label={t("inspection.beds.type")}
+                  >
+                    <SelectValue placeholder={t("inspection.beds.type")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BED_TYPE_KEYS.map((key) => {
+                      const label = t(`inspection.bedTypes.${key}`)
+                      return <SelectItem key={key} value={label}>{label}</SelectItem>
+                    })}
+                  </SelectContent>
+                </Select>
+                <Label htmlFor={quantityId} className="sr-only">
+                  {t("inspection.beds.quantity")}
+                </Label>
+                <Input
+                  id={quantityId}
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={bed.quantity}
+                  onChange={(event) => updateBed(index, {
+                    quantity: Math.max(1, Number.parseInt(event.target.value, 10) || 1),
+                  })}
+                  className="w-20"
+                  aria-label={t("inspection.beds.quantity")}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeBed(index)}
+                  disabled={beds.length === 1}
+                  aria-label={t("inspection.beds.remove")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              {hasError ? (
+                <p className="pl-1 text-xs text-destructive">{t("inspection.beds.required")}</p>
+              ) : null}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -596,6 +745,7 @@ function RoomCreateSheet({
 }) {
   const { t } = useTranslation()
   const [draft, setDraft] = useState<RoomCreateDraft>(createEmptyRoomDraft)
+  const [showBedErrors, setShowBedErrors] = useState(false)
 
   const createMutation = useMutation({
     mutationFn: (data: PMSRoomCreate) => createPmsRoom(propertyId, data),
@@ -612,6 +762,7 @@ function RoomCreateSheet({
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
       setDraft(createEmptyRoomDraft())
+      setShowBedErrors(false)
       createMutation.reset()
     }
     onOpenChange(nextOpen)
@@ -619,6 +770,10 @@ function RoomCreateSheet({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (draft.beds.some((bed) => !bed.type)) {
+      setShowBedErrors(true)
+      return
+    }
     createMutation.mutate({
       room_type_id: Number(draft.room_type_id),
       room_number: draft.room_number.trim(),
@@ -626,6 +781,7 @@ function RoomCreateSheet({
       floor: Number(draft.floor),
       area: draft.area || null,
       bedroom_count: Number(draft.bedroom_count),
+      beds: draft.beds,
       capacity: Number(draft.capacity),
       meal_plan: draft.meal_plan,
       base_price: draft.base_price || null,
@@ -747,6 +903,15 @@ function RoomCreateSheet({
               />
             </div>
           </div>
+
+          <BedConfigurationFields
+            beds={draft.beds}
+            showErrors={showBedErrors}
+            onChange={(beds) => {
+              setShowBedErrors(false)
+              updateDraft("beds", beds)
+            }}
+          />
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">

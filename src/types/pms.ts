@@ -32,6 +32,11 @@ export interface PMSRoomType {
   is_active: boolean
 }
 
+export interface PMSRoomBed {
+  type: string
+  quantity: number
+}
+
 export interface PMSRoom {
   id: number
   property_id: number
@@ -42,6 +47,7 @@ export interface PMSRoom {
   floor: number
   area: string | null
   bedroom_count: number
+  beds: PMSRoomBed[]
   capacity: number
   amenities: string[]
   photos: string[]

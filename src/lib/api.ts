@@ -82,7 +82,7 @@ api.interceptors.response.use(
 
 // ── PMS Calendar API ─────────────────────────────────────────────
 
-import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSProperty, PMSRate, PMSRoomType, PMSRoomCondition, PMSRoomAvailability } from "@/types/pms"
+import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSRoomBed, PMSProperty, PMSRate, PMSRoomType, PMSRoomCondition, PMSRoomAvailability } from "@/types/pms"
 
 export type PMSRoomUpdate = {
   condition?: PMSRoomCondition
@@ -92,6 +92,7 @@ export type PMSRoomUpdate = {
   floor?: number
   area?: string | null
   bedroom_count?: number
+  beds?: PMSRoomBed[]
   capacity?: number
   meal_plan?: string
   base_price?: string | null
@@ -108,6 +109,7 @@ export type PMSRoomCreate = {
   floor: number
   area: string | null
   bedroom_count: number
+  beds: PMSRoomBed[]
   capacity: number
   meal_plan: string
   base_price: string | null
