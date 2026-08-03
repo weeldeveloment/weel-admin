@@ -1,8 +1,8 @@
-import { useMemo, useRef, useState } from "react"
+import { useMemo, useRef, useState, type FormEvent } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useRoomsQuery, useRoomTypesQuery } from "@/hooks/useCalendarQueries"
-import { fetchPmsBookings, updatePmsRoom, uploadRoomImage } from "@/lib/api"
-import type { PMSRoomUpdate } from "@/lib/api"
+import { calendarKeys, useRoomsQuery, useRoomTypesQuery } from "@/hooks/useCalendarQueries"
+import { createPmsRoom, fetchPmsBookings, updatePmsRoom, uploadRoomImage } from "@/lib/api"
+import type { PMSRoomCreate, PMSRoomUpdate } from "@/lib/api"
 import { resolveImageUrl } from "@/lib/utils"
 import type { PMSBooking, PMSRoom, PMSRoomCondition, PMSRoomType } from "@/types/pms"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -37,6 +37,7 @@ import {
   Wrench,
   Star,
   ImagePlus,
+  Plus,
   Trash2,
 } from "lucide-react"
 
@@ -68,6 +69,52 @@ const CURRENCIES = ["USD", "UZS"]
 
 type SheetTab = "details" | "images" | "bookings"
 
+type RoomCreateDraft = {
+  room_type_id: string
+  room_number: string
+  display_name: string
+  floor: string
+  area: string
+  bedroom_count: string
+  capacity: string
+  meal_plan: string
+  base_price: string
+  currency: string
+  condition: PMSRoomCondition
+  availability: PMSRoomCreate["availability"]
+  is_active: boolean
+}
+
+const createEmptyRoomDraft = (): RoomCreateDraft => ({
+  room_type_id: "",
+  room_number: "",
+  display_name: "",
+  floor: "1",
+  area: "",
+  bedroom_count: "1",
+  capacity: "2",
+  meal_plan: "BB",
+  base_price: "",
+  currency: "UZS",
+  condition: "clean",
+  availability: "available",
+  is_active: true,
+})
+
+function getApiErrorMessage(error: unknown, fallback: string): string {
+  const data = (error as { response?: { data?: unknown } }).response?.data
+  if (!data || typeof data !== "object") return fallback
+
+  const record = data as Record<string, unknown>
+  if (typeof record.detail === "string") return record.detail
+
+  for (const value of Object.values(record)) {
+    if (typeof value === "string") return value
+    if (Array.isArray(value) && typeof value[0] === "string") return value[0]
+  }
+  return fallback
+}
+
 export default function HotelRoomsSection({ hotelId }: { hotelId: string | undefined }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -81,6 +128,7 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
   const loading = roomsQuery.isLoading || roomTypesQuery.isLoading
 
   const [selectedRoom, setSelectedRoom] = useState<PMSRoom | null>(null)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<SheetTab>("details")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -102,7 +150,7 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
     mutationFn: (data: PMSRoomUpdate) =>
       updatePmsRoom(propertyId!, selectedRoom!.id, data),
     onSuccess: (updatedRoom) => {
-      queryClient.setQueryData<PMSRoom[]>(["calendar", "rooms", propertyId ?? ""], (old) =>
+      queryClient.setQueryData<PMSRoom[]>(calendarKeys.rooms(propertyId ?? ""), (old) =>
         old?.map((r) => (r.id === updatedRoom.id ? { ...r, ...updatedRoom } : r)),
       )
     },
@@ -159,6 +207,18 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
     updateSelectedRoom({ cover_photo_index: index })
   }
 
+  const handleRoomCreated = (room: PMSRoom) => {
+    queryClient.setQueryData<PMSRoom[]>(calendarKeys.rooms(propertyId ?? ""), (old) => {
+      if (!old) return [room]
+      if (old.some((existingRoom) => existingRoom.id === room.id)) return old
+      return [...old, room]
+    })
+    void queryClient.invalidateQueries({ queryKey: calendarKeys.rooms(propertyId ?? "") })
+    setIsCreateOpen(false)
+    setSelectedRoom(room)
+    setActiveTab("images")
+  }
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -184,6 +244,20 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
         <p className="text-sm text-muted-foreground">
           {rooms.length} {t("properties.rooms")}
         </p>
+        <div className="flex items-center gap-3">
+          {roomTypes.length === 0 ? (
+            <span className="text-xs text-muted-foreground">{t("inspection.create.noRoomTypes")}</span>
+          ) : null}
+          <Button
+            type="button"
+            className="gap-2"
+            onClick={() => setIsCreateOpen(true)}
+            disabled={roomTypes.length === 0}
+          >
+            <Plus className="h-4 w-4" />
+            {t("inspection.create.action")}
+          </Button>
+        </div>
       </div>
 
       {rooms.length === 0 ? (
@@ -204,6 +278,14 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
           ))}
         </div>
       )}
+
+      <RoomCreateSheet
+        open={isCreateOpen}
+        propertyId={propertyId}
+        roomTypes={roomTypes}
+        onOpenChange={setIsCreateOpen}
+        onCreated={handleRoomCreated}
+      />
 
       <Sheet open={!!selectedRoom} onOpenChange={(open) => { if (!open) handleCloseSheet() }}>
         <SheetContent className="sm:max-w-xl overflow-y-auto">
@@ -496,6 +578,278 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
         </SheetContent>
       </Sheet>
     </div>
+  )
+}
+
+function RoomCreateSheet({
+  open,
+  propertyId,
+  roomTypes,
+  onOpenChange,
+  onCreated,
+}: {
+  open: boolean
+  propertyId: string
+  roomTypes: PMSRoomType[]
+  onOpenChange: (open: boolean) => void
+  onCreated: (room: PMSRoom) => void
+}) {
+  const { t } = useTranslation()
+  const [draft, setDraft] = useState<RoomCreateDraft>(createEmptyRoomDraft)
+
+  const createMutation = useMutation({
+    mutationFn: (data: PMSRoomCreate) => createPmsRoom(propertyId, data),
+    onSuccess: (room) => {
+      setDraft(createEmptyRoomDraft())
+      onCreated(room)
+    },
+  })
+
+  const updateDraft = <K extends keyof RoomCreateDraft>(key: K, value: RoomCreateDraft[K]) => {
+    setDraft((current) => ({ ...current, [key]: value }))
+  }
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setDraft(createEmptyRoomDraft())
+      createMutation.reset()
+    }
+    onOpenChange(nextOpen)
+  }
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    createMutation.mutate({
+      room_type_id: Number(draft.room_type_id),
+      room_number: draft.room_number.trim(),
+      display_name: draft.display_name.trim() || null,
+      floor: Number(draft.floor),
+      area: draft.area || null,
+      bedroom_count: Number(draft.bedroom_count),
+      capacity: Number(draft.capacity),
+      meal_plan: draft.meal_plan,
+      base_price: draft.base_price || null,
+      currency: draft.currency,
+      condition: draft.condition,
+      availability: draft.availability,
+      is_active: draft.is_active,
+    })
+  }
+
+  const errorMessage = createMutation.isError
+    ? getApiErrorMessage(createMutation.error, t("common.actionFailed"))
+    : null
+
+  return (
+    <Sheet open={open} onOpenChange={handleOpenChange}>
+      <SheetContent className="sm:max-w-xl overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>{t("inspection.create.title")}</SheetTitle>
+          <SheetDescription>{t("inspection.create.description")}</SheetDescription>
+        </SheetHeader>
+
+        <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
+          {errorMessage ? (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          ) : null}
+
+          <div className="space-y-2">
+            <Label htmlFor="create-room-type">{t("inspection.form.roomType")}</Label>
+            <Select
+              value={draft.room_type_id}
+              onValueChange={(value) => updateDraft("room_type_id", value)}
+              required
+            >
+              <SelectTrigger id="create-room-type">
+                <SelectValue placeholder={t("inspection.create.selectRoomType")} />
+              </SelectTrigger>
+              <SelectContent>
+                {roomTypes.map((roomType) => (
+                  <SelectItem key={roomType.id} value={String(roomType.id)}>
+                    {roomType.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-room-number">{t("inspection.form.roomNumber")}</Label>
+              <Input
+                id="create-room-number"
+                value={draft.room_number}
+                onChange={(event) => updateDraft("room_number", event.target.value)}
+                maxLength={20}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-display-name">{t("inspection.form.displayName")}</Label>
+              <Input
+                id="create-display-name"
+                value={draft.display_name}
+                onChange={(event) => updateDraft("display_name", event.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-floor">{t("inspection.card.floor")}</Label>
+              <Input
+                id="create-floor"
+                type="number"
+                step="1"
+                value={draft.floor}
+                onChange={(event) => updateDraft("floor", event.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-area">{t("inspection.form.area")}</Label>
+              <Input
+                id="create-area"
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={draft.area}
+                onChange={(event) => updateDraft("area", event.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-bedrooms">{t("inspection.form.bedrooms")}</Label>
+              <Input
+                id="create-bedrooms"
+                type="number"
+                min="0"
+                step="1"
+                value={draft.bedroom_count}
+                onChange={(event) => updateDraft("bedroom_count", event.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-capacity">{t("inspection.form.capacity")}</Label>
+              <Input
+                id="create-capacity"
+                type="number"
+                min="1"
+                step="1"
+                value={draft.capacity}
+                onChange={(event) => updateDraft("capacity", event.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-condition">{t("inspection.dialog.condition")}</Label>
+              <Select
+                value={draft.condition}
+                onValueChange={(value) => updateDraft("condition", value as PMSRoomCondition)}
+              >
+                <SelectTrigger id="create-condition"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {ALL_CONDITIONS.map((condition) => (
+                    <SelectItem key={condition} value={condition}>
+                      {t(`inspection.condition.${condition}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-availability">{t("inspection.form.availability")}</Label>
+              <Select
+                value={draft.availability}
+                onValueChange={(value) => updateDraft(
+                  "availability",
+                  value as PMSRoomCreate["availability"],
+                )}
+              >
+                <SelectTrigger id="create-availability"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {(["available", "occupied", "blocked"] as const).map((availability) => (
+                    <SelectItem key={availability} value={availability}>
+                      {t(`inspection.availability.${availability}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-meal-plan">{t("inspection.form.mealPlan")}</Label>
+              <Select value={draft.meal_plan} onValueChange={(value) => updateDraft("meal_plan", value)}>
+                <SelectTrigger id="create-meal-plan"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {MEAL_PLANS.map((mealPlan) => (
+                    <SelectItem key={mealPlan} value={mealPlan}>{mealPlan}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-base-price">{t("inspection.form.basePrice")}</Label>
+              <Input
+                id="create-base-price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={draft.base_price}
+                onChange={(event) => updateDraft("base_price", event.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-currency">{t("inspection.form.currency")}</Label>
+              <Select value={draft.currency} onValueChange={(value) => updateDraft("currency", value)}>
+                <SelectTrigger id="create-currency"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((currency) => (
+                    <SelectItem key={currency} value={currency}>{currency}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end pb-2">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="create-is-active"
+                  checked={draft.is_active}
+                  onCheckedChange={(checked) => updateDraft("is_active", checked === true)}
+                />
+                <Label htmlFor="create-is-active" className="cursor-pointer">
+                  {t("inspection.form.active")}
+                </Label>
+              </div>
+            </div>
+          </div>
+
+          <SheetFooter>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+              {t("inspection.dialog.cancel")}
+            </Button>
+            <Button type="submit" disabled={createMutation.isPending}>
+              {createMutation.isPending
+                ? t("inspection.create.creating")
+                : t("inspection.create.submit")}
+            </Button>
+          </SheetFooter>
+        </form>
+      </SheetContent>
+    </Sheet>
   )
 }
 

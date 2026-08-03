@@ -101,6 +101,22 @@ export type PMSRoomUpdate = {
   cover_photo_index?: number
 }
 
+export type PMSRoomCreate = {
+  room_type_id: number
+  room_number: string
+  display_name: string | null
+  floor: number
+  area: string | null
+  bedroom_count: number
+  capacity: number
+  meal_plan: string
+  base_price: string | null
+  currency: string
+  condition: PMSRoomCondition
+  availability: Exclude<PMSRoomAvailability, "held">
+  is_active: boolean
+}
+
 async function adminAuthGet<T>(url: string, params?: Record<string, string | undefined>): Promise<T> {
   const cleanParams: Record<string, string> = {}
   if (params) {
@@ -140,6 +156,10 @@ export function fetchPmsRooms(propertyId: string, roomTypeId?: number): Promise<
   return adminAuthGet<PMSRoom[]>(`/admin-auth/hotels/${propertyId}/rooms/`, {
     room_type_id: roomTypeId?.toString(),
   })
+}
+
+export function createPmsRoom(propertyId: string, data: PMSRoomCreate): Promise<PMSRoom> {
+  return adminAuthPost<PMSRoom>(`/admin-auth/hotels/${propertyId}/rooms/`, data)
 }
 
 export function fetchPmsRoom(propertyId: string, roomId: number): Promise<PMSRoom> {
