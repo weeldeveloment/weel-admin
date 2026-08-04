@@ -148,8 +148,23 @@ export function fetchPmsProperties(): Promise<PMSProperty[]> {
 
 // ── Room Types ────────────────────────────────────────────────────
 
+export type PMSRoomTypeCreate = {
+  preset?: string | null
+  custom_name?: string | null
+  name: string
+  description?: string | null
+  base_rate?: string | number | null
+  capacity?: number
+  amenities?: string[]
+  photos?: string[]
+}
+
 export function fetchPmsRoomTypes(propertyId: string): Promise<PMSRoomType[]> {
   return adminAuthGet<PMSRoomType[]>(`/admin-auth/hotels/${propertyId}/room-types/`)
+}
+
+export function createPmsRoomType(propertyId: string, data: PMSRoomTypeCreate): Promise<PMSRoomType> {
+  return adminAuthPost<PMSRoomType>(`/admin-auth/hotels/${propertyId}/room-types/`, data)
 }
 
 // ── Rooms ─────────────────────────────────────────────────────────

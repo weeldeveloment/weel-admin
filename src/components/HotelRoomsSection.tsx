@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, type FormEvent } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { calendarKeys, useRoomsQuery, useRoomTypesQuery } from "@/hooks/useCalendarQueries"
-import { createPmsRoom, fetchPmsBookings, updatePmsRoom, uploadRoomImage } from "@/lib/api"
+import { createPmsRoom, fetchPmsBookings, updatePmsRoom, uploadRoomImage, createPmsRoomType, type PMSRoomTypeCreate } from "@/lib/api"
 import type { PMSRoomCreate, PMSRoomUpdate } from "@/lib/api"
 import { resolveImageUrl } from "@/lib/utils"
 import type { PMSBooking, PMSRoom, PMSRoomBed, PMSRoomCondition, PMSRoomType } from "@/types/pms"
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -67,6 +68,17 @@ const CONDITION_ICONS: Record<PMSRoomCondition, typeof CheckCircle2> = {
 const MEAL_PLANS = ["RO", "BB", "HB", "FB", "AI", "UAI"]
 const CURRENCIES = ["USD", "UZS"]
 const BED_TYPE_KEYS = ["single", "twin", "double", "king", "sofa", "bunk", "kids", "extra"] as const
+const ROOM_TYPE_PRESETS = [
+  "standard",
+  "superior",
+  "deluxe",
+  "suite",
+  "studio",
+  "apartment",
+  "family",
+  "dormitory",
+  "custom",
+] as const
 
 type SheetTab = "details" | "images" | "bookings"
 
@@ -152,6 +164,7 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
 
   const [selectedRoom, setSelectedRoom] = useState<PMSRoom | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [isRoomTypeCreateOpen, setIsRoomTypeCreateOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<SheetTab>("details")
   const [showEditBedErrors, setShowEditBedErrors] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -292,6 +305,15 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
           ) : null}
           <Button
             type="button"
+            variant="outline"
+            className="gap-2"
+            onClick={() => setIsRoomTypeCreateOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            {t("inspection.roomType.action")}
+          </Button>
+          <Button
+            type="button"
             className="gap-2"
             onClick={() => setIsCreateOpen(true)}
             disabled={roomTypes.length === 0}
@@ -327,6 +349,16 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
         roomTypes={roomTypes}
         onOpenChange={setIsCreateOpen}
         onCreated={handleRoomCreated}
+      />
+
+      <RoomTypeCreateSheet
+        open={isRoomTypeCreateOpen}
+        propertyId={propertyId}
+        onOpenChange={setIsRoomTypeCreateOpen}
+        onCreated={() => {
+          void queryClient.invalidateQueries({ queryKey: calendarKeys.roomTypes(propertyId) })
+          setIsRoomTypeCreateOpen(false)
+        }}
       />
 
       <Sheet open={!!selectedRoom} onOpenChange={(open) => { if (!open) handleCloseSheet() }}>
@@ -1010,6 +1042,154 @@ function RoomCreateSheet({
               {createMutation.isPending
                 ? t("inspection.create.creating")
                 : t("inspection.create.submit")}
+            </Button>
+          </SheetFooter>
+        </form>
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+function RoomTypeCreateSheet({
+  open,
+  propertyId,
+  onOpenChange,
+  onCreated,
+}: {
+  open: boolean
+  propertyId: string
+  onOpenChange: (open: boolean) => void
+  onCreated: () => void
+}) {
+  const { t } = useTranslation()
+  const [name, setName] = useState("")
+  const [preset, setPreset] = useState<string>("")
+  const [capacity, setCapacity] = useState("2")
+  const [baseRate, setBaseRate] = useState("")
+  const [description, setDescription] = useState("")
+
+  const createMutation = useMutation({
+    mutationFn: (data: PMSRoomTypeCreate) => createPmsRoomType(propertyId, data),
+    onSuccess: () => {
+      setName("")
+      setPreset("")
+      setCapacity("2")
+      setBaseRate("")
+      setDescription("")
+      onCreated()
+    },
+  })
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setName("")
+      setPreset("")
+      setCapacity("2")
+      setBaseRate("")
+      setDescription("")
+      createMutation.reset()
+    }
+    onOpenChange(nextOpen)
+  }
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    createMutation.mutate({
+      name: name.trim(),
+      preset: preset || null,
+      capacity: Number(capacity),
+      base_rate: baseRate.trim() ? baseRate.trim() : null,
+      description: description.trim() || null,
+    })
+  }
+
+  const errorMessage = createMutation.isError
+    ? getApiErrorMessage(createMutation.error, t("common.actionFailed"))
+    : null
+
+  return (
+    <Sheet open={open} onOpenChange={handleOpenChange}>
+      <SheetContent className="sm:max-w-lg overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>{t("inspection.roomType.title")}</SheetTitle>
+          <SheetDescription>{t("inspection.roomType.subtitle")}</SheetDescription>
+        </SheetHeader>
+
+        <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
+          {errorMessage ? (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          ) : null}
+
+          <div className="space-y-2">
+            <Label htmlFor="create-room-type-name">{t("inspection.roomType.name")}</Label>
+            <Input
+              id="create-room-type-name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              maxLength={100}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="create-room-type-preset">{t("inspection.roomType.preset")}</Label>
+              <Select value={preset} onValueChange={setPreset}>
+                <SelectTrigger id="create-room-type-preset">
+                  <SelectValue placeholder="—" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROOM_TYPE_PRESETS.map((p) => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="create-room-type-capacity">{t("inspection.roomType.capacity")}</Label>
+              <Input
+                id="create-room-type-capacity"
+                type="number"
+                min="1"
+                step="1"
+                value={capacity}
+                onChange={(event) => setCapacity(event.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="create-room-type-base-rate">{t("inspection.roomType.baseRate")}</Label>
+            <Input
+              id="create-room-type-base-rate"
+              type="number"
+              min="0"
+              step="0.01"
+              value={baseRate}
+              onChange={(event) => setBaseRate(event.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="create-room-type-description">{t("inspection.roomType.description")}</Label>
+            <Textarea
+              id="create-room-type-description"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </div>
+
+          <SheetFooter>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+              {t("inspection.dialog.cancel")}
+            </Button>
+            <Button type="submit" disabled={createMutation.isPending}>
+              {createMutation.isPending
+                ? t("inspection.roomType.creating")
+                : t("inspection.roomType.submit")}
             </Button>
           </SheetFooter>
         </form>
