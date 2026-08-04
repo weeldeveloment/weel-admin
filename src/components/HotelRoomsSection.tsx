@@ -206,6 +206,22 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
     },
   })
 
+  const autoCreateRoomTypeMutation = useMutation({
+    mutationFn: () => createPmsRoomType(propertyId!, { name: "Standard" }),
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: calendarKeys.roomTypes(propertyId ?? "") })
+      setIsCreateOpen(true)
+    },
+  })
+
+  const handleAddRoom = () => {
+    if (roomTypes.length === 0) {
+      autoCreateRoomTypeMutation.mutate()
+    } else {
+      setIsCreateOpen(true)
+    }
+  }
+
   const handleOpenSheet = (room: PMSRoom) => {
     setSelectedRoom({
       ...room,
@@ -300,9 +316,6 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
           {rooms.length} {t("properties.rooms")}
         </p>
         <div className="flex items-center gap-3">
-          {roomTypes.length === 0 ? (
-            <span className="text-xs text-muted-foreground">{t("inspection.create.noRoomTypes")}</span>
-          ) : null}
           <Button
             type="button"
             variant="outline"
@@ -315,11 +328,13 @@ export default function HotelRoomsSection({ hotelId }: { hotelId: string | undef
           <Button
             type="button"
             className="gap-2"
-            onClick={() => setIsCreateOpen(true)}
-            disabled={roomTypes.length === 0}
+            onClick={handleAddRoom}
+            disabled={autoCreateRoomTypeMutation.isPending}
           >
             <Plus className="h-4 w-4" />
-            {t("inspection.create.action")}
+            {autoCreateRoomTypeMutation.isPending
+              ? t("inspection.roomType.creating")
+              : t("inspection.create.action")}
           </Button>
         </div>
       </div>
