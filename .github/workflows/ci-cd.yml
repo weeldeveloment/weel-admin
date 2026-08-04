@@ -92,6 +92,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Make GHCR package public
+        run: |
+          PKG="weel-admin"
+          response=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X PATCH "https://api.github.com/orgs/weeldeveloment/packages/container/${PKG}" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"visibility":"public"}')
+          echo "Set visibility response: HTTP ${response}"
+          if [ "${response}" != "200" ]; then
+            echo "::warning::Could not make package public (HTTP ${response}). You may need to set GHCR credentials in Dokploy."
+          fi
+
       - name: Trigger Dokploy Deployment
         env:
           DOKPLOY_WEBHOOK_URL: ${{ secrets.DOKPLOY_WEBHOOK_URL }}
