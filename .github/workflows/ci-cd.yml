@@ -95,15 +95,26 @@ jobs:
       - name: Make GHCR package public
         run: |
           PKG="weel-admin"
-          response=$(curl -sS -o /dev/null -w "%{http_code}" \
+          echo "== Debug: list packages visible to GITHUB_TOKEN =="
+          curl -sS "https://api.github.com/user/packages?package_type=container" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" | head -c 2000
+          echo ""
+          echo "== Try org endpoint =="
+          curl -sS -o /tmp/resp.json -w "HTTP %{http_code}\n" \
             -X PATCH "https://api.github.com/orgs/weeldeveloment/packages/container/${PKG}" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            -d '{"visibility":"public"}')
-          echo "Set visibility response: HTTP ${response}"
-          if [ "${response}" != "200" ]; then
-            echo "::warning::Could not make package public (HTTP ${response}). You may need to set GHCR credentials in Dokploy."
-          fi
+            -d '{"visibility":"public"}'
+          cat /tmp/resp.json
+          echo ""
+          echo "== Try repo endpoint =="
+          curl -sS -o /tmp/resp2.json -w "HTTP %{http_code}\n" \
+            -X PATCH "https://api.github.com/repos/weeldeveloment/weel-admin/packages/container/${PKG}" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"visibility":"public"}'
+          cat /tmp/resp2.json
 
       - name: Trigger Dokploy Deployment
         env:
