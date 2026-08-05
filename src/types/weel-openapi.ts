@@ -1766,6 +1766,8 @@ export interface AdminStory {
   property_img?: string;
   /** Partner user id */
   partner_user_id?: number | null;
+  /** Partner name */
+  partner_name?: string | null;
   /** Is verified */
   is_verified: boolean;
   /** Verified by user id */

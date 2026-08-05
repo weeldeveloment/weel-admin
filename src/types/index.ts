@@ -163,6 +163,7 @@ export interface AdminStory {
   property_kind: string | null
   property_img: string | null
   partner_user_id: number | null
+  partner_name?: string | null
   is_verified: boolean
   verified_by_user_id: number | null
   verified_at: string | null

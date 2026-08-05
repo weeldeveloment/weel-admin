@@ -23,6 +23,14 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import HotelPmsSection from '@/components/HotelPmsSection'
 import HotelRoomsSection from '@/components/HotelRoomsSection'
@@ -399,6 +407,14 @@ export default function HotelDetailsUpdate() {
       navigate('/properties')
     },
   })
+
+  // Deleting a hotel is a one-click, irreversible-in-the-UI action with no
+  // active-booking guard on the backend — Cottage/Apartment already require
+  // typing the name to confirm, this brings Hotel in line with that.
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
+  const deleteTitleToMatch = (hotel?.title ?? '').trim()
+  const deleteIsConfirmed = deleteConfirmText.trim() === deleteTitleToMatch
 
   const currentImageCount = isCreateMode
     ? pendingCreateImages.length
@@ -1441,7 +1457,7 @@ export default function HotelDetailsUpdate() {
             <Button
               type="button"
               variant="destructive"
-              onClick={() => void deleteMutation.mutateAsync()}
+              onClick={() => setDeleteDialogOpen(true)}
               disabled={deleteMutation.isPending}
             >
               <Trash2 className="h-4 w-4" />
@@ -1454,6 +1470,57 @@ export default function HotelDetailsUpdate() {
           </Button>
         </div>
       </form>
+
+      {!isCreateMode ? (
+        <Dialog
+          open={deleteDialogOpen}
+          onOpenChange={(open) => {
+            setDeleteDialogOpen(open)
+            if (!open) setDeleteConfirmText('')
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete hotel</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete "{hotel?.title ?? ''}"? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2">
+              <Label htmlFor="delete-hotel-confirm-input">
+                Type the hotel name to confirm
+              </Label>
+              <Input
+                id="delete-hotel-confirm-input"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="Hotel name"
+                autoComplete="off"
+              />
+              <p className="text-sm text-muted-foreground">
+                To confirm, type "{hotel?.title ?? ''}" exactly.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteDialogOpen(false)}
+                disabled={deleteMutation.isPending}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending || !deleteIsConfirmed}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      ) : null}
     </div>
   )
 }

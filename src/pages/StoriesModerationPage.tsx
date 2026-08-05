@@ -308,7 +308,7 @@ export default function StoriesModerationPage() {
                           {t('stories.expires')}: {formatDate(story.expires_at)}
                         </p>
                         <p>
-                          {t('stories.partner')}: #{story.partner_user_id ?? '-'}
+                          {t('stories.partner')}: {story.partner_name ?? (story.partner_user_id ? `#${story.partner_user_id}` : '-')}
                         </p>
                       </div>
                     </div>
@@ -472,8 +472,8 @@ export default function StoriesModerationPage() {
 
               <div className="text-sm space-y-1 text-muted-foreground">
                 <p>
-                  <span className="font-medium text-foreground">{t('stories.partner')}:</span> #
-                  {previewStory.partner_user_id ?? '-'}
+                  <span className="font-medium text-foreground">{t('stories.partner')}:</span>{' '}
+                  {previewStory.partner_name ?? (previewStory.partner_user_id ? `#${previewStory.partner_user_id}` : '-')}
                 </p>
                 <p>
                   <span className="font-medium text-foreground">{t('stories.created')}:</span>{' '}

@@ -150,7 +150,10 @@ export default function BookingsPage() {
         params.status = "pending";
         break;
       case "booked":
-        params.status = "confirmed";
+        // Backend now accepts a comma-separated status list, so checked-in
+        // guests (previously fetched as "confirmed" only, then silently
+        // dropped) actually show up under this tab.
+        params.status = "confirmed,checked_in";
         break;
       case "cancelled":
         params.status = "cancelled";
