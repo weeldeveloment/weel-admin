@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 
-const distDir = join(import.meta.dir, "dist");
+const distDir = resolve(join(import.meta.dir, "dist"));
 const port = Number(process.env.PORT || 3000);
 
 const deployVersion =
@@ -58,9 +58,26 @@ Bun.serve({
   port,
   async fetch(req) {
     const url = new URL(req.url);
-    const pathname = decodeURIComponent(url.pathname);
+
+    let pathname: string;
+    try {
+      pathname = decodeURIComponent(url.pathname);
+    } catch {
+      // Malformed percent-encoding.
+      return new Response("Bad Request", { status: 400 });
+    }
+
     const rel = pathname === "/" ? "/index.html" : pathname;
-    const filePath = join(distDir, rel.replace(/^\//, ""));
+    const filePath = resolve(join(distDir, rel.replace(/^\//, "")));
+
+    // `new URL()` collapses literal `../`, but not the percent-encoded form,
+    // so `/%2e%2e%2f...` survived decodeURIComponent as `../` and `join()`
+    // happily walked out of distDir — turning this static server into an
+    // arbitrary file read. Confine every resolved path to distDir.
+    const isInsideDist = filePath === distDir || filePath.startsWith(distDir + sep);
+    if (!isInsideDist) {
+      return new Response("Forbidden", { status: 403 });
+    }
 
     const finalPath = existsSync(filePath) ? filePath : join(distDir, "index.html");
 
@@ -74,6 +91,12 @@ Bun.serve({
     Object.assign(headers, ch);
 
     headers["X-Deploy-Version"] = deployVersion;
+
+    // The unused nginx.conf carried these; this server serves the app, so
+    // they belong here.
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "SAMEORIGIN";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
 
     const isHtml = rel === "/" || rel === "/index.html" || rel.endsWith(".html");
     if (!isHtml) {
