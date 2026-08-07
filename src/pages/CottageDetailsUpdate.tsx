@@ -1237,6 +1237,7 @@ export default function CottageDetailsUpdate() {
       services: [],
       region: {},
       district: { region: {} },
+      comment_count: 0,
       is_favorite: false,
       is_allowed_corporate: state.allowedCorp,
       created_at: "",

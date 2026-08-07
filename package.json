@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "generate:openapi-types": "cd ../weel-backend-v2 && python manage.py export_openapi_schema --output openapi.json && cd ../weel-admin && bunx swagger-typescript-api generate -p '../weel-backend-v2/openapi.json' -o src/types -n weel-openapi.ts --no-client --route-types --extract-response-body --default-response unknown",
+    "generate:openapi-types": "cd ../weel-backend-v2 && ${PYTHON:-venv/bin/python} manage.py export_openapi_schema --output openapi.json --variant main --base-path /api && cd ../weel-admin && bunx swagger-typescript-api generate -p '../weel-backend-v2/openapi.json' -o src/types -n weel-openapi.ts --no-client --route-types --extract-response-body --default-response unknown",
     "generate:openapi-types:remote": "bunx swagger-typescript-api generate -p 'https://dev.weel.uz/swagger/?format=openapi' -o src/types -n weel-openapi.ts --no-client --route-types --extract-response-body --default-response unknown"
   },
   "dependencies": {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { Message, WebSocketMessage } from '@/types'
 import { getAccessToken } from '@/lib/authTokens'
+import { resolveApiBaseUrl } from '@/lib/api-base-url'
 
 interface UseChatWebSocketOptions {
   onMessage?: (message: Message) => void
@@ -28,7 +29,7 @@ function isReadPayload(value: unknown): value is ReadPayload {
   return true
 }
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'wss://dev.weel.uz'
+const WS_URL = resolveApiBaseUrl(import.meta.env.VITE_WS_URL, { dev: 'wss://dev.weel.uz' })
 
 export function useChatWebSocket(options: UseChatWebSocketOptions = {}) {
   const wsRef = useRef<WebSocket | null>(null)
