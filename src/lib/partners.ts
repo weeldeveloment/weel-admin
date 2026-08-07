@@ -30,7 +30,10 @@ const asBoolean = (value: unknown): boolean | undefined => {
   return typeof value === 'boolean' ? value : undefined
 }
 
-export interface PartnerDetails extends PartnerProfile {
+// `Partial`: normalizePartner tiplanmagan JSON ni ehtiyotkorlik bilan o'qiydi va
+// har bir maydon yetishmasligi mumkin, PartnerProfile da esa `id`/`guid`
+// majburiy. Shuning uchun bu yerda hammasi ixtiyoriy.
+export interface PartnerDetails extends Partial<PartnerProfile> {
   email?: string | null
   full_name?: string
   is_active?: boolean
