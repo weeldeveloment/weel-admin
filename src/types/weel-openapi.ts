@@ -4303,6 +4303,42 @@ export interface PlatformUser {
   created_at: string;
 }
 
+export type NullableOrganization = {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 200
+   */
+  name: string;
+  /**
+   * Slug
+   * @format slug
+   * @minLength 1
+   * @maxLength 100
+   * @pattern ^[-a-zA-Z0-9_]+$
+   */
+  slug: string;
+  /**
+   * Schema name
+   * @minLength 1
+   */
+  schema_name: string;
+  /** Is active */
+  is_active: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Updated at
+   * @format date-time
+   */
+  updated_at: string;
+} | null;
+
 export interface Organization {
   /** Id */
   id: number;
@@ -4351,7 +4387,7 @@ export interface PmsLoginResponse {
    */
   refresh: string;
   user: PlatformUser;
-  organization: Organization;
+  organization?: NullableOrganization;
   organizations?: Organization[];
   /**
    * Has properties
@@ -4362,7 +4398,7 @@ export interface PmsLoginResponse {
 
 export interface PmsMeResponse {
   user: PlatformUser;
-  organization?: Organization;
+  organization?: NullableOrganization;
   organizations: Organization[];
   /**
    * Has properties
@@ -12769,7 +12805,7 @@ export namespace Platform {
   }
 
   /**
-   * No description
+   * @description Start PMS registration. This only creates the personal account; the organization is created afterwards via POST /platform/organization/.
    * @tags api
    * @name PlatformRegisterCreate
    * @request POST:/platform/register/
@@ -12781,8 +12817,6 @@ export namespace Platform {
     export type RequestBody = {
       /** Phone number */
       phone_number: string;
-      /** Organization name */
-      org_name?: string;
       /** First name */
       first_name?: string;
       /** Last name */
@@ -12793,7 +12827,7 @@ export namespace Platform {
   }
 
   /**
-   * No description
+   * @description Finish PMS registration. Creates the personal account only and returns tokens that are not scoped to any organization yet: `organization` is null until the client calls POST /platform/organization/.
    * @tags api
    * @name PlatformRegisterVerifyCreate
    * @request POST:/platform/register/verify/
