@@ -1,11 +1,11 @@
 import axios from 'axios'
 import { clearAuthTokens, getAccessToken, getRefreshToken, setAuthTokens } from './authTokens'
+import { resolveApiBaseUrl } from './api-base-url'
 
-export const API_URL = import.meta.env.VITE_API_URL || 'https://dev.weel.uz'
-
-if (!API_URL) {
-  throw new Error('Missing required VITE_API_URL environment variable.')
-}
+// The `|| 'https://dev.weel.uz'` fallback made the guard below dead code: the
+// value was never empty, so a production build with no VITE_API_URL silently
+// pointed at the dev backend instead of failing.
+export const API_URL = resolveApiBaseUrl(import.meta.env.VITE_API_URL, { dev: 'https://dev.weel.uz' })
 
 const API_BASE = `${API_URL}/api`
 let refreshAccessTokenPromise: Promise<string> | null = null
