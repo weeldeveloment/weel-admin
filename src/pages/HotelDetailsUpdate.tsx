@@ -6,6 +6,7 @@ import { Building2, ChevronLeft, GripVertical, Loader2, Phone, Plus, Trash2, Upl
 import { api } from '@/lib/api'
 import { resolveImageUrl, cn } from '@/lib/utils'
 import { fetchAllPartners } from '@/lib/partners'
+import { mapWithConcurrency } from '@/lib/concurrent'
 import { formatUzbekPhoneNumber, getPhoneHref } from '@/lib/phone'
 import type { HotelOrganizationOption, PropertyItem } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -370,15 +371,22 @@ export default function HotelDetailsUpdate() {
     onSuccess: async (data) => {
       void queryClient.invalidateQueries({ queryKey: ['properties'] })
       if (isCreateMode && data.guid) {
-        for (const pending of pendingCreateImages) {
+        // A newly created hotel usually carries a handful of photos. Sending
+        // them one after another made the save appear to hang for as long as
+        // the slowest connection took times the number of files; a few at a
+        // time keeps the same per-file error handling without the queue.
+        // Captured out of the callback: inside one, TypeScript can no longer
+        // see that the `data.guid` check above narrowed it.
+        const guid = data.guid
+        await mapWithConcurrency(pendingCreateImages, async (pending) => {
           try {
             const formData = new FormData()
             formData.append('image', pending.file)
-            await api.post(`/property/admin/hotels/${encodeURIComponent(data.guid)}/images/`, formData)
+            await api.post(`/property/admin/hotels/${encodeURIComponent(guid)}/images/`, formData)
           } catch {
             dispatch({ type: 'setImageMessage', value: t('common.actionFailed') })
           }
-        }
+        })
         pendingCreateImages.forEach((item) => URL.revokeObjectURL(item.previewUrl))
         setPendingCreateImages([])
         navigate(`/properties/hotels/${encodeURIComponent(data.guid)}`, { replace: true })
