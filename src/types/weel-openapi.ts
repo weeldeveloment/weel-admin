@@ -2827,6 +2827,58 @@ export interface MessageWrite {
   text: string;
 }
 
+export interface EmployeeOfMonth {
+  /** Employee id */
+  employee_id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /** Year */
+  year: number;
+  /** Month */
+  month: number;
+  /**
+   * Selected at
+   * @format date-time
+   */
+  selected_at: string;
+}
+
+export interface EmployeeOfMonthSelect {
+  /** Employee id */
+  employee_id: number;
+}
+
+export interface EmployeeMonthlyStat {
+  /** Employee id */
+  employee_id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /** Completed count */
+  completed_count: number;
+  /** Due count */
+  due_count: number;
+  /** On time count */
+  on_time_count: number;
+  /** On time rate */
+  on_time_rate?: number | null;
+}
+
 export interface CalendarEvent {
   /** Id */
   id: number;
@@ -2942,6 +2994,125 @@ export interface EventPatch {
   /** Notes */
   notes?: string | null;
   participant_ids?: number[];
+}
+
+export interface WorkspaceFile {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /** Size */
+  size: number;
+  /** Author id */
+  author_id: number;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Url
+   * @minLength 1
+   */
+  url: string;
+}
+
+export interface WorkspaceFileList {
+  results: WorkspaceFile[];
+}
+
+export interface Lead {
+  /** Id */
+  id: number;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name: string;
+  /**
+   * Contact full name
+   * @minLength 1
+   */
+  contact_full_name?: string | null;
+  /**
+   * Contact phone
+   * @minLength 1
+   */
+  contact_phone?: string | null;
+  /**
+   * Product name
+   * @minLength 1
+   */
+  product_name: string;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status: string;
+  /** Author id */
+  author_id: number;
+  /** Claimed by id */
+  claimed_by_id?: number | null;
+  /**
+   * Claimed at
+   * @format date-time
+   */
+  claimed_at?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /** Can claim */
+  can_claim: boolean;
+  /** Can complete */
+  can_complete: boolean;
+  /** Can view details */
+  can_view_details: boolean;
+}
+
+export interface LeadList {
+  results: Lead[];
+}
+
+export interface LeadWrite {
+  /**
+   * Company name
+   * @minLength 1
+   * @maxLength 300
+   */
+  company_name: string;
+  /**
+   * Contact full name
+   * @minLength 1
+   * @maxLength 300
+   */
+  contact_full_name: string;
+  /**
+   * Contact phone
+   * @minLength 1
+   * @maxLength 20
+   */
+  contact_phone: string;
+  /**
+   * Product name
+   * @minLength 1
+   * @maxLength 300
+   */
+  product_name: string;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
 }
 
 export interface Me {
@@ -7289,9 +7460,13 @@ export type AdminAuthActivitiesCalendarListData = any;
 
 export type AdminAuthB2BCompaniesListData = B2BCompany[];
 
+export type AdminAuthB2BCompaniesCreateData = B2BCompany;
+
 export type AdminAuthB2BCompaniesReadData = B2BCompany;
 
 export type AdminAuthB2BCompaniesUsersListData = B2BUser[];
+
+export type AdminAuthB2BCompaniesUsersCreateData = B2BUser;
 
 export type AdminAuthHotelsListData = PropertyHotelCard[];
 
@@ -7524,6 +7699,12 @@ export type B2BWorkspaceChatsMessagesCreateData = WorkspaceChatMessage;
 
 export type B2BWorkspaceChatsReadCreateData = any;
 
+export type B2BWorkspaceEmployeeOfMonthListData = EmployeeOfMonth;
+
+export type B2BWorkspaceEmployeeOfMonthCreateData = EmployeeOfMonth;
+
+export type B2BWorkspaceEmployeeOfMonthStatsListData = EmployeeMonthlyStat[];
+
 export type B2BWorkspaceEventsListData = CalendarEvent[];
 
 export type B2BWorkspaceEventsCreateData = CalendarEvent;
@@ -7534,9 +7715,25 @@ export type B2BWorkspaceEventsPartialUpdateData = CalendarEvent;
 
 export type B2BWorkspaceEventsDeleteData = any;
 
+export type B2BWorkspaceFilesListData = WorkspaceFileList;
+
+export type B2BWorkspaceFilesCreateData = WorkspaceFile;
+
+export type B2BWorkspaceFilesDeleteData = any;
+
 export type B2BWorkspaceHotelsListData = any;
 
+export type B2BWorkspaceLeadsListData = LeadList;
+
+export type B2BWorkspaceLeadsCreateData = Lead;
+
+export type B2BWorkspaceLeadsClaimCreateData = Lead;
+
+export type B2BWorkspaceLeadsCompleteCreateData = Lead;
+
 export type B2BWorkspaceMeListData = Me;
+
+export type B2BWorkspaceMeDeviceTokenCreateData = any;
 
 export type B2BWorkspaceTasksListData = TaskList;
 
@@ -9153,7 +9350,7 @@ export namespace AdminAuth {
   }
 
   /**
-   * @description List all B2B companies — admin view
+   * @description List/create B2B companies — admin view
    * @tags api
    * @name AdminAuthB2BCompaniesList
    * @request GET:/admin-auth/b2b/companies/
@@ -9165,6 +9362,21 @@ export namespace AdminAuth {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = AdminAuthB2BCompaniesListData;
+  }
+
+  /**
+   * @description List/create B2B companies — admin view
+   * @tags api
+   * @name AdminAuthB2BCompaniesCreate
+   * @request POST:/admin-auth/b2b/companies/
+   * @secure
+   */
+  export namespace AdminAuthB2BCompaniesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = B2BCompany;
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminAuthB2BCompaniesCreateData;
   }
 
   /**
@@ -9199,6 +9411,23 @@ export namespace AdminAuth {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = AdminAuthB2BCompaniesUsersListData;
+  }
+
+  /**
+   * No description
+   * @tags api
+   * @name AdminAuthB2BCompaniesUsersCreate
+   * @request POST:/admin-auth/b2b/companies/{company_id}/users/
+   * @secure
+   */
+  export namespace AdminAuthB2BCompaniesUsersCreate {
+    export type RequestParams = {
+      companyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = B2BUser;
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminAuthB2BCompaniesUsersCreateData;
   }
 
   /**
@@ -11202,6 +11431,54 @@ export namespace B2B {
   }
 
   /**
+   * @description GET/POST /api/b2b/workspace/employee-of-month/ Anyone can see this month's pick; only the owner can make or change it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceEmployeeOfMonthList
+   * @summary This month's employee of the month
+   * @request GET:/b2b/workspace/employee-of-month/
+   * @secure
+   */
+  export namespace B2BWorkspaceEmployeeOfMonthList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceEmployeeOfMonthListData;
+  }
+
+  /**
+   * @description GET/POST /api/b2b/workspace/employee-of-month/ Anyone can see this month's pick; only the owner can make or change it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceEmployeeOfMonthCreate
+   * @summary Pick this month's employee of the month (owner only)
+   * @request POST:/b2b/workspace/employee-of-month/
+   * @secure
+   */
+  export namespace B2BWorkspaceEmployeeOfMonthCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = EmployeeOfMonthSelect;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceEmployeeOfMonthCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/employee-of-month/stats/ — owner only. Every active employee's completed-task count and on-time rate for the current calendar month, sorted best-first — what the owner picks the winner from.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceEmployeeOfMonthStatsList
+   * @summary Monthly task stats per employee (owner only)
+   * @request GET:/b2b/workspace/employee-of-month/stats/
+   * @secure
+   */
+  export namespace B2BWorkspaceEmployeeOfMonthStatsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceEmployeeOfMonthStatsListData;
+  }
+
+  /**
    * @description GET  /api/b2b/workspace/events/ — the calendar window. POST /api/b2b/workspace/events/ — managers create shared events; employees may create personal ones for themselves.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceEventsList
@@ -11293,6 +11570,59 @@ export namespace B2B {
   }
 
   /**
+   * @description GET/POST /api/b2b/workspace/files/ — the company's shared folder. Everyone may read and add; nothing here is scoped to a role, so a driver can send a photographed waybill without asking anyone to do it for them.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceFilesList
+   * @summary List files
+   * @request GET:/b2b/workspace/files/
+   * @secure
+   */
+  export namespace B2BWorkspaceFilesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceFilesListData;
+  }
+
+  /**
+   * @description GET/POST /api/b2b/workspace/files/ — the company's shared folder. Everyone may read and add; nothing here is scoped to a role, so a driver can send a photographed waybill without asking anyone to do it for them.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceFilesCreate
+   * @summary Upload a file
+   * @request POST:/b2b/workspace/files/
+   * @secure
+   */
+  export namespace B2BWorkspaceFilesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** @format binary */
+      file: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceFilesCreateData;
+  }
+
+  /**
+   * @description DELETE /api/b2b/workspace/files/<id>/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceFilesDelete
+   * @summary Delete a file
+   * @request DELETE:/b2b/workspace/files/{file_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceFilesDelete {
+    export type RequestParams = {
+      fileId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceFilesDeleteData;
+  }
+
+  /**
    * @description GET /api/b2b/workspace/hotels/ — partner hotels, shaped for the phone. A thin projection of the platform hotel card: the mobile list only renders a name, a location, a rating and a starting price, and shipping the full card (policies, rate plans, legal info) over mobile data for a list of 20 would cost far more than it shows.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceHotelsList
@@ -11314,6 +11644,76 @@ export namespace B2B {
   }
 
   /**
+   * @description GET  /api/b2b/workspace/leads/ — every lead in the company, any employee may see the board and claim an open one. POST /api/b2b/workspace/leads/ — owner/performer only.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsList
+   * @summary List leads
+   * @request GET:/b2b/workspace/leads/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      status?: "new" | "in_progress" | "completed";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/leads/ — every lead in the company, any employee may see the board and claim an open one. POST /api/b2b/workspace/leads/ — owner/performer only.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsCreate
+   * @summary Create a lead (owner/manager only)
+   * @request POST:/b2b/workspace/leads/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = LeadWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsCreateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/leads/<id>/claim/ — any employee takes a 'new' lead.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsClaimCreate
+   * @summary Claim a lead
+   * @request POST:/b2b/workspace/leads/{lead_id}/claim/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsClaimCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsClaimCreateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/leads/<id>/complete/ — the claiming employee marks it resolved.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsCompleteCreate
+   * @summary Complete a lead
+   * @request POST:/b2b/workspace/leads/{lead_id}/complete/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsCompleteCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsCompleteCreateData;
+  }
+
+  /**
    * @description GET /api/b2b/workspace/me/ — profile plus the permission map the app builds its UI from.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceMeList
@@ -11327,6 +11727,22 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceMeListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/me/device-token/ — register this device for push.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceMeDeviceTokenCreate
+   * @summary Register the FCM token for push notifications
+   * @request POST:/b2b/workspace/me/device-token/
+   * @secure
+   */
+  export namespace B2BWorkspaceMeDeviceTokenCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMeDeviceTokenCreateData;
   }
 
   /**

@@ -39,6 +39,7 @@ const resources = {
       },
       nav: {
         users: 'Users',
+        b2b: 'B2B',
         bookings: 'Bookings',
         properties: 'Properties',
         activities: 'Activities',
@@ -134,6 +135,42 @@ const resources = {
         chat: {
           open: 'Open chat',
           partnersOnly: 'Chat is available for partners only',
+        },
+      },
+      b2b: {
+        title: 'B2B Accounts',
+        subtitle: 'Create companies and open accounts for B2B users',
+        company: {
+          create: 'New company',
+          searchPlaceholder: 'Search companies...',
+          empty: 'No companies yet',
+          form: {
+            name: 'Company name',
+            legalName: 'Legal name',
+            inn: 'INN',
+            city: 'City',
+            industry: 'Industry',
+          },
+        },
+        user: {
+          create: 'Add user',
+          selectCompany: 'Select a company to view and add its users',
+          empty: 'No users in this company yet',
+          count: '{{count}} users',
+          role: 'Role',
+          form: {
+            phone: 'Phone number',
+            firstName: 'First name',
+            lastName: 'Last name',
+          },
+        },
+        role: {
+          owner: 'Owner',
+          performer: 'Performer',
+        },
+        errors: {
+          nameRequired: 'Company name is required',
+          phoneRequired: 'Phone number is required',
         },
       },
       bookings: {
@@ -826,6 +863,7 @@ const resources = {
       },
       nav: {
         users: 'Пользователи',
+        b2b: 'B2B',
         bookings: 'Бронирования',
         properties: 'Объекты',
         activities: 'Активности',
@@ -921,6 +959,42 @@ const resources = {
         chat: {
           open: 'Открыть чат',
           partnersOnly: 'Чат доступен только для партнёров',
+        },
+      },
+      b2b: {
+        title: 'B2B аккаунты',
+        subtitle: 'Создавайте компании и открывайте аккаунты для B2B пользователей',
+        company: {
+          create: 'Новая компания',
+          searchPlaceholder: 'Поиск компаний...',
+          empty: 'Пока нет компаний',
+          form: {
+            name: 'Название компании',
+            legalName: 'Юридическое название',
+            inn: 'ИНН',
+            city: 'Город',
+            industry: 'Отрасль',
+          },
+        },
+        user: {
+          create: 'Добавить пользователя',
+          selectCompany: 'Выберите компанию, чтобы увидеть и добавить пользователей',
+          empty: 'В этой компании пока нет пользователей',
+          count: '{{count}} пользователей',
+          role: 'Роль',
+          form: {
+            phone: 'Номер телефона',
+            firstName: 'Имя',
+            lastName: 'Фамилия',
+          },
+        },
+        role: {
+          owner: 'Владелец',
+          performer: 'Исполнитель',
+        },
+        errors: {
+          nameRequired: 'Название компании обязательно',
+          phoneRequired: 'Номер телефона обязателен',
         },
       },
       bookings: {
@@ -1613,6 +1687,7 @@ const resources = {
       },
       nav: {
         users: 'Foydalanuvchilar',
+        b2b: 'B2B',
         bookings: 'Bronlar',
         properties: 'Obyektlar',
         activities: 'Faoliyatlar',
@@ -1708,6 +1783,42 @@ const resources = {
         chat: {
           open: 'Chatni ochish',
           partnersOnly: 'Chat faqat hamkorlar uchun',
+        },
+      },
+      b2b: {
+        title: 'B2B akkauntlar',
+        subtitle: 'Kompaniyalar yarating va B2B foydalanuvchilar uchun akkount oching',
+        company: {
+          create: 'Yangi kompaniya',
+          searchPlaceholder: 'Kompaniyalarni qidirish...',
+          empty: 'Hozircha kompaniyalar yo‘q',
+          form: {
+            name: 'Kompaniya nomi',
+            legalName: 'Yuridik nomi',
+            inn: 'STIR',
+            city: 'Shahar',
+            industry: 'Soha',
+          },
+        },
+        user: {
+          create: 'Foydalanuvchi qo‘shish',
+          selectCompany: 'Foydalanuvchilarni ko‘rish va qo‘shish uchun kompaniya tanlang',
+          empty: 'Bu kompaniyada hozircha foydalanuvchilar yo‘q',
+          count: '{{count}} foydalanuvchi',
+          role: 'Rol',
+          form: {
+            phone: 'Telefon raqami',
+            firstName: 'Ism',
+            lastName: 'Familiya',
+          },
+        },
+        role: {
+          owner: 'Egasi',
+          performer: 'Xodim',
+        },
+        errors: {
+          nameRequired: 'Kompaniya nomi kiritilishi shart',
+          phoneRequired: 'Telefon raqami kiritilishi shart',
         },
       },
       bookings: {

@@ -83,6 +83,7 @@ api.interceptors.response.use(
 // ── PMS Calendar API ─────────────────────────────────────────────
 
 import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSRoomBed, PMSProperty, PMSRate, PMSRoomType, PMSRoomCondition, PMSRoomAvailability } from "@/types/pms"
+import type { AdminB2BCompany, AdminB2BUser } from "@/types"
 
 export type PMSRoomUpdate = {
   condition?: PMSRoomCondition
@@ -262,6 +263,24 @@ export function fetchPmsRates(propertyId: string, roomTypeId?: number): Promise<
   return adminAuthGet<PMSRate[]>(`/admin-auth/hotels/${propertyId}/rates/`, {
     room_type_id: roomTypeId?.toString(),
   })
+}
+
+// ── B2B ───────────────────────────────────────────────────────────
+
+export function fetchB2BCompanies(): Promise<AdminB2BCompany[]> {
+  return adminAuthGet<AdminB2BCompany[]>('/admin-auth/b2b/companies/')
+}
+
+export function createB2BCompany(data: Partial<AdminB2BCompany>): Promise<AdminB2BCompany> {
+  return adminAuthPost<AdminB2BCompany>('/admin-auth/b2b/companies/', data)
+}
+
+export function fetchB2BUsers(companyId: number): Promise<AdminB2BUser[]> {
+  return adminAuthGet<AdminB2BUser[]>(`/admin-auth/b2b/companies/${companyId}/users/`)
+}
+
+export function createB2BUser(companyId: number, data: Partial<AdminB2BUser>): Promise<AdminB2BUser> {
+  return adminAuthPost<AdminB2BUser>(`/admin-auth/b2b/companies/${companyId}/users/`, data)
 }
 
 export async function fetchExchangeRate(): Promise<number> {

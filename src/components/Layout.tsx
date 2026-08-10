@@ -16,7 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Users, MessageSquare, LogOut, Home, Building2, BookOpen, Newspaper, Image, MountainSnow, Paintbrush } from 'lucide-react'
+import { Users, MessageSquare, LogOut, Home, Building2, BookOpen, Newspaper, Image, MountainSnow, Paintbrush, Briefcase } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeToggle } from './ThemeToggle'
@@ -29,6 +29,7 @@ export default function Layout() {
   const navItems = [
     { icon: Home, label: t('nav.bookings'), path: '/bookings' },
     { icon: Users, label: t('nav.users'), path: '/users' },
+    { icon: Briefcase, label: t('nav.b2b'), path: '/b2b' },
     { icon: Building2, label: t('nav.properties'), path: '/properties' },
     { icon: MountainSnow, label: t('nav.activities'), path: '/activities' },
     { icon: BookOpen, label: t('nav.stories'), path: '/stories' },
