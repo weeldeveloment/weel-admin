@@ -150,6 +150,32 @@ export interface AdminPmsUser {
   created_at?: string
 }
 
+export interface AdminB2BCompany {
+  id: number
+  name: string
+  legal_name?: string | null
+  inn?: string | null
+  city?: string | null
+  district?: string | null
+  legal_address?: string | null
+  industry?: string | null
+  employee_count?: number | null
+  is_active?: boolean
+  created_at?: string
+}
+
+export interface AdminB2BUser {
+  id: number
+  company_id: number
+  phone: string
+  email?: string | null
+  first_name?: string | null
+  last_name?: string | null
+  role: 'owner' | 'performer'
+  is_active?: boolean
+  created_at?: string
+}
+
 export interface StoryMedia {
   guid: string
   media_type: string

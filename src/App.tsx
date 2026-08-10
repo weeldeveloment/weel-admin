@@ -6,6 +6,7 @@ import Layout from './components/Layout'
 
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const UsersPage = lazy(() => import('./pages/UsersPage'))
+const B2BPage = lazy(() => import('./pages/B2BPage'))
 const ChatPage = lazy(() => import('./pages/ChatPage'))
 const BookingsPage = lazy(() => import('./pages/BookingsPage'))
 const Partner = lazy(() => import('./pages/Partner'))
@@ -59,6 +60,7 @@ function App() {
         >
           <Route index element={<Navigate to="/users" replace />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="b2b" element={<B2BPage />} />
           <Route path="bookings" element={<BookingsPage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="chat/:partnerId" element={<ChatPage />} />
