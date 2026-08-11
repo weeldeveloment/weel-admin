@@ -353,7 +353,10 @@ export interface PropertyItem {
   check_out_time?: string | null
   cancellation_policy?: string | null
   timezone?: string | null
+  /** Display titles resolved from the services reference table. */
   amenities?: string[]
+  /** Raw `services.id` GUIDs — this is what the edit form must PATCH back. */
+  amenity_ids?: string[]
   star_rating?: number | null
   is_allowed_alcohol?: boolean
   is_allowed_pets?: boolean

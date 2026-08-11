@@ -173,6 +173,8 @@ export interface PropertyHotelCard {
   available_rooms?: number;
   /** @default [] */
   amenities?: string[];
+  /** @default [] */
+  amenity_ids?: string[];
   /**
    * Legal info
    * @default {}
@@ -1851,6 +1853,7 @@ export interface HotelCard {
   verification_status?: string | null;
   themes: string[];
   amenities: string[];
+  amenity_ids: string[];
   /** Legal info */
   legal_info: Record<string, string | null>;
   /**
@@ -4199,6 +4202,7 @@ export interface HotelDetail {
   themes: string[];
   /** @default [] */
   amenities: string[];
+  amenity_ids: string[];
   /** Legal info */
   legal_info: Record<string, string | null>;
   /**
@@ -6005,6 +6009,8 @@ export interface PropertyHotelAdminList {
   available_rooms?: number;
   /** @default [] */
   amenities?: string[];
+  /** @default [] */
+  amenity_ids?: string[];
   /**
    * Legal info
    * @default {}

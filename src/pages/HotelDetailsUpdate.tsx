@@ -153,11 +153,15 @@ function createInitialForm(item: PropertyItem | null): HotelForm {
     description_ru: item.description_ru ?? String(detail.description_ru ?? ''),
     description_uz: item.description_uz ?? String(detail.description_uz ?? ''),
     description_en: item.description_en ?? String(detail.description_en ?? ''),
-    amenities: Array.isArray(item.amenities)
-      ? item.amenities.join(', ')
+    // `item.amenities` is now resolved display titles; the form edits and
+    // PATCHes the stored values, so prefer the raw GUID list.
+    amenities: Array.isArray(item.amenity_ids)
+      ? item.amenity_ids.join(', ')
       : Array.isArray(detail.amenities)
         ? (detail.amenities as string[]).join(', ')
-        : '',
+        : Array.isArray(item.amenities)
+          ? item.amenities.join(', ')
+          : '',
     is_active: item.is_active ?? true,
     is_verified: item.is_verified ?? false,
     is_archived: item.is_archived ?? false,
