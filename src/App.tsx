@@ -8,6 +8,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage'))
 const UsersPage = lazy(() => import('./pages/UsersPage'))
 const B2BPage = lazy(() => import('./pages/B2BPage'))
 const ChatPage = lazy(() => import('./pages/ChatPage'))
+const B2BSupportPage = lazy(() => import('./pages/B2BSupportPage'))
 const BookingsPage = lazy(() => import('./pages/BookingsPage'))
 const Partner = lazy(() => import('./pages/Partner'))
 const PropertiesPage = lazy(() => import('./pages/PropertiesPage'))
@@ -64,6 +65,7 @@ function App() {
           <Route path="bookings" element={<BookingsPage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="chat/:partnerId" element={<ChatPage />} />
+          <Route path="b2b-support" element={<B2BSupportPage />} />
           <Route path="partner/:partnerId" element={<Partner />} />
           <Route path="properties" element={<PropertiesPage />} />
           <Route path="properties/cottages/:propertyId" element={<CottageDetailsUpdate />} />

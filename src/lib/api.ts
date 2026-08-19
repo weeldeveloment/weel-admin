@@ -83,7 +83,7 @@ api.interceptors.response.use(
 // ── PMS Calendar API ─────────────────────────────────────────────
 
 import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSRoomBed, PMSProperty, PMSRate, PMSRoomType, PMSRoomCondition, PMSRoomAvailability } from "@/types/pms"
-import type { AdminB2BCompany, AdminB2BUser } from "@/types"
+import type { AdminB2BCompany, AdminB2BUser, B2BSupportMessage, B2BSupportThread } from "@/types"
 
 export type PMSRoomUpdate = {
   condition?: PMSRoomCondition
@@ -281,6 +281,29 @@ export function fetchB2BUsers(companyId: number): Promise<AdminB2BUser[]> {
 
 export function createB2BUser(companyId: number, data: Partial<AdminB2BUser>): Promise<AdminB2BUser> {
   return adminAuthPost<AdminB2BUser>(`/admin-auth/b2b/companies/${companyId}/users/`, data)
+}
+
+// ── B2B yordam markazi ────────────────────────────────────────────
+//
+// The other end of the mobile app's "Yordam markazi". Reading a thread marks
+// its employee's lines answered server-side, which is what clears the badge on
+// the inbox — so the list is refetched after opening one.
+
+export function fetchB2BSupportThreads(search?: string): Promise<B2BSupportThread[]> {
+  return adminAuthGet<B2BSupportThread[]>('/admin-auth/b2b/support/', {
+    search: search?.trim() || undefined,
+  })
+}
+
+export function fetchB2BSupportThread(employeeId: number): Promise<B2BSupportMessage[]> {
+  return adminAuthGet<B2BSupportMessage[]>(`/admin-auth/b2b/support/${employeeId}/`)
+}
+
+export function replyToB2BSupportThread(
+  employeeId: number,
+  text: string,
+): Promise<B2BSupportMessage> {
+  return adminAuthPost<B2BSupportMessage>(`/admin-auth/b2b/support/${employeeId}/`, { text })
 }
 
 export async function fetchExchangeRate(): Promise<number> {

@@ -150,6 +150,29 @@ export interface AdminPmsUser {
   created_at?: string
 }
 
+/** One row of the B2B support inbox — a person waiting, and for how long. */
+export interface B2BSupportThread {
+  employee_id: number
+  full_name: string
+  phone?: string | null
+  photo?: string | null
+  company_id: number
+  company_name?: string | null
+  message_count: number
+  /** The employee's own lines nobody has answered yet. */
+  unread_count: number
+  last_message?: string | null
+  last_message_at?: string | null
+}
+
+export interface B2BSupportMessage {
+  id: number
+  text: string
+  /** True for a line WEEL support wrote, false for the employee's own. */
+  is_staff: boolean
+  created_at: string
+}
+
 export interface AdminB2BCompany {
   id: number
   name: string
