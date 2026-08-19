@@ -79,6 +79,73 @@ export interface B2BUser {
   created_at: string;
 }
 
+export interface SupportThread {
+  /** Employee id */
+  employee_id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Phone
+   * @minLength 1
+   */
+  phone?: string | null;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /** Company id */
+  company_id: number;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name?: string | null;
+  /** Message count */
+  message_count: number;
+  /** Unread count */
+  unread_count: number;
+  /**
+   * Last message
+   * @minLength 1
+   */
+  last_message?: string | null;
+  /**
+   * Last message at
+   * @format date-time
+   */
+  last_message_at?: string | null;
+}
+
+export interface SupportMessage {
+  /** Id */
+  id: number;
+  /**
+   * Text
+   * @minLength 1
+   */
+  text: string;
+  /** Is staff */
+  is_staff: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface SupportMessageCreate {
+  /**
+   * Text
+   * @minLength 1
+   * @maxLength 4000
+   */
+  text: string;
+}
+
 export interface PropertyHotelCard {
   /** Id */
   id?: number;
@@ -175,6 +242,10 @@ export interface PropertyHotelCard {
   amenities?: string[];
   /** @default [] */
   amenity_ids?: string[];
+  /** @default [] */
+  services?: Record<string, string | null>[];
+  /** @default [] */
+  property_services?: Record<string, string | null>[];
   /**
    * Legal info
    * @default {}
@@ -1854,6 +1925,8 @@ export interface HotelCard {
   themes: string[];
   amenities: string[];
   amenity_ids: string[];
+  services: Record<string, string | null>[];
+  property_services: Record<string, string | null>[];
   /** Legal info */
   legal_info: Record<string, string | null>;
   /**
@@ -2736,6 +2809,116 @@ export interface TravelVoucher {
   created_at: string;
 }
 
+export interface AttendanceEntry {
+  /** Employee id */
+  employee_id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /**
+   * Department name
+   * @minLength 1
+   */
+  department_name?: string | null;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status?: string | null;
+  /**
+   * Checked in at
+   * @format date-time
+   */
+  checked_in_at?: string | null;
+  /**
+   * Reason
+   * @minLength 1
+   */
+  reason?: string | null;
+  /** Marked by id */
+  marked_by_id?: number | null;
+}
+
+export interface AttendanceDay {
+  /**
+   * Date
+   * @format date
+   */
+  date: string;
+  /** Present */
+  present: number;
+  /** Absent */
+  absent: number;
+  /** Unmarked */
+  unmarked: number;
+  /**
+   * My status
+   * @minLength 1
+   */
+  my_status?: string | null;
+  entries: AttendanceEntry[];
+}
+
+export interface AttendanceCheckIn {
+  /** Latitude */
+  latitude?: number | null;
+  /** Longitude */
+  longitude?: number | null;
+}
+
+export interface AttendanceLocation {
+  /** Is enabled */
+  is_enabled: boolean;
+  /** Latitude */
+  latitude?: number | null;
+  /** Longitude */
+  longitude?: number | null;
+  /** Radius meters */
+  radius_meters: number;
+  /**
+   * Updated at
+   * @format date-time
+   */
+  updated_at?: string | null;
+}
+
+export interface AttendanceLocationUpdate {
+  /** Is enabled */
+  is_enabled: boolean;
+  /** Latitude */
+  latitude?: number | null;
+  /** Longitude */
+  longitude?: number | null;
+  /**
+   * Radius meters
+   * @min 10
+   * @max 5000
+   */
+  radius_meters?: number;
+}
+
+export interface AttendanceMark {
+  /** Status */
+  status: "present" | "absent" | "late" | "remote";
+  /**
+   * Reason
+   * @maxLength 200
+   */
+  reason?: string | null;
+  /**
+   * Date
+   * @format date
+   */
+  date?: string;
+}
+
 export interface WorkspaceLogin {
   /**
    * Phone
@@ -2775,17 +2958,16 @@ export type WorkspaceChatMessage = {
   thread_id?: number;
   /** Sender id */
   sender_id: number;
-  /**
-   * Text
-   * @minLength 1
-   */
+  /** Text */
   text: string;
+  /** Reply to id */
+  reply_to_id?: number | null;
   /**
    * Created at
    * @format date-time
    */
   created_at: string;
-} | null;
+};
 
 export interface ChatThread {
   /** Id */
@@ -2821,13 +3003,40 @@ export interface ThreadFlags {
   is_muted?: boolean;
 }
 
-export interface MessageWrite {
+export interface Customer {
+  /** Id */
+  id: number;
   /**
-   * Text
+   * Full name
    * @minLength 1
-   * @maxLength 4000
    */
-  text: string;
+  full_name: string;
+  /**
+   * Phone
+   * @minLength 1
+   */
+  phone: string;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name?: string | null;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /** Deal count */
+  deal_count: number;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface CustomerList {
+  results: Customer[];
 }
 
 export interface EmployeeOfMonth {
@@ -2872,6 +3081,18 @@ export interface EmployeeMonthlyStat {
    * @minLength 1
    */
   photo?: string | null;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /**
+   * Department name
+   * @minLength 1
+   */
+  department_name?: string | null;
+  /** Deals count */
+  deals_count: number;
   /** Completed count */
   completed_count: number;
   /** Due count */
@@ -3046,6 +3267,21 @@ export interface Lead {
    */
   contact_phone?: string | null;
   /**
+   * Contact position
+   * @minLength 1
+   */
+  contact_position?: string | null;
+  /**
+   * Contact email
+   * @minLength 1
+   */
+  contact_email?: string | null;
+  /**
+   * Contact address
+   * @minLength 1
+   */
+  contact_address?: string | null;
+  /**
    * Product name
    * @minLength 1
    */
@@ -3056,10 +3292,26 @@ export interface Lead {
    */
   quantity: string;
   /**
+   * Amount
+   * @format decimal
+   */
+  amount: string;
+  /**
    * Status
    * @minLength 1
    */
   status: string;
+  /** Stage */
+  stage:
+    | "new"
+    | "interested"
+    | "proposal"
+    | "negotiation"
+    | "contract"
+    | "won"
+    | "lost";
+  /** Source */
+  source: "website" | "call" | "referral" | "exhibition" | "manual";
   /** Author id */
   author_id: number;
   /** Claimed by id */
@@ -3069,6 +3321,28 @@ export interface Lead {
    * @format date-time
    */
   claimed_at?: string | null;
+  /**
+   * Completed at
+   * @format date-time
+   */
+  completed_at?: string | null;
+  /** Lost reason */
+  lost_reason?:
+    | "price"
+    | "competitor"
+    | "no_budget"
+    | "no_response"
+    | "not_needed"
+    | "postponed"
+    | "other"
+    | null;
+  /**
+   * Lost note
+   * @minLength 1
+   */
+  lost_note?: string | null;
+  /** Customer id */
+  customer_id?: number | null;
   /**
    * Created at
    * @format date-time
@@ -3080,19 +3354,43 @@ export interface Lead {
   can_complete: boolean;
   /** Can view details */
   can_view_details: boolean;
+  /** Item count */
+  item_count?: number;
+  /** Task count */
+  task_count?: number;
 }
 
 export interface LeadList {
   results: Lead[];
 }
 
-export interface LeadWrite {
+export interface LeadItemWrite {
   /**
-   * Company name
+   * Name
    * @minLength 1
    * @maxLength 300
    */
-  company_name: string;
+  name: string;
+  /**
+   * Unit
+   * @maxLength 100
+   */
+  unit?: string;
+  /**
+   * Amount
+   * @format decimal
+   */
+  amount?: string;
+}
+
+export interface LeadWrite {
+  /** Customer id */
+  customer_id?: number | null;
+  /**
+   * Company name
+   * @maxLength 300
+   */
+  company_name?: string;
   /**
    * Contact full name
    * @minLength 1
@@ -3107,64 +3405,90 @@ export interface LeadWrite {
   contact_phone: string;
   /**
    * Product name
-   * @minLength 1
    * @maxLength 300
    */
-  product_name: string;
+  product_name?: string;
   /**
    * Quantity
    * @format decimal
    */
-  quantity: string;
+  quantity?: string;
+  /**
+   * Amount
+   * @format decimal
+   */
+  amount?: string;
+  /**
+   * Note
+   * @maxLength 2000
+   */
+  note?: string | null;
+  /**
+   * Assign to me
+   * @default true
+   */
+  assign_to_me?: boolean;
+  /**
+   * Contact position
+   * @maxLength 200
+   */
+  contact_position?: string | null;
+  /**
+   * Contact email
+   * @format email
+   * @maxLength 254
+   */
+  contact_email?: string | null;
+  /** Contact address */
+  contact_address?: string | null;
+  /** Source */
+  source?: "website" | "call" | "referral" | "exhibition" | "manual";
+  items?: LeadItemWrite[];
 }
 
-export interface Me {
+export interface LeadItem {
   /** Id */
   id: number;
-  /** Company id */
-  company_id: number;
   /**
-   * Company name
+   * Name
    * @minLength 1
    */
-  company_name?: string | null;
+  name: string;
+  /** Unit */
+  unit: string;
   /**
-   * Full name
+   * Amount
+   * @format decimal
+   */
+  amount: string;
+  /** Position */
+  position: number;
+}
+
+export interface LeadActivity {
+  /** Id */
+  id: number;
+  /** Kind */
+  kind: "created" | "claimed" | "assigned" | "stage" | "comment" | "completed";
+  /** Text */
+  text: string;
+  /** Author id */
+  author_id?: number | null;
+  /**
+   * Author name
    * @minLength 1
    */
-  full_name: string;
+  author_name?: string | null;
   /**
-   * Position
+   * Author photo
    * @minLength 1
    */
-  position?: string | null;
+  author_photo?: string | null;
   /**
-   * Role
-   * @minLength 1
+   * Created at
+   * @format date-time
    */
-  role: string;
-  /**
-   * Phone
-   * @minLength 1
-   */
-  phone?: string | null;
-  /**
-   * Email
-   * @minLength 1
-   */
-  email?: string | null;
-  /**
-   * Photo
-   * @minLength 1
-   */
-  photo?: string | null;
-  /**
-   * Department name
-   * @minLength 1
-   */
-  department_name?: string | null;
-  /** Permissions */
-  permissions: Record<string, boolean>;
+  created_at: string;
 }
 
 export interface Subtask {
@@ -3244,10 +3568,160 @@ export interface Task {
   can_change_status: boolean;
 }
 
-export interface TaskList {
-  results: Task[];
-  /** Counters */
-  counters: Record<string, number>;
+export interface LeadDetail {
+  /** Id */
+  id: number;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name: string;
+  /**
+   * Contact full name
+   * @minLength 1
+   */
+  contact_full_name?: string | null;
+  /**
+   * Contact phone
+   * @minLength 1
+   */
+  contact_phone?: string | null;
+  /**
+   * Contact position
+   * @minLength 1
+   */
+  contact_position?: string | null;
+  /**
+   * Contact email
+   * @minLength 1
+   */
+  contact_email?: string | null;
+  /**
+   * Contact address
+   * @minLength 1
+   */
+  contact_address?: string | null;
+  /**
+   * Product name
+   * @minLength 1
+   */
+  product_name: string;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
+  /**
+   * Amount
+   * @format decimal
+   */
+  amount: string;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status: string;
+  /** Stage */
+  stage:
+    | "new"
+    | "interested"
+    | "proposal"
+    | "negotiation"
+    | "contract"
+    | "won"
+    | "lost";
+  /** Source */
+  source: "website" | "call" | "referral" | "exhibition" | "manual";
+  /** Author id */
+  author_id: number;
+  /** Claimed by id */
+  claimed_by_id?: number | null;
+  /**
+   * Claimed at
+   * @format date-time
+   */
+  claimed_at?: string | null;
+  /**
+   * Completed at
+   * @format date-time
+   */
+  completed_at?: string | null;
+  /** Lost reason */
+  lost_reason?:
+    | "price"
+    | "competitor"
+    | "no_budget"
+    | "no_response"
+    | "not_needed"
+    | "postponed"
+    | "other"
+    | null;
+  /**
+   * Lost note
+   * @minLength 1
+   */
+  lost_note?: string | null;
+  /** Customer id */
+  customer_id?: number | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /** Can claim */
+  can_claim: boolean;
+  /** Can complete */
+  can_complete: boolean;
+  /** Can view details */
+  can_view_details: boolean;
+  /** Item count */
+  item_count?: number;
+  /** Task count */
+  task_count?: number;
+  items: LeadItem[];
+  activity: LeadActivity[];
+  tasks: Task[];
+}
+
+export interface LeadAssignWrite {
+  /** Employee id */
+  employee_id: number;
+}
+
+export interface LeadCommentWrite {
+  /**
+   * Text
+   * @minLength 1
+   * @maxLength 2000
+   */
+  text: string;
+}
+
+export interface LeadStageWrite {
+  /** Stage */
+  stage:
+    | "new"
+    | "interested"
+    | "proposal"
+    | "negotiation"
+    | "contract"
+    | "won"
+    | "lost";
+  /** Lost reason */
+  lost_reason?:
+    | "price"
+    | "competitor"
+    | "no_budget"
+    | "no_response"
+    | "not_needed"
+    | "postponed"
+    | "other"
+    | null;
+  /**
+   * Note
+   * @maxLength 2000
+   */
+  note?: string | null;
 }
 
 export interface TaskWrite {
@@ -3286,6 +3760,408 @@ export interface TaskWrite {
   assignee_ids?: number[];
   /** @default [] */
   subtasks?: string[];
+}
+
+export interface MailAccount {
+  /** Id */
+  id: number;
+  /**
+   * Address
+   * @minLength 1
+   */
+  address: string;
+  /**
+   * Display name
+   * @minLength 1
+   */
+  display_name?: string | null;
+  /**
+   * Provider
+   * @minLength 1
+   */
+  provider: string;
+  /**
+   * Auth type
+   * @minLength 1
+   */
+  auth_type: string;
+  /**
+   * Imap host
+   * @minLength 1
+   */
+  imap_host: string;
+  /**
+   * Smtp host
+   * @minLength 1
+   */
+  smtp_host: string;
+  /** Is active */
+  is_active: boolean;
+  /**
+   * Last sync at
+   * @format date-time
+   */
+  last_sync_at?: string | null;
+  /**
+   * Sync error
+   * @minLength 1
+   */
+  sync_error?: string | null;
+  /** Unread */
+  unread?: number;
+}
+
+export interface MailAccountConnect {
+  /**
+   * Address
+   * @format email
+   * @minLength 1
+   */
+  address: string;
+  /**
+   * Password
+   * @minLength 1
+   */
+  password: string;
+  /**
+   * Display name
+   * @maxLength 200
+   */
+  display_name?: string;
+  /**
+   * Imap host
+   * @maxLength 253
+   */
+  imap_host?: string;
+  /**
+   * Imap port
+   * @min 1
+   * @max 65535
+   */
+  imap_port?: number;
+  /**
+   * Smtp host
+   * @maxLength 253
+   */
+  smtp_host?: string;
+  /**
+   * Smtp port
+   * @min 1
+   * @max 65535
+   */
+  smtp_port?: number;
+}
+
+export interface MailAccountPatch {
+  /**
+   * Display name
+   * @maxLength 200
+   */
+  display_name?: string;
+}
+
+export interface MailSend {
+  /** Account id */
+  account_id?: number | null;
+  to: string[];
+  /** @default [] */
+  cc?: string[];
+  /** @default [] */
+  bcc?: string[];
+  /**
+   * Subject
+   * @maxLength 500
+   * @default ""
+   */
+  subject?: string;
+  /**
+   * Body text
+   * @default ""
+   */
+  body_text?: string;
+  /**
+   * Body html
+   * @default ""
+   */
+  body_html?: string;
+  /** Reply to message id */
+  reply_to_message_id?: number | null;
+  /** @default [] */
+  attachment_ids?: number[];
+}
+
+export interface MailRecipient {
+  /**
+   * Kind
+   * @minLength 1
+   */
+  kind: string;
+  /**
+   * Address
+   * @minLength 1
+   */
+  address: string;
+  /** Name */
+  name: string;
+}
+
+export interface MailAttachment {
+  /** Id */
+  id: number;
+  /**
+   * Filename
+   * @minLength 1
+   */
+  filename: string;
+  /**
+   * Content type
+   * @minLength 1
+   */
+  content_type: string;
+  /** Size bytes */
+  size_bytes: number;
+  /**
+   * Download url
+   * @minLength 1
+   */
+  download_url?: string;
+}
+
+export interface MailMessage {
+  /** Id */
+  id: number;
+  /** Thread id */
+  thread_id: number;
+  /**
+   * Direction
+   * @minLength 1
+   */
+  direction: string;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status: string;
+  /**
+   * From address
+   * @minLength 1
+   */
+  from_address: string;
+  /** From name */
+  from_name: string;
+  /** Subject */
+  subject: string;
+  /** Body text */
+  body_text: string;
+  /** Body html */
+  body_html: string;
+  /** Has attachments */
+  has_attachments: boolean;
+  /** Is read */
+  is_read: boolean;
+  /**
+   * Error
+   * @minLength 1
+   */
+  error?: string | null;
+  /**
+   * Sent at
+   * @format date-time
+   */
+  sent_at?: string | null;
+  recipients?: MailRecipient[];
+  attachments?: MailAttachment[];
+}
+
+export interface MailProviderHint {
+  /**
+   * Provider
+   * @minLength 1
+   */
+  provider: string;
+  /**
+   * Label
+   * @minLength 1
+   */
+  label: string;
+  /**
+   * Imap host
+   * @minLength 1
+   */
+  imap_host: string;
+  /** Imap port */
+  imap_port: number;
+  /**
+   * Smtp host
+   * @minLength 1
+   */
+  smtp_host: string;
+  /** Smtp port */
+  smtp_port: number;
+  /** Requires app password */
+  requires_app_password: boolean;
+  /**
+   * Help url
+   * @minLength 1
+   */
+  help_url?: string | null;
+  /** Supports oauth */
+  supports_oauth: boolean;
+}
+
+export interface MailThread {
+  /** Id */
+  id: number;
+  /** Account id */
+  account_id: number;
+  /**
+   * Subject
+   * @minLength 1
+   */
+  subject: string;
+  /**
+   * Snippet
+   * @minLength 1
+   */
+  snippet: string;
+  /**
+   * Folder
+   * @minLength 1
+   */
+  folder: string;
+  /**
+   * Participants
+   * @minLength 1
+   */
+  participants: string;
+  /** Message count */
+  message_count: number;
+  /** Unread count */
+  unread_count: number;
+  /** Is starred */
+  is_starred: boolean;
+  /**
+   * Last message at
+   * @format date-time
+   */
+  last_message_at?: string | null;
+}
+
+export interface MailThreadFlags {
+  /** Is starred */
+  is_starred?: boolean;
+  /** Folder */
+  folder?: "inbox" | "archive" | "trash";
+}
+
+export interface Me {
+  /** Id */
+  id: number;
+  /** Company id */
+  company_id: number;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name?: string | null;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /**
+   * Role
+   * @minLength 1
+   */
+  role: string;
+  /**
+   * Phone
+   * @minLength 1
+   */
+  phone?: string | null;
+  /**
+   * Email
+   * @minLength 1
+   */
+  email?: string | null;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /**
+   * Department name
+   * @minLength 1
+   */
+  department_name?: string | null;
+  /** Completed this month */
+  completed_this_month: number;
+  /** Permissions */
+  permissions: Record<string, boolean>;
+}
+
+export interface B2BNotification {
+  /** Id */
+  id: number;
+  /**
+   * Kind
+   * @minLength 1
+   */
+  kind: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  /** Body */
+  body: string;
+  /** Payload */
+  payload: object;
+  /** Is read */
+  is_read: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface NotificationRead {
+  /** @default [] */
+  ids?: number[];
+}
+
+export interface StorageKindUsage {
+  /** Bytes */
+  bytes: number;
+  /** Files */
+  files: number;
+}
+
+export interface StorageUsage {
+  /** Used bytes */
+  used_bytes: number;
+  /** Quota bytes */
+  quota_bytes: number;
+  /** Available bytes */
+  available_bytes: number;
+  /** Used percent */
+  used_percent: number;
+  /** Max upload bytes */
+  max_upload_bytes: number;
+  /** By kind */
+  by_kind: Record<string, StorageKindUsage>;
+}
+
+export interface TaskList {
+  results: Task[];
+  /** Counters */
+  counters: Record<string, number>;
 }
 
 export interface TaskPatch {
@@ -4203,6 +5079,8 @@ export interface HotelDetail {
   /** @default [] */
   amenities: string[];
   amenity_ids: string[];
+  services: Record<string, string | null>[];
+  property_services: Record<string, string | null>[];
   /** Legal info */
   legal_info: Record<string, string | null>;
   /**
@@ -6011,6 +6889,10 @@ export interface PropertyHotelAdminList {
   amenities?: string[];
   /** @default [] */
   amenity_ids?: string[];
+  /** @default [] */
+  services?: Record<string, string | null>[];
+  /** @default [] */
+  property_services?: Record<string, string | null>[];
   /**
    * Legal info
    * @default {}
@@ -7474,6 +8356,12 @@ export type AdminAuthB2BCompaniesUsersListData = B2BUser[];
 
 export type AdminAuthB2BCompaniesUsersCreateData = B2BUser;
 
+export type AdminAuthB2BSupportListData = SupportThread[];
+
+export type AdminAuthB2BSupportReadData = SupportMessage[];
+
+export type AdminAuthB2BSupportCreateData = SupportMessage;
+
 export type AdminAuthHotelsListData = PropertyHotelCard[];
 
 export type AdminAuthHotelsReadData = Property;
@@ -7685,6 +8573,16 @@ export type B2BTripsVoucherListData = TravelVoucher;
 
 export type B2BTripsVoucherCreateData = TravelVoucher;
 
+export type B2BWorkspaceAttendanceListData = AttendanceDay;
+
+export type B2BWorkspaceAttendanceCheckInCreateData = AttendanceDay;
+
+export type B2BWorkspaceAttendanceLocationListData = AttendanceLocation;
+
+export type B2BWorkspaceAttendanceLocationUpdateData = AttendanceLocation;
+
+export type B2BWorkspaceAttendanceCreateData = AttendanceDay;
+
 export type B2BWorkspaceAuthLoginCreateData = any;
 
 export type B2BWorkspaceAuthLoginVerifyCreateData = any;
@@ -7703,7 +8601,11 @@ export type B2BWorkspaceChatsMessagesListData = WorkspaceChatMessage[];
 
 export type B2BWorkspaceChatsMessagesCreateData = WorkspaceChatMessage;
 
+export type B2BWorkspaceChatsMessagesDeleteData = any;
+
 export type B2BWorkspaceChatsReadCreateData = any;
+
+export type B2BWorkspaceCustomersListData = CustomerList;
 
 export type B2BWorkspaceEmployeeOfMonthListData = EmployeeOfMonth;
 
@@ -7733,13 +8635,71 @@ export type B2BWorkspaceLeadsListData = LeadList;
 
 export type B2BWorkspaceLeadsCreateData = Lead;
 
+export type B2BWorkspaceLeadsReadData = LeadDetail;
+
+export type B2BWorkspaceLeadsAssignCreateData = Lead;
+
 export type B2BWorkspaceLeadsClaimCreateData = Lead;
 
+export type B2BWorkspaceLeadsCommentsCreateData = LeadActivity;
+
 export type B2BWorkspaceLeadsCompleteCreateData = Lead;
+
+export type B2BWorkspaceLeadsItemsCreateData = LeadItem;
+
+export type B2BWorkspaceLeadsItemsUpdateData = LeadItem[];
+
+export type B2BWorkspaceLeadsItemsDeleteData = any;
+
+export type B2BWorkspaceLeadsStageCreateData = Lead;
+
+export type B2BWorkspaceLeadsTasksCreateData = Task;
+
+export type B2BWorkspaceMailAccountsListData = MailAccount[];
+
+export type B2BWorkspaceMailAccountsCreateData = MailAccount;
+
+export type B2BWorkspaceMailAccountsPartialUpdateData = MailAccount;
+
+export type B2BWorkspaceMailAccountsDeleteData = any;
+
+export type B2BWorkspaceMailAccountsReconnectCreateData = MailAccount;
+
+export type B2BWorkspaceMailAttachmentsCreateData = any;
+
+export type B2BWorkspaceMailAttachmentsReadData = any;
+
+export type B2BWorkspaceMailMessagesCreateData = MailMessage;
+
+export type B2BWorkspaceMailOauthGoogleListData = any;
+
+export type B2BWorkspaceMailOauthGoogleCallbackCreateData = MailAccount;
+
+export type B2BWorkspaceMailProvidersListData = MailProviderHint;
+
+export type B2BWorkspaceMailSyncCreateData = any;
+
+export type B2BWorkspaceMailThreadsListData = MailThread[];
+
+export type B2BWorkspaceMailThreadsFlagsCreateData = MailThread;
+
+export type B2BWorkspaceMailThreadsMessagesListData = MailMessage[];
+
+export type B2BWorkspaceMailThreadsReadCreateData = any;
 
 export type B2BWorkspaceMeListData = Me;
 
 export type B2BWorkspaceMeDeviceTokenCreateData = any;
+
+export type B2BWorkspaceNotificationsListData = B2BNotification[];
+
+export type B2BWorkspaceNotificationsReadCreateData = any;
+
+export type B2BWorkspaceStorageListData = StorageUsage;
+
+export type B2BWorkspaceSupportListData = SupportMessage[];
+
+export type B2BWorkspaceSupportCreateData = SupportMessage;
 
 export type B2BWorkspaceTasksListData = TaskList;
 
@@ -9434,6 +10394,61 @@ export namespace AdminAuth {
     export type RequestBody = B2BUser;
     export type RequestHeaders = {};
     export type ResponseBody = AdminAuthB2BCompaniesUsersCreateData;
+  }
+
+  /**
+   * @description One row per employee who has written in, newest first, with the count of their own lines nobody has answered yet. Across every company: this is WEEL's own desk, not a company's.
+   * @tags api
+   * @name AdminAuthB2BSupportList
+   * @summary GET ``/api/admin-auth/b2b/support/`` — the inbox.
+   * @request GET:/admin-auth/b2b/support/
+   * @secure
+   */
+  export namespace AdminAuthB2BSupportList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Employee name, company name or phone. */
+      search?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminAuthB2BSupportListData;
+  }
+
+  /**
+   * @description Reading marks the employee's lines answered, which is what clears them off the inbox counter. A reply is stored with ``is_staff`` set here rather than taken from the body, the same way the app cannot claim to be support.
+   * @tags api
+   * @name AdminAuthB2BSupportRead
+   * @summary GET/POST ``/api/admin-auth/b2b/support/<employee_id>/`` — one conversation, and the reply into it.
+   * @request GET:/admin-auth/b2b/support/{employee_id}/
+   * @secure
+   */
+  export namespace AdminAuthB2BSupportRead {
+    export type RequestParams = {
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminAuthB2BSupportReadData;
+  }
+
+  /**
+   * @description Reading marks the employee's lines answered, which is what clears them off the inbox counter. A reply is stored with ``is_staff`` set here rather than taken from the body, the same way the app cannot claim to be support.
+   * @tags api
+   * @name AdminAuthB2BSupportCreate
+   * @summary GET/POST ``/api/admin-auth/b2b/support/<employee_id>/`` — one conversation, and the reply into it.
+   * @request POST:/admin-auth/b2b/support/{employee_id}/
+   * @secure
+   */
+  export namespace AdminAuthB2BSupportCreate {
+    export type RequestParams = {
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = SupportMessageCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminAuthB2BSupportCreateData;
   }
 
   /**
@@ -11266,6 +12281,91 @@ export namespace B2B {
   }
 
   /**
+   * @description GET /api/b2b/workspace/attendance/ — today's roll call. Readable by everyone: it is on the chat home screen, and the point of it is knowing who is around. `?date=YYYY-MM-DD` reads another day.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAttendanceList
+   * @summary Attendance for a day
+   * @request GET:/b2b/workspace/attendance/
+   * @secure
+   */
+  export namespace B2BWorkspaceAttendanceList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** YYYY-MM-DD, defaults to today */
+      date?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAttendanceListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/attendance/check-in/ — "I'm here". Needs no capability: it only ever writes the caller's own row. The arrival time is taken from the server rather than the request, so a wrong device clock cannot become an arrival time nobody can argue with. When the company has a geofence on, the phone's coordinates are checked against it *here*, server-side — a client-side "close enough" is a check a modified app could always pass.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAttendanceCheckInCreate
+   * @summary Check yourself in for today
+   * @request POST:/b2b/workspace/attendance/check-in/
+   * @secure
+   */
+  export namespace B2BWorkspaceAttendanceCheckInCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = AttendanceCheckIn;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAttendanceCheckInCreateData;
+  }
+
+  /**
+   * @description GET / PUT ``attendance/location/`` — the office geofence. Read by everyone: the app needs `is_enabled` before it knows whether a check-in has to carry coordinates at all. Only the owner may change it — gated by `can_manage_attendance_location` rather than the manager-level `can_manage_attendance`, since this is company policy, not one person's day.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAttendanceLocationList
+   * @summary The office geofence attendance is checked against
+   * @request GET:/b2b/workspace/attendance/location/
+   * @secure
+   */
+  export namespace B2BWorkspaceAttendanceLocationList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAttendanceLocationListData;
+  }
+
+  /**
+   * @description GET / PUT ``attendance/location/`` — the office geofence. Read by everyone: the app needs `is_enabled` before it knows whether a check-in has to carry coordinates at all. Only the owner may change it — gated by `can_manage_attendance_location` rather than the manager-level `can_manage_attendance`, since this is company policy, not one person's day.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAttendanceLocationUpdate
+   * @summary Set or toggle the office geofence
+   * @request PUT:/b2b/workspace/attendance/location/
+   * @secure
+   */
+  export namespace B2BWorkspaceAttendanceLocationUpdate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = AttendanceLocationUpdate;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAttendanceLocationUpdateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/attendance/<employee_id>/ — record someone's day. A manager's screen. Marking yourself goes through check-in instead, which is why this does not special-case it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAttendanceCreate
+   * @summary Mark an employee present or absent
+   * @request POST:/b2b/workspace/attendance/{employee_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceAttendanceCreate {
+    export type RequestParams = {
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AttendanceMark;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAttendanceCreateData;
+  }
+
+  /**
    * @description POST /api/b2b/workspace/auth/login/ — send a login code.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceAuthLoginCreate
@@ -11404,7 +12504,7 @@ export namespace B2B {
    * @description GET / POST messages in a thread the caller belongs to.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceChatsMessagesCreate
-   * @summary Send a message
+   * @summary Send a message, optionally with a photo or video
    * @request POST:/b2b/workspace/chats/{thread_id}/messages/
    * @secure
    */
@@ -11413,9 +12513,37 @@ export namespace B2B {
       threadId: string;
     };
     export type RequestQuery = {};
-    export type RequestBody = MessageWrite;
+    export type RequestBody = {
+      /**
+       * @maxLength 4000
+       * @default ""
+       */
+      text?: string;
+      reply_to_id?: number | null;
+      /** @format binary */
+      file?: File;
+    };
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceChatsMessagesCreateData;
+  }
+
+  /**
+   * @description DELETE /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/ Your own message, always. Anyone else's only if you run the company — a manager has to be able to take down something posted in a shared room, and an employee must not be able to edit the record of what was said.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsMessagesDelete
+   * @summary Delete a message
+   * @request DELETE:/b2b/workspace/chats/{thread_id}/messages/{message_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsMessagesDelete {
+    export type RequestParams = {
+      threadId: string;
+      messageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsMessagesDeleteData;
   }
 
   /**
@@ -11434,6 +12562,25 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceChatsReadCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/customers/?q= — the company's customer directory. What step 1 of the "Yangi lead" sheet searches. Any employee may look a customer up: the point of the search is to stop the same buyer being typed in twice, and a directory only half the company can see would not. Deliberately not paged. It answers a search box the moment somebody stops typing, and twenty matches is already more than anyone reads before narrowing the query.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCustomersList
+   * @summary Search the customer directory
+   * @request GET:/b2b/workspace/customers/
+   * @secure
+   */
+  export namespace B2BWorkspaceCustomersList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Name, company or phone. Blank returns the most recent. */
+      q?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCustomersListData;
   }
 
   /**
@@ -11585,7 +12732,10 @@ export namespace B2B {
    */
   export namespace B2BWorkspaceFilesList {
     export type RequestParams = {};
-    export type RequestQuery = {};
+    export type RequestQuery = {
+      /** file (default), chat, or voucher */
+      kind?: string;
+    };
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceFilesListData;
@@ -11684,6 +12834,42 @@ export namespace B2B {
   }
 
   /**
+   * @description GET /api/b2b/workspace/leads/<id>/ — the whole lead in one response. The detail screen shows the lead, its priced lines, its history and the tasks raised off it all at once, so it fetches them together: four small queries on the server beats four round trips from a phone.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsRead
+   * @summary Lead detail with items, activity and linked tasks
+   * @request GET:/b2b/workspace/leads/{lead_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsRead {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsReadData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/leads/<id>/assign/ — hand the lead to somebody. Managers only, and distinct from claiming: claiming is first-come and self-service, this takes a lead off one employee and gives it to another.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsAssignCreate
+   * @summary Reassign a lead (managers only)
+   * @request POST:/b2b/workspace/leads/{lead_id}/assign/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsAssignCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = LeadAssignWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsAssignCreateData;
+  }
+
+  /**
    * @description POST /api/b2b/workspace/leads/<id>/claim/ — any employee takes a 'new' lead.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceLeadsClaimCreate
@@ -11702,6 +12888,24 @@ export namespace B2B {
   }
 
   /**
+   * @description POST /api/b2b/workspace/leads/<id>/comments/ — add a note to the history. Only open to whoever may see the contact: the history names the people and the calls, and it is withheld from the rest of the board for the same reason the phone number is.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsCommentsCreate
+   * @summary Comment on a lead
+   * @request POST:/b2b/workspace/leads/{lead_id}/comments/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsCommentsCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = LeadCommentWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsCommentsCreateData;
+  }
+
+  /**
    * @description POST /api/b2b/workspace/leads/<id>/complete/ — the claiming employee marks it resolved.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceLeadsCompleteCreate
@@ -11717,6 +12921,384 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceLeadsCompleteCreateData;
+  }
+
+  /**
+   * @description POST   /api/b2b/workspace/leads/<id>/items/ — add a priced line. PUT    /api/b2b/workspace/leads/<id>/items/ — replace the whole list. Either way the lead's ``amount`` is re-totalled, so the board's money never disagrees with the lines it came from.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsItemsCreate
+   * @summary Add a line item to a lead
+   * @request POST:/b2b/workspace/leads/{lead_id}/items/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsItemsCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = LeadItemWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsItemsCreateData;
+  }
+
+  /**
+   * @description POST   /api/b2b/workspace/leads/<id>/items/ — add a priced line. PUT    /api/b2b/workspace/leads/<id>/items/ — replace the whole list. Either way the lead's ``amount`` is re-totalled, so the board's money never disagrees with the lines it came from.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsItemsUpdate
+   * @summary Replace a lead's line items
+   * @request PUT:/b2b/workspace/leads/{lead_id}/items/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsItemsUpdate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = LeadItemWrite[];
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsItemsUpdateData;
+  }
+
+  /**
+   * @description DELETE /api/b2b/workspace/leads/<id>/items/<item_id>/.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsItemsDelete
+   * @summary Delete a lead's line item
+   * @request DELETE:/b2b/workspace/leads/{lead_id}/items/{item_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsItemsDelete {
+    export type RequestParams = {
+      leadId: string;
+      itemId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsItemsDeleteData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/leads/<id>/stage/ — move the lead along the funnel. The owner or a manager, and never on a closed lead. Reaching ``won`` or ``lost`` completes it; that rule lives in the repository so this view does not have to know which stages are terminal.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsStageCreate
+   * @summary Change a lead's funnel stage
+   * @request POST:/b2b/workspace/leads/{lead_id}/stage/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsStageCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = LeadStageWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsStageCreateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/leads/<id>/tasks/ — raise a task off this lead. Deliberately not gated on `can_create_task`: the point of the button on the lead screen is that the person working the deal can write down the next thing they have to do, and that is an employee more often than a manager. The task is created assigned to them.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsTasksCreate
+   * @summary Create a task linked to a lead
+   * @request POST:/b2b/workspace/leads/{lead_id}/tasks/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsTasksCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = TaskWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsTasksCreateData;
+  }
+
+  /**
+   * @description GET / POST /api/b2b/workspace/mail/accounts/ — the caller's own inboxes.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailAccountsList
+   * @summary List the inboxes this person has connected
+   * @request GET:/b2b/workspace/mail/accounts/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailAccountsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailAccountsListData;
+  }
+
+  /**
+   * @description GET / POST /api/b2b/workspace/mail/accounts/ — the caller's own inboxes.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailAccountsCreate
+   * @summary Connect an inbox with an app password
+   * @request POST:/b2b/workspace/mail/accounts/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailAccountsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = MailAccountConnect;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailAccountsCreateData;
+  }
+
+  /**
+   * @description PATCH / DELETE /api/b2b/workspace/mail/accounts/<id>/
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailAccountsPartialUpdate
+   * @summary Rename a connected inbox
+   * @request PATCH:/b2b/workspace/mail/accounts/{account_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailAccountsPartialUpdate {
+    export type RequestParams = {
+      accountId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = MailAccountPatch;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailAccountsPartialUpdateData;
+  }
+
+  /**
+   * @description PATCH / DELETE /api/b2b/workspace/mail/accounts/<id>/
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailAccountsDelete
+   * @summary Disconnect an inbox
+   * @request DELETE:/b2b/workspace/mail/accounts/{account_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailAccountsDelete {
+    export type RequestParams = {
+      accountId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailAccountsDeleteData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/mail/accounts/<id>/reconnect/ — new password.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailAccountsReconnectCreate
+   * @summary Replace a stored app password
+   * @request POST:/b2b/workspace/mail/accounts/{account_id}/reconnect/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailAccountsReconnectCreate {
+    export type RequestParams = {
+      accountId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = MailAccountConnect;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailAccountsReconnectCreateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/mail/attachments/ — upload before composing.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailAttachmentsCreate
+   * @summary Upload a file to attach to a message
+   * @request POST:/b2b/workspace/mail/attachments/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailAttachmentsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** @format binary */
+      file: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailAttachmentsCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/mail/attachments/<id>/ — redirect to the file.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailAttachmentsRead
+   * @summary Download an attachment
+   * @request GET:/b2b/workspace/mail/attachments/{attachment_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailAttachmentsRead {
+    export type RequestParams = {
+      attachmentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailAttachmentsReadData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/mail/messages/ — compose and send.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailMessagesCreate
+   * @summary Send an email
+   * @request POST:/b2b/workspace/mail/messages/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailMessagesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = MailSend;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailMessagesCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/mail/oauth/google/ — where to send the browser.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailOauthGoogleList
+   * @summary Begin Google sign-in
+   * @request GET:/b2b/workspace/mail/oauth/google/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailOauthGoogleList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailOauthGoogleListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/mail/oauth/google/callback/ — finish sign-in.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailOauthGoogleCallbackCreate
+   * @summary Complete Google sign-in
+   * @request POST:/b2b/workspace/mail/oauth/google/callback/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailOauthGoogleCallbackCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailOauthGoogleCallbackCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/mail/providers/?address=… — what to show next. Lets the connect screen say "Gmail needs an app password, here is the link" the moment an address is typed, instead of after a failed attempt.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailProvidersList
+   * @summary Guess a provider's settings from an address
+   * @request GET:/b2b/workspace/mail/providers/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailProvidersList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      address: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailProvidersListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/mail/sync/ — pull-to-refresh.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailSyncCreate
+   * @summary Check for new mail now
+   * @request POST:/b2b/workspace/mail/sync/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailSyncCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailSyncCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/mail/threads/ — the conversation list. With no ``account_id`` the caller's accounts are merged into one list, so somebody with a personal and a work inbox sees a single stream.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailThreadsList
+   * @summary List mail threads
+   * @request GET:/b2b/workspace/mail/threads/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailThreadsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Omit to merge every connected inbox */
+      account_id?: number;
+      /** inbox | sent | archive | trash */
+      folder?: string;
+      q?: string;
+      unread?: boolean;
+      starred?: boolean;
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailThreadsListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/mail/threads/<id>/flags/ — star, archive, trash.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailThreadsFlagsCreate
+   * @summary Star or move a thread
+   * @request POST:/b2b/workspace/mail/threads/{thread_id}/flags/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailThreadsFlagsCreate {
+    export type RequestParams = {
+      threadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = MailThreadFlags;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailThreadsFlagsCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/mail/threads/<id>/messages/
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailThreadsMessagesList
+   * @summary Messages in a thread (oldest first)
+   * @request GET:/b2b/workspace/mail/threads/{thread_id}/messages/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailThreadsMessagesList {
+    export type RequestParams = {
+      threadId: string;
+    };
+    export type RequestQuery = {
+      before_id?: number;
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailThreadsMessagesListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/mail/threads/<id>/read/
+   * @tags B2B / Mail
+   * @name B2BWorkspaceMailThreadsReadCreate
+   * @summary Mark a thread as read
+   * @request POST:/b2b/workspace/mail/threads/{thread_id}/read/
+   * @secure
+   */
+  export namespace B2BWorkspaceMailThreadsReadCreate {
+    export type RequestParams = {
+      threadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMailThreadsReadCreateData;
   }
 
   /**
@@ -11749,6 +13331,89 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceMeDeviceTokenCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/notifications/ — the real, server-stored feed. Replaces the feed both clients used to synthesise from whatever data they happened to have loaded, which could not show anything that arrived while the app was closed.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceNotificationsList
+   * @summary List notifications
+   * @request GET:/b2b/workspace/notifications/
+   * @secure
+   */
+  export namespace B2BWorkspaceNotificationsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      before_id?: number;
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceNotificationsListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/notifications/read/ — mark some or all read.
+   * @tags B2B / Mail
+   * @name B2BWorkspaceNotificationsReadCreate
+   * @summary Mark notifications read
+   * @request POST:/b2b/workspace/notifications/read/
+   * @secure
+   */
+  export namespace B2BWorkspaceNotificationsReadCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = NotificationRead;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceNotificationsReadCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/storage/ — how much of the 5 GB is gone. Read by everyone, not just the owner: an employee about to upload a video needs to know it will be refused before they spend the data sending it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceStorageList
+   * @summary Company storage usage and quota
+   * @request GET:/b2b/workspace/storage/
+   * @secure
+   */
+  export namespace B2BWorkspaceStorageList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceStorageListData;
+  }
+
+  /**
+   * @description GET/POST ``support/`` — the employee's own thread with WEEL support. No capability and no thread id. Every employee has exactly one conversation, it is scoped to whoever is calling, and it is created by the first message rather than by an explicit "open a ticket" step — a help desk that asks you to file a ticket before you can describe the problem is one people give up on. Reading it also marks support's replies seen, because opening the screen is what seeing them means; there is no separate "read" call for the app to forget to make.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceSupportList
+   * @summary The caller's support conversation
+   * @request GET:/b2b/workspace/support/
+   * @secure
+   */
+  export namespace B2BWorkspaceSupportList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceSupportListData;
+  }
+
+  /**
+   * @description GET/POST ``support/`` — the employee's own thread with WEEL support. No capability and no thread id. Every employee has exactly one conversation, it is scoped to whoever is calling, and it is created by the first message rather than by an explicit "open a ticket" step — a help desk that asks you to file a ticket before you can describe the problem is one people give up on. Reading it also marks support's replies seen, because opening the screen is what seeing them means; there is no separate "read" call for the app to forget to make.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceSupportCreate
+   * @summary Write to support
+   * @request POST:/b2b/workspace/support/
+   * @secure
+   */
+  export namespace B2BWorkspaceSupportCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = SupportMessageCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceSupportCreateData;
   }
 
   /**
