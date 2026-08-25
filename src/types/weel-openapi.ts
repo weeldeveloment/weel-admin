@@ -146,898 +146,6 @@ export interface SupportMessageCreate {
   text: string;
 }
 
-export interface PropertyHotelCard {
-  /** Id */
-  id?: number;
-  /**
-   * Guid
-   * @minLength 1
-   */
-  guid?: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title?: string;
-  /**
-   * Description
-   * @minLength 1
-   */
-  description?: string | null;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string | null;
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string | null;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string | null;
-  /**
-   * Address
-   * @minLength 1
-   */
-  address?: string | null;
-  /** @default [] */
-  img?: string[];
-  /** Star rating */
-  star_rating?: number | null;
-  /**
-   * Weel classification
-   * @minLength 1
-   */
-  weel_classification?: string | null;
-  /** @default [] */
-  themes?: string[];
-  /**
-   * City
-   * @minLength 1
-   */
-  city?: string | null;
-  /**
-   * Country
-   * @minLength 1
-   */
-  country?: string | null;
-  /** Latitude */
-  latitude?: number | null;
-  /** Longitude */
-  longitude?: number | null;
-  /**
-   * Min price
-   * @format decimal
-   */
-  min_price?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Timezone */
-  timezone?: string | null;
-  /**
-   * Rating
-   * @format decimal
-   */
-  rating?: string | null;
-  /**
-   * Review count
-   * @default 0
-   */
-  review_count?: number;
-  /**
-   * Booking count
-   * @default 0
-   */
-  booking_count?: number;
-  /**
-   * Available rooms
-   * @default 0
-   */
-  available_rooms?: number;
-  /** @default [] */
-  amenities?: string[];
-  /** @default [] */
-  amenity_ids?: string[];
-  /** @default [] */
-  services?: Record<string, string | null>[];
-  /** @default [] */
-  property_services?: Record<string, string | null>[];
-  /**
-   * Legal info
-   * @default {}
-   */
-  legal_info?: Record<string, string | null>;
-  /**
-   * Check in time
-   * @minLength 1
-   */
-  check_in_time?: string | null;
-  /**
-   * Check out time
-   * @minLength 1
-   */
-  check_out_time?: string | null;
-  /**
-   * Cancellation policy
-   * @minLength 1
-   */
-  cancellation_policy?: string | null;
-  /**
-   * Policies
-   * @default {}
-   */
-  policies?: Record<string, string | null>;
-  /** Is favorite */
-  is_favorite?: boolean;
-  /** Is verified */
-  is_verified?: boolean;
-  /** Is active */
-  is_active?: boolean;
-  /** Is testing */
-  is_testing?: boolean;
-  /** Is archived */
-  is_archived?: boolean;
-  /** Is recommended */
-  is_recommended?: boolean;
-  /** Verification status */
-  verification_status?: string | null;
-  /** Tenant schema */
-  tenant_schema?: string | null;
-  /**
-   * Organization
-   * @default {}
-   */
-  organization?: Record<string, string | null>;
-  /**
-   * Owner user
-   * @default {}
-   */
-  owner_user?: Record<string, string | null>;
-  /**
-   * Property detail
-   * @default {}
-   */
-  property_detail?: Record<string, string | null>;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at?: string | null;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at?: string | null;
-}
-
-export interface Property {
-  /** Id */
-  id: number;
-  /**
-   * Guid
-   * @minLength 1
-   */
-  guid: string;
-  /** Organization id */
-  organization_id: number;
-  /**
-   * Name
-   * @minLength 1
-   * @maxLength 200
-   */
-  name: string;
-  /** Description uz */
-  description_uz?: string | null;
-  /** Description ru */
-  description_ru?: string | null;
-  /** Description en */
-  description_en?: string | null;
-  /** Address */
-  address?: string | null;
-  /** Full address */
-  full_address?: string | null;
-  /** City */
-  city?: string | null;
-  /**
-   * Country
-   * @minLength 1
-   * @default "UZ"
-   */
-  country?: string;
-  /**
-   * Latitude
-   * @format decimal
-   */
-  latitude?: string | null;
-  /**
-   * Longitude
-   * @format decimal
-   */
-  longitude?: string | null;
-  /**
-   * Star rating
-   * @min 0
-   * @max 5
-   */
-  star_rating?: number | null;
-  /** Weel classification */
-  weel_classification?:
-    | "standard"
-    | "essential"
-    | "comfort"
-    | "comfort_plus"
-    | "business"
-    | "premium"
-    | "signature"
-    | null;
-  /** @default [] */
-  themes: (
-    | "beach"
-    | "ski"
-    | "city"
-    | "countryside"
-    | "lakefront"
-    | "mountain"
-    | "boutique"
-    | "business"
-    | "historic"
-    | "nature"
-    | "spa"
-    | "family"
-  )[];
-  /** @default [] */
-  amenities: string[];
-  /**
-   * Legal info
-   * @default {}
-   */
-  legal_info: string;
-  /** Check in time */
-  check_in_time?: string | null;
-  /** Check out time */
-  check_out_time?: string | null;
-  /** Cancellation policy */
-  cancellation_policy?: string | null;
-  /**
-   * Quiet hours
-   * @default true
-   */
-  quiet_hours?: boolean;
-  /**
-   * Alcohol allowed
-   * @default true
-   */
-  alcohol_allowed?: boolean;
-  /**
-   * Pets allowed
-   * @default false
-   */
-  pets_allowed?: boolean;
-  /**
-   * Timezone
-   * @minLength 1
-   * @default "Asia/Tashkent"
-   */
-  timezone?: string;
-  /** @default [] */
-  photos: string[];
-  /** Is active */
-  is_active: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-}
-
-export interface Change {
-  /** Value */
-  value: number;
-  /** Change */
-  change: number;
-  /** Change percent */
-  change_percent: number;
-}
-
-export interface ChangeWithCurrency {
-  /** Value */
-  value: number;
-  /** Change */
-  change: number;
-  /** Change percent */
-  change_percent: number;
-  /**
-   * Currency
-   * @minLength 1
-   */
-  currency: string;
-}
-
-export interface KPIResponse {
-  check_ins: Change;
-  revenue: ChangeWithCurrency;
-  bookings: Change;
-  occupancy: Change;
-  /** Current guests */
-  current_guests: string;
-}
-
-export interface ChartPoint {
-  /**
-   * Date
-   * @minLength 1
-   */
-  date: string;
-  /** Value */
-  value: number;
-  /** Previous value */
-  previous_value?: number | null;
-}
-
-export interface ChartResponse {
-  points: ChartPoint[];
-  /**
-   * Metric
-   * @minLength 1
-   */
-  metric: string;
-}
-
-export interface RoomAnalytics {
-  /** Room id */
-  room_id: number;
-  /**
-   * Room number
-   * @minLength 1
-   */
-  room_number: string;
-  /**
-   * Category
-   * @minLength 1
-   */
-  category: string;
-  occupancy: Change;
-  revenue: ChangeWithCurrency;
-  adr: ChangeWithCurrency;
-  revpar: ChangeWithCurrency;
-}
-
-export interface PeriodResponse {
-  /**
-   * Type
-   * @minLength 1
-   */
-  type: string;
-  /**
-   * Date from
-   * @minLength 1
-   */
-  date_from: string;
-  /**
-   * Date to
-   * @minLength 1
-   */
-  date_to: string;
-}
-
-export interface AnalyticsResponse {
-  kpi: KPIResponse;
-  chart: ChartResponse;
-  rooms: RoomAnalytics[];
-  period: PeriodResponse;
-}
-
-export interface Booking {
-  /** Id */
-  id: number;
-  /** Property id */
-  property_id: number;
-  /** Room id */
-  room_id: number;
-  /** Guest id */
-  guest_id?: number | null;
-  /**
-   * Booking number
-   * @minLength 1
-   */
-  booking_number: string;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-  /**
-   * Source
-   * @default "direct"
-   */
-  source?: "direct" | "ota" | "b2b" | "walk_in";
-  /**
-   * Meal plan
-   * @default "RO"
-   */
-  meal_plan?: "RO" | "BB" | "HB" | "FB" | "AI" | "UAI";
-  /**
-   * Adult count
-   * @min 1
-   * @default 1
-   */
-  adult_count?: number;
-  /**
-   * Child count
-   * @min 0
-   * @default 0
-   */
-  child_count?: number;
-  /**
-   * Rate
-   * @format decimal
-   */
-  rate?: string | null;
-  /**
-   * Currency
-   * @minLength 1
-   * @maxLength 3
-   * @default "USD"
-   */
-  currency?: string;
-  /**
-   * Payment status
-   * @default "pending"
-   */
-  payment_status?: "pending" | "paid" | "partial" | "refunded";
-  /**
-   * Total cost
-   * @format decimal
-   */
-  total_cost?: string | null;
-  /**
-   * Hold amount
-   * @format decimal
-   */
-  hold_amount?: string | null;
-  /**
-   * Confirmed at
-   * @format date-time
-   */
-  confirmed_at?: string | null;
-  /**
-   * Confirmation deadline
-   * @format date-time
-   */
-  confirmation_deadline?: string | null;
-  /** B2b company id */
-  b2b_company_id?: number | null;
-  /** Voucher number */
-  voucher_number?: string | null;
-  /** Notes */
-  notes?: string | null;
-  /**
-   * Room number
-   * @minLength 1
-   */
-  room_number?: string | null;
-  /**
-   * Guest first name
-   * @minLength 1
-   */
-  guest_first_name?: string | null;
-  /**
-   * Guest last name
-   * @minLength 1
-   */
-  guest_last_name?: string | null;
-  /**
-   * External provider
-   * @minLength 1
-   */
-  external_provider?: string | null;
-  /**
-   * External reservation id
-   * @minLength 1
-   */
-  external_reservation_id?: string | null;
-  /**
-   * External room id
-   * @minLength 1
-   */
-  external_room_id?: string | null;
-  /** External payload ref */
-  external_payload_ref: string;
-  /**
-   * Imported at
-   * @format date-time
-   */
-  imported_at?: string | null;
-  /**
-   * Last synced at
-   * @format date-time
-   */
-  last_synced_at?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-}
-
-export interface ClassifyProperty {
-  /**
-   * Star rating
-   * @min 0
-   * @max 5
-   */
-  star_rating?: number | null;
-  /** Weel classification */
-  weel_classification?:
-    | "standard"
-    | "essential"
-    | "comfort"
-    | "comfort_plus"
-    | "business"
-    | "premium"
-    | "signature"
-    | null;
-}
-
-export interface Review {
-  /** Id */
-  id: number;
-  /** Property id */
-  property_id: number;
-  /** Booking id */
-  booking_id?: number | null;
-  /**
-   * Guest name
-   * @minLength 1
-   * @maxLength 200
-   */
-  guest_name: string;
-  /**
-   * Rating
-   * @format decimal
-   */
-  rating: string;
-  /**
-   * Categories
-   * @default {}
-   */
-  categories: string;
-  /** Text */
-  text?: string | null;
-  /**
-   * Hotel response
-   * @minLength 1
-   */
-  hotel_response?: string | null;
-  /**
-   * Response date
-   * @format date-time
-   */
-  response_date?: string | null;
-  /** Is complained */
-  is_complained: boolean;
-  /**
-   * Complaint reason
-   * @minLength 1
-   */
-  complaint_reason?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-}
-
-export interface ReviewComplain {
-  /**
-   * Reason
-   * @minLength 1
-   * @maxLength 500
-   */
-  reason: string;
-}
-
-export interface ReviewRespond {
-  /**
-   * Response
-   * @minLength 1
-   * @maxLength 2000
-   */
-  response: string;
-}
-
-export interface RoomType {
-  /** Id */
-  id: number;
-  /** Property id */
-  property_id: number;
-  /** Preset */
-  preset?:
-    | "standard"
-    | "superior"
-    | "deluxe"
-    | "suite"
-    | "studio"
-    | "apartment"
-    | "family"
-    | "dormitory"
-    | "custom"
-    | null;
-  /**
-   * Custom name
-   * @maxLength 100
-   */
-  custom_name?: string | null;
-  /**
-   * Name
-   * @minLength 1
-   * @maxLength 100
-   */
-  name: string;
-  /** Description */
-  description?: string | null;
-  /**
-   * Base rate
-   * @format decimal
-   */
-  base_rate?: string | null;
-  /**
-   * Capacity
-   * @default 2
-   */
-  capacity?: number;
-  /** @default [] */
-  amenities: string[];
-  /** @default [] */
-  photos: string[];
-  /** Is active */
-  is_active: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-}
-
-export interface Room {
-  /** Id */
-  id: number;
-  /** Property id */
-  property_id: number;
-  /** Room type id */
-  room_type_id?: number | null;
-  /**
-   * Room type
-   * @minLength 1
-   */
-  room_type?: string | null;
-  /** Room type name */
-  room_type_name?: string | null;
-  /** Room type preset */
-  room_type_preset?: string | null;
-  /**
-   * Room number
-   * @minLength 1
-   * @maxLength 20
-   */
-  room_number: string;
-  /** Display name */
-  display_name?: string | null;
-  /**
-   * Floor
-   * @default 1
-   */
-  floor?: number;
-  /**
-   * Area
-   * @format decimal
-   */
-  area?: string | null;
-  /**
-   * Bedroom count
-   * @default 1
-   */
-  bedroom_count?: number;
-  /**
-   * Beds
-   * @default []
-   */
-  beds: string;
-  /** @default [] */
-  amenities: string[];
-  /** @default [] */
-  photos: string[];
-  /**
-   * Condition
-   * @default "clean"
-   */
-  condition?: "clean" | "dirty" | "inspection" | "maintenance";
-  /**
-   * Availability
-   * @default "available"
-   */
-  availability?: "available" | "occupied" | "blocked";
-  /**
-   * Capacity
-   * @default 2
-   */
-  capacity?: number;
-  /**
-   * Meal plan
-   * @default "BB"
-   */
-  meal_plan?: "RO" | "BB" | "HB" | "FB" | "AI" | "UAI";
-  /**
-   * Base price
-   * @format decimal
-   */
-  base_price?: string | null;
-  /**
-   * Currency
-   * @default "UZS"
-   */
-  currency?: string | null;
-  /**
-   * Cover photo index
-   * @default 0
-   */
-  cover_photo_index?: number;
-  /** Is active */
-  is_active?: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-}
-
-export interface AdminHotelRoomCreate {
-  /** Id */
-  id?: number;
-  /** Property id */
-  property_id?: number;
-  /**
-   * Room type id
-   * @min 1
-   */
-  room_type_id: number;
-  /**
-   * Room type
-   * @minLength 1
-   */
-  room_type?: string | null;
-  /**
-   * Room type name
-   * @minLength 1
-   */
-  room_type_name?: string;
-  /**
-   * Room type preset
-   * @minLength 1
-   */
-  room_type_preset?: string;
-  /**
-   * Room number
-   * @minLength 1
-   * @maxLength 20
-   */
-  room_number: string;
-  /** Display name */
-  display_name?: string | null;
-  /**
-   * Floor
-   * @default 1
-   */
-  floor?: number;
-  /**
-   * Area
-   * @format decimal
-   */
-  area?: string | null;
-  /**
-   * Bedroom count
-   * @min 0
-   * @default 1
-   */
-  bedroom_count?: number;
-  /**
-   * Beds
-   * @default []
-   */
-  beds?: string;
-  /** @default [] */
-  amenities?: string[];
-  /** @default [] */
-  photos?: string[];
-  /**
-   * Condition
-   * @default "clean"
-   */
-  condition?: "clean" | "dirty" | "inspection" | "maintenance";
-  /**
-   * Availability
-   * @default "available"
-   */
-  availability?: "available" | "occupied" | "blocked";
-  /**
-   * Capacity
-   * @min 1
-   * @default 2
-   */
-  capacity?: number;
-  /**
-   * Meal plan
-   * @default "BB"
-   */
-  meal_plan?: "RO" | "BB" | "HB" | "FB" | "AI" | "UAI";
-  /**
-   * Base price
-   * @format decimal
-   */
-  base_price?: string | null;
-  /**
-   * Currency
-   * @default "UZS"
-   */
-  currency?: string | null;
-  /**
-   * Cover photo index
-   * @default 0
-   */
-  cover_photo_index?: number;
-  /** Is active */
-  is_active?: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at?: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at?: string;
-}
-
 export interface AdminCreate {
   /**
    * Email
@@ -1081,6 +189,333 @@ export interface AdminUser {
   is_staff: string;
   /** Is superuser */
   is_superuser: string;
+}
+
+export interface AviaBookingPassenger {
+  /** Id */
+  id?: number;
+  /**
+   * Passenger key
+   * @minLength 1
+   */
+  passenger_key?: string;
+  /**
+   * First name
+   * @minLength 1
+   */
+  first_name?: string;
+  /**
+   * Last name
+   * @minLength 1
+   */
+  last_name?: string;
+  /**
+   * Middle name
+   * @minLength 1
+   */
+  middle_name?: string | null;
+  /**
+   * Age group
+   * @minLength 1
+   */
+  age_group?: string;
+  /**
+   * Gender
+   * @minLength 1
+   */
+  gender?: string | null;
+  /**
+   * Birthdate
+   * @format date
+   */
+  birthdate?: string | null;
+  /**
+   * Citizenship
+   * @minLength 1
+   */
+  citizenship?: string | null;
+  /**
+   * Doc type
+   * @minLength 1
+   */
+  doc_type?: string | null;
+  /**
+   * Doc number
+   * @minLength 1
+   */
+  doc_number?: string | null;
+  /**
+   * Doc expire
+   * @format date
+   */
+  doc_expire?: string | null;
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string | null;
+  /** Tickets */
+  tickets?: object;
+  /**
+   * Itinerary receipt url
+   * @minLength 1
+   */
+  itinerary_receipt_url?: string | null;
+}
+
+export interface AviaBooking {
+  /** Id */
+  id?: number;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string;
+  /**
+   * Provider booking id
+   * @minLength 1
+   */
+  provider_booking_id?: string;
+  /**
+   * Booking number
+   * @minLength 1
+   */
+  booking_number?: string | null;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status?: string;
+  /**
+   * Offer type
+   * @minLength 1
+   */
+  offer_type?: string | null;
+  /**
+   * Flight type
+   * @minLength 1
+   */
+  flight_type?: string | null;
+  /**
+   * Fare family type
+   * @minLength 1
+   */
+  fare_family_type?: string | null;
+  /** Is charter */
+  is_charter?: boolean;
+  /** Refund availability */
+  refund_availability?: boolean;
+  /**
+   * Amount
+   * @format decimal
+   */
+  amount?: string | null;
+  /**
+   * Prev amount
+   * @format decimal
+   */
+  prev_amount?: string | null;
+  /**
+   * Currency
+   * @minLength 1
+   */
+  currency?: string | null;
+  /**
+   * Payer name
+   * @minLength 1
+   */
+  payer_name?: string | null;
+  /**
+   * Payer email
+   * @minLength 1
+   */
+  payer_email?: string | null;
+  /**
+   * Payer tel
+   * @minLength 1
+   */
+  payer_tel?: string | null;
+  /** B2b trip id */
+  b2b_trip_id?: number | null;
+  /** B2b employee id */
+  b2b_employee_id?: number | null;
+  /**
+   * Provider created at
+   * @format date-time
+   */
+  provider_created_at?: string | null;
+  /**
+   * Expires at
+   * @format date-time
+   */
+  expires_at?: string | null;
+  /** Directions */
+  directions?: object;
+  /** Information for clients */
+  information_for_clients?: object;
+  /** Additional services */
+  additional_services?: object | null;
+  /** Fiscalization */
+  fiscalization?: object | null;
+  passengers?: AviaBookingPassenger[];
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at?: string;
+  /**
+   * Updated at
+   * @format date-time
+   */
+  updated_at?: string;
+}
+
+export interface Passenger {
+  /**
+   * First name
+   * @minLength 1
+   * @maxLength 120
+   */
+  first_name: string;
+  /**
+   * Last name
+   * @minLength 1
+   * @maxLength 120
+   */
+  last_name: string;
+  /**
+   * Middle name
+   * @minLength 1
+   * @maxLength 120
+   */
+  middle_name?: string | null;
+  /** Age */
+  age: "adt" | "chd" | "inf" | "ins";
+  /**
+   * Birthdate
+   * @format date
+   */
+  birthdate: string;
+  /** Gender */
+  gender: "F" | "M";
+  /**
+   * Citizenship
+   * @minLength 2
+   * @maxLength 2
+   */
+  citizenship: string;
+  /**
+   * Tel
+   * @minLength 1
+   * @maxLength 32
+   */
+  tel: string;
+  /**
+   * Doc type
+   * @minLength 1
+   * @maxLength 8
+   * @default "A"
+   */
+  doc_type?: string;
+  /**
+   * Doc number
+   * @minLength 1
+   * @maxLength 64
+   */
+  doc_number: string;
+  /**
+   * Doc expire
+   * @format date
+   */
+  doc_expire: string;
+}
+
+export interface B2BCreateBooking {
+  /**
+   * Payer name
+   * @minLength 1
+   * @maxLength 255
+   */
+  payer_name: string;
+  /**
+   * Payer email
+   * @format email
+   * @minLength 1
+   */
+  payer_email: string;
+  /**
+   * Payer tel
+   * @minLength 1
+   * @pattern ^\+\d{9,15}$
+   */
+  payer_tel: string;
+  /**
+   * Order note
+   * @maxLength 64
+   */
+  order_note?: string;
+  passengers: Passenger[];
+  additional_services?: string[];
+  /** Trip id */
+  trip_id?: number | null;
+  /** Employee id */
+  employee_id?: number | null;
+}
+
+export interface Direction {
+  /**
+   * Departure airport
+   * @minLength 3
+   * @maxLength 3
+   */
+  departure_airport: string;
+  /**
+   * Arrival airport
+   * @minLength 3
+   * @maxLength 3
+   */
+  arrival_airport: string;
+  /**
+   * Date
+   * @format date
+   */
+  date: string;
+}
+
+export interface OfferSearch {
+  directions: Direction[];
+  /**
+   * Service class
+   * @default "E"
+   */
+  service_class?: "A" | "B" | "E";
+  /**
+   * Adults
+   * @min 1
+   * @max 9
+   */
+  adults: number;
+  /**
+   * Children
+   * @min 0
+   * @max 9
+   * @default 0
+   */
+  children?: number;
+  /**
+   * Infants
+   * @min 0
+   * @max 9
+   * @default 0
+   */
+  infants?: number;
+  /**
+   * Infants with seat
+   * @min 0
+   * @max 9
+   * @default 0
+   */
+  infants_with_seat?: number;
 }
 
 export interface B2BLoginSendOTP {
@@ -1325,7 +760,7 @@ export interface B2BEmployee {
    * Role
    * @default "employee"
    */
-  role?: "owner" | "performer" | "employee";
+  role?: "owner" | "performer" | "lider" | "employee";
   /** Is active */
   is_active: boolean;
   /**
@@ -1502,623 +937,6 @@ export interface TopEmployeeByTrips {
   department_name?: string | null;
   /** Trip count */
   trip_count: number;
-}
-
-export interface HotelBookingRequest {
-  /** Id */
-  id: number;
-  /** Company id */
-  company_id: number;
-  /** Trip id */
-  trip_id?: number | null;
-  /**
-   * Tenant schema
-   * @minLength 1
-   */
-  tenant_schema: string;
-  /** Hotel property id */
-  hotel_property_id: number;
-  /**
-   * Hotel name
-   * @minLength 1
-   */
-  hotel_name?: string | null;
-  /**
-   * Hotel guid
-   * @minLength 1
-   */
-  hotel_guid?: string | null;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /** Status */
-  status: "pending" | "confirmed" | "rejected" | "cancelled";
-  /**
-   * Room count
-   * @default 0
-   */
-  room_count?: number;
-  /**
-   * Employee count
-   * @default 0
-   */
-  employee_count?: number;
-  /** Requested by */
-  requested_by?: number | null;
-  /**
-   * Reviewed at
-   * @format date-time
-   */
-  reviewed_at?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-}
-
-export interface HotelBookingRoomRequest {
-  /** Room id */
-  room_id: number;
-  /**
-   * @maxItems 2
-   * @minItems 1
-   */
-  employee_ids: number[];
-}
-
-export interface HotelBookingRequestCreate {
-  /** Trip id */
-  trip_id: number;
-  /**
-   * Hotel guid
-   * @minLength 1
-   */
-  hotel_guid: string;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  rooms: HotelBookingRoomRequest[];
-}
-
-export interface HotelBookingRoomEmployee {
-  /** Employee id */
-  employee_id: number;
-  /**
-   * Full name
-   * @minLength 1
-   */
-  full_name?: string | null;
-  /**
-   * Position
-   * @minLength 1
-   */
-  position?: string | null;
-}
-
-export interface HotelBookingRoom {
-  /** Id */
-  id: number;
-  /** Room id */
-  room_id: number;
-  /**
-   * Room name
-   * @minLength 1
-   */
-  room_name?: string | null;
-  /**
-   * Price per night
-   * @format decimal
-   */
-  price_per_night?: string | null;
-  /**
-   * Total price
-   * @format decimal
-   */
-  total_price?: string | null;
-  /** Pms booking id */
-  pms_booking_id?: number | null;
-  employees: HotelBookingRoomEmployee[];
-}
-
-export interface HotelBookingRequestDetail {
-  /** Id */
-  id: number;
-  /** Company id */
-  company_id: number;
-  /** Trip id */
-  trip_id?: number | null;
-  /**
-   * Tenant schema
-   * @minLength 1
-   */
-  tenant_schema: string;
-  /** Hotel property id */
-  hotel_property_id: number;
-  /**
-   * Hotel name
-   * @minLength 1
-   */
-  hotel_name?: string | null;
-  /**
-   * Hotel guid
-   * @minLength 1
-   */
-  hotel_guid?: string | null;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /** Status */
-  status: "pending" | "confirmed" | "rejected" | "cancelled";
-  /**
-   * Room count
-   * @default 0
-   */
-  room_count?: number;
-  /**
-   * Employee count
-   * @default 0
-   */
-  employee_count?: number;
-  /** Requested by */
-  requested_by?: number | null;
-  /**
-   * Reviewed at
-   * @format date-time
-   */
-  reviewed_at?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  rooms: HotelBookingRoom[];
-}
-
-export interface HotelCity {
-  /**
-   * City
-   * @minLength 1
-   */
-  city: string;
-  /** Hotel count */
-  hotel_count: number;
-}
-
-export interface HotelCityList {
-  results: HotelCity[];
-}
-
-export interface TopHotelByBookings {
-  /**
-   * Tenant schema
-   * @minLength 1
-   */
-  tenant_schema: string;
-  /** Hotel property id */
-  hotel_property_id: number;
-  /**
-   * Hotel name
-   * @minLength 1
-   */
-  hotel_name?: string | null;
-  /**
-   * Hotel guid
-   * @minLength 1
-   */
-  hotel_guid?: string | null;
-  /** Booking count */
-  booking_count: number;
-  /**
-   * Total spend
-   * @format decimal
-   */
-  total_spend: string;
-}
-
-export interface HotelMonthlySummary {
-  /** Year */
-  year: number;
-  /** Month */
-  month: number;
-  /**
-   * Month spend
-   * @minLength 1
-   */
-  month_spend: string;
-  top_hotels: TopHotelByBookings[];
-}
-
-export interface HotelSearchMatchingRoom {
-  /** Id */
-  id: number;
-  /**
-   * Room number
-   * @minLength 1
-   */
-  room_number?: string | null;
-  /** Floor */
-  floor?: number | null;
-  /**
-   * Display name
-   * @minLength 1
-   */
-  display_name?: string | null;
-  /** Room type id */
-  room_type_id?: number | null;
-  /**
-   * Bedroom count
-   * @default 1
-   */
-  bedroom_count: number;
-  /**
-   * Price per night
-   * @format decimal
-   */
-  price_per_night?: string | null;
-  /**
-   * Currency
-   * @minLength 1
-   */
-  currency?: string | null;
-  /** Beds */
-  beds: object;
-  amenities: string[];
-  /** Capacity adults */
-  capacity_adults?: number | null;
-  /** Capacity children */
-  capacity_children?: number | null;
-  /**
-   * Room type name
-   * @minLength 1
-   */
-  room_type_name?: string | null;
-  /**
-   * Preset
-   * @minLength 1
-   */
-  preset?: string | null;
-  /**
-   * Sellability
-   * @minLength 1
-   */
-  sellability?: string | null;
-  /**
-   * Is available
-   * @default true
-   */
-  is_available: boolean;
-  /** Area sqm */
-  area_sqm?: number | null;
-  /**
-   * Meal plan
-   * @minLength 1
-   */
-  meal_plan?: string | null;
-  /** Img */
-  img: object;
-  /** Nights */
-  nights: number;
-  /**
-   * Total price
-   * @format decimal
-   */
-  total_price?: string | null;
-}
-
-export interface HotelCard {
-  /** Id */
-  id: number;
-  /**
-   * Guid
-   * @minLength 1
-   */
-  guid?: string | null;
-  /**
-   * Organization name
-   * @minLength 1
-   */
-  organization_name?: string | null;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  /**
-   * City
-   * @minLength 1
-   */
-  city?: string | null;
-  /**
-   * Country
-   * @minLength 1
-   */
-  country?: string | null;
-  /**
-   * Address
-   * @minLength 1
-   */
-  address?: string | null;
-  /**
-   * Full address
-   * @minLength 1
-   */
-  full_address?: string | null;
-  /**
-   * Description
-   * @minLength 1
-   */
-  description?: string | null;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string | null;
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string | null;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string | null;
-  /** Star rating */
-  star_rating?: number | null;
-  /**
-   * Weel classification
-   * @minLength 1
-   */
-  weel_classification?: string | null;
-  /**
-   * Is recommended
-   * @default false
-   */
-  is_recommended: boolean;
-  /**
-   * Is verified
-   * @default false
-   */
-  is_verified: boolean;
-  /**
-   * Is active
-   * @default true
-   */
-  is_active: boolean;
-  /**
-   * Is testing
-   * @default false
-   */
-  is_testing: boolean;
-  /**
-   * Is archived
-   * @default false
-   */
-  is_archived: boolean;
-  /**
-   * Verification status
-   * @minLength 1
-   */
-  verification_status?: string | null;
-  themes: string[];
-  amenities: string[];
-  amenity_ids: string[];
-  services: Record<string, string | null>[];
-  property_services: Record<string, string | null>[];
-  /** Legal info */
-  legal_info: Record<string, string | null>;
-  /**
-   * Booking count
-   * @default 0
-   */
-  booking_count: number;
-  /**
-   * Rating
-   * @format decimal
-   */
-  rating?: string | null;
-  /**
-   * Review count
-   * @default 0
-   */
-  review_count: number;
-  /**
-   * Available rooms
-   * @default 0
-   */
-  available_rooms: number;
-  /**
-   * Total estimated price
-   * @format decimal
-   */
-  total_estimated_price?: string | null;
-  matching_rooms?: HotelSearchMatchingRoom[];
-  /** Check in time */
-  check_in_time?: string | null;
-  /** Check out time */
-  check_out_time?: string | null;
-  /**
-   * Cancellation policy
-   * @minLength 1
-   */
-  cancellation_policy?: string | null;
-  /** Policies */
-  policies: Record<string, string | null>;
-  /**
-   * Currency
-   * @minLength 1
-   */
-  currency?: string | null;
-  /**
-   * Timezone
-   * @minLength 1
-   */
-  timezone?: string | null;
-  /** Latitude */
-  latitude?: number | null;
-  /** Longitude */
-  longitude?: number | null;
-  /**
-   * Min price
-   * @format decimal
-   */
-  min_price?: string | null;
-  img: string[];
-  /**
-   * Is favorite
-   * @default false
-   */
-  is_favorite: boolean;
-  /** Organization */
-  organization: Record<string, string | null>;
-  /** Partner user */
-  partner_user?: Record<string, string | null>;
-  /** Property detail */
-  property_detail: Record<string, string | null>;
-  /**
-   * Tenant schema
-   * @minLength 1
-   */
-  tenant_schema?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at?: string | null;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at?: string | null;
-}
-
-export interface HotelSearchPage {
-  /** Count */
-  count: number;
-  /** Page */
-  page: number;
-  /** Page size */
-  page_size: number;
-  results: HotelCard[];
-}
-
-export interface B2BHotelCalendar {
-  /** Room id */
-  room_id: number;
-  /**
-   * Room name
-   * @minLength 1
-   */
-  room_name?: string | null;
-  /**
-   * Date
-   * @format date
-   */
-  date: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-}
-
-export interface RoomAvailability {
-  /** Id */
-  id: number;
-  /**
-   * Room number
-   * @minLength 1
-   */
-  room_number?: string | null;
-  /** Floor */
-  floor?: number | null;
-  /**
-   * Display name
-   * @minLength 1
-   */
-  display_name?: string | null;
-  /** Room type id */
-  room_type_id?: number | null;
-  /**
-   * Bedroom count
-   * @default 1
-   */
-  bedroom_count?: number;
-  /**
-   * Price per night
-   * @format decimal
-   */
-  price_per_night?: string | null;
-  /**
-   * Currency
-   * @minLength 1
-   */
-  currency?: string | null;
-  /**
-   * Beds
-   * @default []
-   */
-  beds: object;
-  /** @default [] */
-  amenities: string[];
-  /** Capacity adults */
-  capacity_adults?: number | null;
-  /** Capacity children */
-  capacity_children?: number | null;
-  /**
-   * Room type name
-   * @minLength 1
-   */
-  room_type_name?: string | null;
-  /**
-   * Preset
-   * @minLength 1
-   */
-  preset?: string | null;
-  /**
-   * Sellability
-   * @minLength 1
-   */
-  sellability?: string | null;
-  /**
-   * Is available
-   * @default true
-   */
-  is_available?: boolean;
-  /** Area sqm */
-  area_sqm?: number | null;
-  /**
-   * Meal plan
-   * @minLength 1
-   */
-  meal_plan?: string | null;
-  /**
-   * Img
-   * @default []
-   */
-  img: object;
 }
 
 export interface B2BLeadRequest {
@@ -2647,56 +1465,6 @@ export interface ActiveTripEmployee {
    * @format date-time
    */
   assigned_at: string;
-  /**
-   * Hotel name
-   * @minLength 1
-   */
-  hotel_name?: string | null;
-  /**
-   * Voucher number
-   * @minLength 1
-   */
-  voucher_number?: string | null;
-  /**
-   * Room name
-   * @minLength 1
-   */
-  room_name?: string | null;
-  /**
-   * Price per night
-   * @format decimal
-   */
-  price_per_night?: string | null;
-  /**
-   * Total price
-   * @format decimal
-   */
-  total_price?: string | null;
-  /**
-   * Hotel address
-   * @minLength 1
-   */
-  hotel_address?: string | null;
-  /**
-   * Hotel maps url
-   * @minLength 1
-   */
-  hotel_maps_url?: string | null;
-  /**
-   * Hotel qr
-   * @minLength 1
-   */
-  hotel_qr?: string | null;
-  /**
-   * Hotel check in time
-   * @minLength 1
-   */
-  hotel_check_in_time?: string | null;
-  /**
-   * Hotel check out time
-   * @minLength 1
-   */
-  hotel_check_out_time?: string | null;
   /** Pms accepted */
   pms_accepted: string;
 }
@@ -2809,6 +1577,77 @@ export interface TravelVoucher {
   created_at: string;
 }
 
+export interface RoleAccess {
+  modules: string[];
+  permissions: string[];
+}
+
+export interface JoinRequest {
+  /**
+   * Slug
+   * @minLength 1
+   * @maxLength 50
+   */
+  slug: string;
+  /**
+   * Message
+   * @maxLength 1000
+   */
+  message?: string;
+  modules?: string[] | null;
+}
+
+export interface Profile {
+  /**
+   * First name
+   * @minLength 1
+   * @maxLength 100
+   */
+  first_name: string;
+  /**
+   * Last name
+   * @maxLength 100
+   */
+  last_name?: string;
+  /**
+   * Username
+   * @minLength 1
+   * @maxLength 50
+   */
+  username: string;
+}
+
+export interface WorkspaceCreate {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 200
+   */
+  name: string;
+  /** Org id */
+  org_id?: number | null;
+  /**
+   * Description
+   * @maxLength 500
+   */
+  description?: string;
+  /**
+   * Icon
+   * @maxLength 20
+   */
+  icon?: string | null;
+  /**
+   * Workspace name
+   * @maxLength 200
+   */
+  workspace_name?: string;
+  /**
+   * Tax id
+   * @maxLength 20
+   */
+  tax_id?: string;
+}
+
 export interface AttendanceEntry {
   /** Employee id */
   employee_id: number;
@@ -2863,7 +1702,26 @@ export interface AttendanceDay {
    * @minLength 1
    */
   my_status?: string | null;
+  /**
+   * My reason
+   * @minLength 1
+   */
+  my_reason?: string | null;
   entries: AttendanceEntry[];
+}
+
+export interface AttendanceSelfAbsence {
+  /**
+   * Reason
+   * @minLength 1
+   * @maxLength 200
+   */
+  reason: string;
+  /**
+   * Date
+   * @format date
+   */
+  date?: string;
 }
 
 export interface AttendanceCheckIn {
@@ -3003,6 +1861,149 @@ export interface ThreadFlags {
   is_muted?: boolean;
 }
 
+export interface CrmCustomer {
+  /** Id */
+  id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Phone
+   * @minLength 1
+   */
+  phone: string;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name?: string | null;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /** Deal count */
+  deal_count: number;
+  /**
+   * Total amount
+   * @format decimal
+   */
+  total_amount: string;
+  /**
+   * Last activity at
+   * @format date-time
+   */
+  last_activity_at?: string | null;
+  /** Is active */
+  is_active: boolean;
+}
+
+export interface CrmCustomerList {
+  results: CrmCustomer[];
+}
+
+export interface CrmMonthlyAmount {
+  /**
+   * Month
+   * @minLength 1
+   */
+  month: string;
+  /**
+   * Amount
+   * @format decimal
+   */
+  amount: string;
+}
+
+export interface CrmDeal {
+  /** Id */
+  id: number;
+  /**
+   * Amount
+   * @format decimal
+   */
+  amount: string;
+  /** Stage */
+  stage:
+    | "new"
+    | "interested"
+    | "proposal"
+    | "negotiation"
+    | "contract"
+    | "won"
+    | "lost";
+  /** Status */
+  status: "new" | "in_progress" | "completed";
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Completed at
+   * @format date-time
+   */
+  completed_at?: string | null;
+}
+
+export interface CrmCustomerDetail {
+  /** Id */
+  id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Phone
+   * @minLength 1
+   */
+  phone: string;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name?: string | null;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /** Deal count */
+  deal_count: number;
+  /**
+   * Total amount
+   * @format decimal
+   */
+  total_amount: string;
+  /**
+   * Last activity at
+   * @format date-time
+   */
+  last_activity_at?: string | null;
+  /** Is active */
+  is_active: boolean;
+  /**
+   * Email
+   * @minLength 1
+   */
+  email?: string | null;
+  /**
+   * Address
+   * @minLength 1
+   */
+  address?: string | null;
+  /**
+   * Top manager name
+   * @minLength 1
+   */
+  top_manager_name?: string | null;
+  monthly_amounts: CrmMonthlyAmount[];
+  deals: CrmDeal[];
+}
+
 export interface Customer {
   /** Id */
   id: number;
@@ -3101,6 +2102,21 @@ export interface EmployeeMonthlyStat {
   on_time_count: number;
   /** On time rate */
   on_time_rate?: number | null;
+  /** Present days */
+  present_days: number;
+  /** Absent days */
+  absent_days: number;
+  /** Unexcused days */
+  unexcused_days: number;
+  /** Attendance rate */
+  attendance_rate?: number | null;
+}
+
+export interface EmployeeAccess {
+  /** Role */
+  role?: "owner" | "admin" | "manager" | "employee" | "guest";
+  modules?: string[] | null;
+  permissions?: string[] | null;
 }
 
 export interface CalendarEvent {
@@ -3248,6 +2264,77 @@ export interface WorkspaceFileList {
   results: WorkspaceFile[];
 }
 
+export interface WorkspaceFilePatch {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 300
+   */
+  name?: string;
+  /** Folder id */
+  folder_id?: number | null;
+}
+
+export interface WorkspaceFolder {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /** Author id */
+  author_id: number;
+  /** File count */
+  file_count: number;
+  /** Size bytes */
+  size_bytes: number;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface WorkspaceFolderList {
+  results: WorkspaceFolder[];
+}
+
+export interface WorkspaceFolderWrite {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 120
+   */
+  name: string;
+}
+
+export interface InviteCreate {
+  /** Role */
+  role: "owner" | "admin" | "manager" | "employee" | "guest";
+  modules?: string[] | null;
+  permissions?: string[] | null;
+  /**
+   * Days
+   * @min 1
+   * @max 30
+   */
+  days?: number;
+  /** Thread id */
+  thread_id?: number | null;
+}
+
+export interface JoinDecision {
+  /** Role */
+  role?: "owner" | "admin" | "manager" | "employee" | "guest";
+  modules?: string[] | null;
+  /**
+   * Reason
+   * @maxLength 1000
+   */
+  reason?: string;
+}
+
 export interface Lead {
   /** Id */
   id: number;
@@ -3354,6 +2441,14 @@ export interface Lead {
   can_complete: boolean;
   /** Can view details */
   can_view_details: boolean;
+  /** Can work */
+  can_work?: boolean;
+  /** Can change stage */
+  can_change_stage?: boolean;
+  /** Can assign */
+  can_assign?: boolean;
+  /** Can delete */
+  can_delete?: boolean;
   /** Item count */
   item_count?: number;
   /** Task count */
@@ -3674,6 +2769,14 @@ export interface LeadDetail {
   can_complete: boolean;
   /** Can view details */
   can_view_details: boolean;
+  /** Can work */
+  can_work?: boolean;
+  /** Can change stage */
+  can_change_stage?: boolean;
+  /** Can assign */
+  can_assign?: boolean;
+  /** Can delete */
+  can_delete?: boolean;
   /** Item count */
   item_count?: number;
   /** Task count */
@@ -3740,7 +2843,7 @@ export interface TaskWrite {
    * Status
    * @default "todo"
    */
-  status?: "todo" | "in_progress" | "review" | "done";
+  status?: "todo" | "in_progress" | "done";
   /**
    * Priority
    * @default "medium"
@@ -4057,6 +3160,11 @@ export interface MailThreadFlags {
 export interface Me {
   /** Id */
   id: number;
+  /**
+   * Username
+   * @minLength 1
+   */
+  username?: string | null;
   /** Company id */
   company_id: number;
   /**
@@ -4064,6 +3172,18 @@ export interface Me {
    * @minLength 1
    */
   company_name?: string | null;
+  /** Org id */
+  org_id?: number | null;
+  /**
+   * Org name
+   * @minLength 1
+   */
+  org_name?: string | null;
+  /**
+   * Org join code
+   * @minLength 1
+   */
+  org_join_code?: string | null;
   /**
    * Full name
    * @minLength 1
@@ -4103,6 +3223,44 @@ export interface Me {
   completed_this_month: number;
   /** Permissions */
   permissions: Record<string, boolean>;
+  /**
+   * Is guest
+   * @default false
+   */
+  is_guest?: boolean;
+  modules?: string[] | null;
+  /**
+   * Guest until
+   * @format date-time
+   */
+  guest_until?: string | null;
+}
+
+export interface OwnProfile {
+  /**
+   * First name
+   * @minLength 1
+   * @maxLength 100
+   */
+  first_name: string;
+  /**
+   * Last name
+   * @maxLength 100
+   */
+  last_name?: string;
+  /**
+   * Email
+   * @format email
+   */
+  email?: string;
+}
+
+export interface Username {
+  /**
+   * Username
+   * @maxLength 50
+   */
+  username: string;
 }
 
 export interface B2BNotification {
@@ -4134,6 +3292,169 @@ export interface B2BNotification {
 export interface NotificationRead {
   /** @default [] */
   ids?: number[];
+}
+
+export interface OrgPerson {
+  /** Id */
+  id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Username
+   * @minLength 1
+   */
+  username?: string | null;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /**
+   * Phone
+   * @minLength 1
+   */
+  phone?: string | null;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /**
+   * Role
+   * @minLength 1
+   */
+  role?: string;
+  /** Company id */
+  company_id: number;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name?: string | null;
+}
+
+export interface SecondmentRequest {
+  /** Id */
+  id: number;
+  /** Company id */
+  company_id: number;
+  /**
+   * Company name
+   * @minLength 1
+   */
+  company_name?: string | null;
+  /** From employee id */
+  from_employee_id: number;
+  /**
+   * From full name
+   * @minLength 1
+   */
+  from_full_name?: string | null;
+  /**
+   * From position
+   * @minLength 1
+   */
+  from_position?: string | null;
+  /**
+   * From photo
+   * @minLength 1
+   */
+  from_photo?: string | null;
+  /** To employee id */
+  to_employee_id: number;
+  /**
+   * To full name
+   * @minLength 1
+   */
+  to_full_name?: string | null;
+  /**
+   * To position
+   * @minLength 1
+   */
+  to_position?: string | null;
+  /**
+   * To photo
+   * @minLength 1
+   */
+  to_photo?: string | null;
+  /**
+   * To company name
+   * @minLength 1
+   */
+  to_company_name?: string | null;
+  /** Message */
+  message?: string;
+  /**
+   * Role
+   * @minLength 1
+   */
+  role: string;
+  modules?: string[];
+  /**
+   * Starts at
+   * @format date-time
+   */
+  starts_at?: string | null;
+  /**
+   * Ends at
+   * @format date-time
+   */
+  ends_at?: string | null;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status: string;
+  /**
+   * Decline reason
+   * @minLength 1
+   */
+  decline_reason?: string | null;
+  /**
+   * Responded at
+   * @format date-time
+   */
+  responded_at?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at?: string;
+}
+
+export interface SecondmentRequestCreate {
+  /** To employee id */
+  to_employee_id: number;
+  /**
+   * Message
+   * @maxLength 2000
+   */
+  message?: string;
+  /** Role */
+  role: "lider" | "manager" | "employee" | "ghost";
+  modules?: ("chat" | "savdo" | "vazifa" | "taqvim" | "fayllar")[];
+  /**
+   * Starts at
+   * @format date-time
+   */
+  starts_at?: string | null;
+  /**
+   * Ends at
+   * @format date-time
+   */
+  ends_at?: string | null;
+}
+
+export interface SecondmentDecline {
+  /**
+   * Reason
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason: string;
 }
 
 export interface StorageKindUsage {
@@ -4174,7 +3495,7 @@ export interface TaskPatch {
   /** Description */
   description?: string;
   /** Status */
-  status?: "todo" | "in_progress" | "review" | "done";
+  status?: "todo" | "in_progress" | "done";
   /** Priority */
   priority?: "low" | "medium" | "high" | "urgent";
   /**
@@ -4202,7 +3523,7 @@ export interface TaskCommentWrite {
 
 export interface TaskStatus {
   /** Status */
-  status: "todo" | "in_progress" | "review" | "done";
+  status: "todo" | "in_progress" | "done";
 }
 
 export interface TeamMember {
@@ -4213,6 +3534,11 @@ export interface TeamMember {
    * @minLength 1
    */
   full_name: string;
+  /**
+   * Username
+   * @minLength 1
+   */
+  username?: string | null;
   /**
    * Position
    * @minLength 1
@@ -4253,555 +3579,11 @@ export interface TeamMember {
    * @minLength 1
    */
   status?: string;
-}
-
-export interface RawAdminBookingClient {
-  /** Id */
-  id: number;
-  /** First name */
-  first_name?: string | null;
-  /** Last name */
-  last_name?: string | null;
-  /** Phone number */
-  phone_number?: string | null;
-}
-
-export interface RawAdminBookingProperty {
   /**
-   * Guid
-   * @format uuid
+   * Is guest
+   * @default false
    */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  /**
-   * Property type
-   * @minLength 1
-   */
-  property_type: string;
-}
-
-export interface RawAdminBookingList {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Booking number
-   * @minLength 1
-   */
-  booking_number: string;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /** Adults */
-  adults: number;
-  /** Children */
-  children: number;
-  /** Babies */
-  babies: number;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-  /** Cancellation reason */
-  cancellation_reason?: string | null;
-  /**
-   * Confirmed at
-   * @format date-time
-   */
-  confirmed_at?: string | null;
-  /**
-   * Cancelled at
-   * @format date-time
-   */
-  cancelled_at?: string | null;
-  /**
-   * Completed at
-   * @format date-time
-   */
-  completed_at?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  client: RawAdminBookingClient;
-  property: RawAdminBookingProperty;
-  /** Booking price */
-  booking_price: string;
-}
-
-export interface RawPartnerBooking {
-  /** Username */
-  username?: string | null;
-  /** First name */
-  first_name?: string | null;
-  /** Last name */
-  last_name?: string | null;
-  /** Phone number */
-  phone_number?: string | null;
-}
-
-export interface RawClientBookingList {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /** Property */
-  property: string;
-  partner: RawPartnerBooking;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /**
-   * Confirmed at
-   * @format date-time
-   */
-  confirmed_at?: string | null;
-  /**
-   * Cancelled at
-   * @format date-time
-   */
-  cancelled_at?: string | null;
-  /**
-   * Completed at
-   * @format date-time
-   */
-  completed_at?: string | null;
-}
-
-export interface RawClientBookingCreate {
-  /**
-   * Property id
-   * @format uuid
-   */
-  property_id: string;
-  /**
-   * Card id
-   * @minLength 1
-   */
-  card_id: string;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /**
-   * Adults
-   * @min 1
-   */
-  adults: number;
-  /**
-   * Children
-   * @min 0
-   * @default 0
-   */
-  children?: number;
-  /**
-   * Babies
-   * @min 0
-   * @max 5
-   * @default 0
-   */
-  babies?: number;
-}
-
-export interface RawClientBookingHistoryList {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Property type
-   * @minLength 1
-   */
-  property_type: string;
-  /** Property */
-  property: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-}
-
-export interface HotelBookingCreate {
-  /**
-   * Hotel guid
-   * @minLength 1
-   */
-  hotel_guid: string;
-  /**
-   * Room id
-   * @min 1
-   */
-  room_id: number;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /**
-   * Guests
-   * @min 1
-   */
-  guests: number;
-  /**
-   * Card id
-   * @minLength 1
-   */
-  card_id?: string | null;
-}
-
-export interface HotelBookingList {
-  /** Id */
-  id: number;
-  /**
-   * Booking number
-   * @minLength 1
-   */
-  booking_number: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /** Adult count */
-  adult_count: number;
-  /** Child count */
-  child_count: number;
-  /**
-   * Total cost
-   * @format decimal
-   */
-  total_cost: string;
-  /**
-   * Hold amount
-   * @format decimal
-   */
-  hold_amount: string;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Hotel name
-   * @minLength 1
-   */
-  hotel_name: string;
-  /**
-   * Hotel city
-   * @minLength 1
-   */
-  hotel_city: string;
-  /** Hotel star rating */
-  hotel_star_rating?: number | null;
-  /**
-   * Room number
-   * @minLength 1
-   */
-  room_number: string;
-  /**
-   * Room name
-   * @minLength 1
-   */
-  room_name: string;
-  /**
-   * Room type name
-   * @minLength 1
-   */
-  room_type_name: string;
-  /**
-   * Room type preset
-   * @minLength 1
-   */
-  room_type_preset: string;
-  /**
-   * Room price per night
-   * @format decimal
-   */
-  room_price_per_night: string;
-}
-
-export interface HotelBookingDetail {
-  /** Id */
-  id: number;
-  /**
-   * Booking number
-   * @minLength 1
-   */
-  booking_number: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /** Adult count */
-  adult_count: number;
-  /** Child count */
-  child_count: number;
-  /**
-   * Total cost
-   * @format decimal
-   */
-  total_cost: string;
-  /**
-   * Hold amount
-   * @format decimal
-   */
-  hold_amount: string;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Hotel name
-   * @minLength 1
-   */
-  hotel_name: string;
-  /**
-   * Hotel city
-   * @minLength 1
-   */
-  hotel_city: string;
-  /**
-   * Hotel address
-   * @minLength 1
-   */
-  hotel_address: string;
-  /** Hotel star rating */
-  hotel_star_rating?: number | null;
-  /**
-   * Hotel check in time
-   * @minLength 1
-   */
-  hotel_check_in_time?: string | null;
-  /**
-   * Hotel check out time
-   * @minLength 1
-   */
-  hotel_check_out_time?: string | null;
-  /**
-   * Hotel latitude
-   * @minLength 1
-   */
-  hotel_latitude?: string | null;
-  /**
-   * Hotel longitude
-   * @minLength 1
-   */
-  hotel_longitude?: string | null;
-  /** Hotel images */
-  hotel_images: object;
-  /**
-   * Room number
-   * @minLength 1
-   */
-  room_number: string;
-  /**
-   * Room name
-   * @minLength 1
-   */
-  room_name: string;
-  /** Room floor */
-  room_floor?: number | null;
-  /**
-   * Room price per night
-   * @format decimal
-   */
-  room_price_per_night: string;
-  /** Room bedroom count */
-  room_bedroom_count?: number | null;
-  /** Room beds */
-  room_beds?: number | null;
-  /** Room capacity */
-  room_capacity?: number | null;
-  /**
-   * Room type name
-   * @minLength 1
-   */
-  room_type_name: string;
-  /**
-   * Room type preset
-   * @minLength 1
-   */
-  room_type_preset: string;
-  /**
-   * Room meal plan
-   * @minLength 1
-   */
-  room_meal_plan?: string | null;
-  /** Room images */
-  room_images: object;
-}
-
-export interface RawPropertyBooking {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  /** Img */
-  img: string;
-}
-
-export interface RawClientBooking {
-  /** First name */
-  first_name?: string | null;
-  /** Last name */
-  last_name?: string | null;
-}
-
-export interface RawPartnerBookingList {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  property: RawPropertyBooking;
-  client: RawClientBooking;
-  /**
-   * Check in
-   * @format date
-   */
-  check_in: string;
-  /**
-   * Check out
-   * @format date
-   */
-  check_out: string;
-  /** Adults */
-  adults: number;
-  /** Children */
-  children: number;
-  /** Babies */
-  babies: number;
-  /** Guests over listing standard */
-  guests_over_listing_standard: string;
-  /** Booking price */
-  booking_price: string;
-  /**
-   * Booking number
-   * @minLength 1
-   */
-  booking_number: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-  /** Cancellation reason */
-  cancellation_reason?: string | null;
-  /**
-   * Confirmed at
-   * @format date-time
-   */
-  confirmed_at?: string | null;
-  /**
-   * Cancelled at
-   * @format date-time
-   */
-  cancelled_at?: string | null;
-  /**
-   * Completed at
-   * @format date-time
-   */
-  completed_at?: string | null;
-}
-
-export interface RawCalendarDate {
-  /**
-   * Date
-   * @format date
-   */
-  date: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-}
-
-export interface RawPropertyCalendarDateRange {
-  /**
-   * From date
-   * @format date
-   */
-  from_date: string;
-  /**
-   * To date
-   * @format date
-   */
-  to_date?: string;
+  is_guest?: boolean;
 }
 
 export interface ChatMessage {
@@ -4898,7 +3680,7 @@ export interface DocumentRecipient {
   /** Document id */
   document_id: number;
   /** Recipient type */
-  recipient_type: "client" | "partner" | "hotel" | "b2b";
+  recipient_type: "client" | "partner" | "b2b";
   /**
    * Inn
    * @maxLength 20
@@ -4980,225 +3762,70 @@ export interface DocumentStatus {
   status: "created" | "sent" | "signed" | "rejected";
 }
 
-export interface HotelDetail {
+export interface Hotel {
   /** Id */
-  id: number;
-  /**
-   * Guid
-   * @minLength 1
-   */
-  guid?: string | null;
-  /**
-   * Organization name
-   * @minLength 1
-   */
-  organization_name?: string | null;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  /**
-   * City
-   * @minLength 1
-   */
-  city?: string | null;
-  /**
-   * Country
-   * @minLength 1
-   */
-  country?: string | null;
-  /**
-   * Address
-   * @minLength 1
-   */
-  address?: string | null;
-  /**
-   * Full address
-   * @minLength 1
-   */
-  full_address?: string | null;
-  /**
-   * Description
-   * @minLength 1
-   */
-  description?: string | null;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string | null;
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string | null;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string | null;
-  /** Star rating */
-  star_rating?: number | null;
-  /**
-   * Weel classification
-   * @minLength 1
-   */
-  weel_classification?: string | null;
-  /**
-   * Is recommended
-   * @default false
-   */
-  is_recommended: boolean;
-  /**
-   * Is verified
-   * @default false
-   */
-  is_verified: boolean;
-  /**
-   * Is active
-   * @default true
-   */
-  is_active: boolean;
-  /**
-   * Is testing
-   * @default false
-   */
-  is_testing: boolean;
-  /**
-   * Is archived
-   * @default false
-   */
-  is_archived: boolean;
-  /**
-   * Verification status
-   * @minLength 1
-   */
-  verification_status?: string | null;
-  themes: string[];
-  /** @default [] */
-  amenities: string[];
-  amenity_ids: string[];
-  services: Record<string, string | null>[];
-  property_services: Record<string, string | null>[];
-  /** Legal info */
-  legal_info: Record<string, string | null>;
-  /**
-   * Booking count
-   * @default 0
-   */
-  booking_count: number;
-  /**
-   * Rating
-   * @format decimal
-   */
-  rating?: string | null;
-  /**
-   * Review count
-   * @default 0
-   */
-  review_count: number;
-  /**
-   * Available rooms
-   * @default 0
-   */
-  available_rooms: number;
-  /**
-   * Total estimated price
-   * @format decimal
-   */
-  total_estimated_price?: string | null;
-  matching_rooms?: HotelSearchMatchingRoom[];
-  /**
-   * Check in time
-   * @minLength 1
-   */
-  check_in_time?: string | null;
-  /**
-   * Check out time
-   * @minLength 1
-   */
-  check_out_time?: string | null;
-  /**
-   * Cancellation policy
-   * @minLength 1
-   */
-  cancellation_policy?: string | null;
-  /**
-   * Policies
-   * @default {}
-   */
-  policies: Record<string, string | null>;
+  id?: number;
+  /** Hotel type id */
+  hotel_type_id?: number | null;
+  /** City id */
+  city_id?: number | null;
+  /** Star id */
+  star_id?: number | null;
   /**
    * Currency
    * @minLength 1
    */
   currency?: string | null;
   /**
-   * Timezone
-   * @minLength 1
-   */
-  timezone?: string | null;
-  /** Latitude */
-  latitude?: number | null;
-  /** Longitude */
-  longitude?: number | null;
-  /**
-   * Min price
+   * Latitude
    * @format decimal
    */
-  min_price?: string | null;
-  img: string[];
+  latitude?: string | null;
   /**
-   * Is favorite
-   * @default false
+   * Longitude
+   * @format decimal
    */
-  is_favorite: boolean;
-  /** Organization */
-  organization: Record<string, string | null>;
-  /** Partner user */
-  partner_user?: Record<string, string | null>;
-  /** Property detail */
-  property_detail: Record<string, string | null>;
+  longitude?: string | null;
   /**
-   * Tenant schema
+   * Postal code
    * @minLength 1
    */
-  tenant_schema?: string | null;
+  postal_code?: string | null;
+  /** Names */
+  names?: object;
+  /** Address */
+  address?: object;
+  /** Description */
+  description?: object;
+  /** Check in */
+  check_in?: object;
+  /** Check out */
+  check_out?: object;
+  /** Guest age rules */
+  guest_age_rules?: object;
+  /** Facilities */
+  facilities?: object;
+  /** Photos */
+  photos?: object;
+  /** Nearby places */
+  nearby_places?: object;
+  /** Services in room */
+  services_in_room?: object;
   /**
-   * Created at
+   * Synced at
    * @format date-time
    */
-  created_at?: string | null;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at?: string | null;
-  /** @default [] */
-  room_types: Record<string, string | null>[];
-  /** @default [] */
-  reviews: Record<string, string | null>[];
+  synced_at?: string;
 }
 
-export interface HotelCalendar {
-  /** Room id */
-  room_id: number;
+export interface HotelBookingRoom {
+  /** Id */
+  id?: number;
   /**
-   * Room name
+   * Option ref id
    * @minLength 1
    */
-  room_name?: string | null;
-  /**
-   * Date
-   * @format date
-   */
-  date: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
+  option_ref_id?: string | null;
   /** Room type id */
   room_type_id?: number | null;
   /**
@@ -5206,83 +3833,363 @@ export interface HotelCalendar {
    * @minLength 1
    */
   room_type_name?: string | null;
+  /** Rate plan id */
+  rate_plan_id?: number | null;
   /**
-   * Room type preset
+   * Meal plan
    * @minLength 1
    */
-  room_type_preset?: string | null;
-  /** Capacity */
-  capacity?: number | null;
+  meal_plan?: string | null;
+  /** Included meal options */
+  included_meal_options?: object;
+  /** Extra bed added */
+  extra_bed_added?: boolean;
+  /** Cancellation policy */
+  cancellation_policy?: object | null;
   /**
-   * Price per night
+   * Price
    * @format decimal
    */
-  price_per_night?: string | null;
-  /**
-   * Sellability
-   * @minLength 1
-   */
-  sellability?: string | null;
-  /**
-   * Status reason
-   * @minLength 1
-   */
-  status_reason?: string | null;
+  price?: string | null;
+  /** Price breakdown */
+  price_breakdown?: object | null;
+  /** Guests */
+  guests?: object;
+  /** B2b employee id */
+  b2b_employee_id?: number | null;
 }
 
-export interface ReviewList {
+export interface HotelBooking {
   /** Id */
-  id: number;
+  id?: number;
   /**
-   * Guest name
+   * Guid
+   * @format uuid
+   */
+  guid?: string;
+  /**
+   * External id
    * @minLength 1
    */
-  guest_name: string;
+  external_id?: string;
   /**
-   * Rating
+   * Provider booking id
+   * @minLength 1
+   */
+  provider_booking_id?: string | null;
+  /** Hotel id */
+  hotel_id?: number | null;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status?: string;
+  /**
+   * Check in
+   * @format date-time
+   */
+  check_in?: string | null;
+  /**
+   * Check out
+   * @format date-time
+   */
+  check_out?: string | null;
+  /** Is resident */
+  is_resident?: boolean;
+  /**
+   * Price
    * @format decimal
    */
-  rating: string;
+  price?: string | null;
   /**
-   * Text
+   * Currency
    * @minLength 1
    */
-  text: string;
+  currency?: string | null;
   /**
-   * Hotel response
+   * Comment
    * @minLength 1
    */
-  hotel_response?: string | null;
+  comment?: string | null;
+  /**
+   * Hotel confirmation number
+   * @minLength 1
+   */
+  hotel_confirmation_number?: string | null;
+  /** Additional information */
+  additional_information?: object | null;
+  /** B2b trip id */
+  b2b_trip_id?: number | null;
+  /**
+   * Provider created at
+   * @format date-time
+   */
+  provider_created_at?: string | null;
+  rooms?: HotelBookingRoom[];
   /**
    * Created at
    * @format date-time
    */
-  created_at: string;
+  created_at?: string;
+  /**
+   * Updated at
+   * @format date-time
+   */
+  updated_at?: string;
 }
 
-export interface StayPrice {
-  /** Nights */
-  nights: number;
+export interface Guest {
+  /** Person title */
+  person_title: "CHILD" | "MR" | "MRS";
   /**
-   * Price per night
+   * First name
+   * @minLength 1
+   * @maxLength 120
+   */
+  first_name: string;
+  /**
+   * Last name
+   * @minLength 1
+   * @maxLength 120
+   */
+  last_name: string;
+  /**
+   * Nationality
+   * @minLength 2
+   * @maxLength 2
+   */
+  nationality: string;
+  /**
+   * Age
+   * @min 0
+   * @max 17
+   */
+  age?: number | null;
+}
+
+export interface BookingRoom {
+  /**
+   * Option ref id
+   * @minLength 1
+   * @maxLength 512
+   */
+  option_ref_id: string;
+  /**
+   * Price
    * @format decimal
    */
-  price_per_night: string;
+  price: string;
   /**
-   * Total price
+   * Currency
+   * @minLength 1
+   * @maxLength 8
+   */
+  currency?: string;
+  guests: Guest[];
+  /** Employee id */
+  employee_id?: number | null;
+}
+
+export interface DeltaPrice {
+  /**
+   * Amount
    * @format decimal
    */
-  total_price: string;
+  amount?: string;
   /**
-   * Hold amount
+   * Percent
    * @format decimal
    */
-  hold_amount: string;
+  percent?: string;
   /**
-   * Remaining on arrival
+   * Matches
+   * @default "ALL"
+   */
+  matches?: "ALL" | "ANY";
+}
+
+export interface CreateHotelBooking {
+  /**
+   * Quote id
+   * @minLength 1
+   * @maxLength 64
+   */
+  quote_id: string;
+  /** Hotel id */
+  hotel_id: number;
+  /**
+   * Check in
+   * @format date
+   */
+  check_in: string;
+  /**
+   * Check out
+   * @format date
+   */
+  check_out: string;
+  booking_rooms: BookingRoom[];
+  /**
+   * Comment
+   * @maxLength 1000
+   */
+  comment?: string;
+  delta_price?: DeltaPrice;
+  /**
+   * Nationality
+   * @minLength 2
+   * @maxLength 2
+   */
+  nationality?: string;
+  /**
+   * Residence
+   * @minLength 2
+   * @maxLength 2
+   */
+  residence?: string;
+  /**
+   * Is resident
+   * @default false
+   */
+  is_resident?: boolean;
+  /** Trip id */
+  trip_id?: number | null;
+}
+
+export interface City {
+  /** Id */
+  id?: number;
+  /** Region id */
+  region_id?: number | null;
+  /** Names */
+  names?: object;
+  /** Hotel count */
+  hotel_count?: number;
+}
+
+export interface TopHotel {
+  /** Hotel id */
+  hotel_id?: number;
+  /** Names */
+  names?: object;
+  /**
+   * Name en
+   * @minLength 1
+   */
+  name_en?: string | null;
+  /** Photos */
+  photos?: object;
+  /** Star id */
+  star_id?: number | null;
+  /** City id */
+  city_id?: number | null;
+  /** Bookings count */
+  bookings_count?: number;
+  /**
+   * Spend
    * @format decimal
    */
-  remaining_on_arrival: string;
+  spend?: string | null;
+}
+
+export interface MonthlySummary {
+  /** Year */
+  year?: number;
+  /** Month */
+  month?: number;
+  /**
+   * Month spend
+   * @format decimal
+   */
+  month_spend?: string;
+  top_hotels?: TopHotel[];
+}
+
+export interface Quote {
+  /**
+   * @maxItems 20
+   * @minItems 1
+   */
+  option_ref_ids: string[];
+}
+
+export interface RecommendedHotel {
+  /** Id */
+  id?: number;
+  /** City id */
+  city_id?: number | null;
+  /** Star id */
+  star_id?: number | null;
+  /** Names */
+  names?: object;
+  /** Photos */
+  photos?: object;
+  /** Address */
+  address?: object;
+}
+
+export interface Occupancy {
+  /**
+   * Adults
+   * @min 1
+   * @max 10
+   */
+  adults: number;
+  /** @maxItems 10 */
+  children_ages?: number[];
+}
+
+export interface HotelSearch {
+  /** City id */
+  city_id?: number | null;
+  /** @maxItems 200 */
+  hotel_ids?: number[];
+  /**
+   * Check in
+   * @format date
+   */
+  check_in: string;
+  /**
+   * Check out
+   * @format date
+   */
+  check_out: string;
+  occupancies: Occupancy[];
+  /**
+   * Currency
+   * @minLength 1
+   * @maxLength 8
+   * @default "uzs"
+   */
+  currency?: string;
+  /**
+   * Nationality
+   * @minLength 2
+   * @maxLength 2
+   */
+  nationality?: string;
+  /**
+   * Residence
+   * @minLength 2
+   * @maxLength 2
+   */
+  residence?: string;
+  /**
+   * Price min
+   * @format decimal
+   */
+  price_min?: string;
+  /**
+   * Price max
+   * @format decimal
+   */
+  price_max?: string;
+  stars?: number[];
+  facilities?: number[];
+  equipments?: number[];
+  /** Cancellation type */
+  cancellation_type?: "rf" | "nrf" | "all";
+  meal_plans?: ("BB" | "FB" | "HB" | "RO")[];
+  hotel_types?: number[];
 }
 
 export interface MarkAsRead {
@@ -5311,2512 +4218,6 @@ export interface PartnerDevice {
   device_type: "ios" | "android";
 }
 
-export interface PmsOtpSendResponse {
-  /**
-   * Detail
-   * @minLength 1
-   */
-  detail: string;
-  /**
-   * Phone number
-   * @minLength 1
-   */
-  phone_number: string;
-  /**
-   * Expires in
-   * @minLength 1
-   */
-  expires_in: string;
-}
-
-export interface PlatformUser {
-  /** Id */
-  id: number;
-  /**
-   * Phone number
-   * @minLength 1
-   */
-  phone_number: string;
-  /**
-   * First name
-   * @minLength 1
-   */
-  first_name?: string | null;
-  /**
-   * Last name
-   * @minLength 1
-   */
-  last_name?: string | null;
-  /** Is active */
-  is_active: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-}
-
-export type NullableOrganization = {
-  /** Id */
-  id: number;
-  /**
-   * Name
-   * @minLength 1
-   * @maxLength 200
-   */
-  name: string;
-  /**
-   * Slug
-   * @format slug
-   * @minLength 1
-   * @maxLength 100
-   * @pattern ^[-a-zA-Z0-9_]+$
-   */
-  slug: string;
-  /**
-   * Schema name
-   * @minLength 1
-   */
-  schema_name: string;
-  /** Is active */
-  is_active: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-} | null;
-
-export interface Organization {
-  /** Id */
-  id: number;
-  /**
-   * Name
-   * @minLength 1
-   * @maxLength 200
-   */
-  name: string;
-  /**
-   * Slug
-   * @format slug
-   * @minLength 1
-   * @maxLength 100
-   * @pattern ^[-a-zA-Z0-9_]+$
-   */
-  slug: string;
-  /**
-   * Schema name
-   * @minLength 1
-   */
-  schema_name: string;
-  /** Is active */
-  is_active: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-}
-
-export interface PmsLoginResponse {
-  /**
-   * Access
-   * @minLength 1
-   */
-  access: string;
-  /**
-   * Refresh
-   * @minLength 1
-   */
-  refresh: string;
-  user: PlatformUser;
-  organization?: NullableOrganization;
-  organizations?: Organization[];
-  /**
-   * Has properties
-   * @default false
-   */
-  has_properties?: boolean;
-}
-
-export interface PmsMeResponse {
-  user: PlatformUser;
-  organization?: NullableOrganization;
-  organizations: Organization[];
-  /**
-   * Has properties
-   * @default false
-   */
-  has_properties?: boolean;
-}
-
-export interface PlatformUserUpdate {
-  /**
-   * First name
-   * @maxLength 100
-   */
-  first_name?: string;
-  /**
-   * Last name
-   * @maxLength 100
-   */
-  last_name?: string;
-  /**
-   * Phone
-   * @maxLength 32
-   */
-  phone?: string;
-}
-
-export interface AuthenticatedOrgCreate {
-  /**
-   * Name
-   * @minLength 1
-   * @maxLength 200
-   */
-  name: string;
-}
-
-export interface OrganizationCreateResponse {
-  /** Id */
-  id: number;
-  /**
-   * Name
-   * @minLength 1
-   * @maxLength 200
-   */
-  name: string;
-  /**
-   * Slug
-   * @format slug
-   * @minLength 1
-   * @maxLength 100
-   * @pattern ^[-a-zA-Z0-9_]+$
-   */
-  slug: string;
-  /**
-   * Schema name
-   * @minLength 1
-   */
-  schema_name: string;
-  /** Is active */
-  is_active: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-  /**
-   * Access
-   * @minLength 1
-   */
-  access: string;
-  /**
-   * Refresh
-   * @minLength 1
-   */
-  refresh: string;
-}
-
-export interface OrganizationUpdate {
-  /**
-   * Name
-   * @maxLength 200
-   */
-  name?: string;
-  /**
-   * Slug
-   * @maxLength 100
-   */
-  slug?: string;
-}
-
-export interface OrganizationMember {
-  /** Id */
-  id: number;
-  /** User id */
-  user_id: number;
-  /** Organization id */
-  organization_id: number;
-  /**
-   * Role
-   * @minLength 1
-   */
-  role: string;
-  /**
-   * Phone number
-   * @minLength 1
-   */
-  phone_number?: string | null;
-  /**
-   * First name
-   * @minLength 1
-   */
-  first_name?: string | null;
-  /**
-   * Last name
-   * @minLength 1
-   */
-  last_name?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-}
-
-export interface AddMember {
-  /**
-   * Phone number
-   * @minLength 1
-   * @maxLength 32
-   */
-  phone_number: string;
-  /**
-   * Role
-   * @default "manager"
-   */
-  role?: "owner" | "admin" | "manager" | "receptionist" | "housekeeping";
-}
-
-export interface UpdateMemberRole {
-  /** Role */
-  role: "owner" | "admin" | "manager" | "receptionist" | "housekeeping";
-}
-
-export interface PmsSwitchOrg {
-  /** Organization id */
-  organization_id: number;
-}
-
-export interface PmsSwitchOrgResponse {
-  /**
-   * Access
-   * @minLength 1
-   */
-  access: string;
-  /**
-   * Refresh
-   * @minLength 1
-   */
-  refresh: string;
-  organization: Organization;
-  /**
-   * Has properties
-   * @default false
-   */
-  has_properties?: boolean;
-}
-
-export interface PmsTokenRefreshResponse {
-  /**
-   * Access
-   * @minLength 1
-   */
-  access: string;
-  /**
-   * Refresh
-   * @minLength 1
-   */
-  refresh: string;
-}
-
-export interface Guest {
-  /** Id */
-  id: number;
-  /**
-   * First name
-   * @minLength 1
-   * @maxLength 100
-   */
-  first_name: string;
-  /**
-   * Last name
-   * @maxLength 100
-   */
-  last_name?: string | null;
-  /**
-   * Email
-   * @format email
-   */
-  email?: string | null;
-  /**
-   * Phone
-   * @maxLength 32
-   */
-  phone?: string | null;
-  /**
-   * Id document
-   * @default {}
-   */
-  id_document: string;
-  /**
-   * Preferences
-   * @default {}
-   */
-  preferences: string;
-  /**
-   * Is vip
-   * @default false
-   */
-  is_vip?: boolean;
-  /**
-   * Is blacklisted
-   * @default false
-   */
-  is_blacklisted?: boolean;
-  /** Notes */
-  notes?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at: string;
-}
-
-export interface BookingComConnection {
-  /** Id */
-  id?: number;
-  /** Property id */
-  property_id?: number;
-  /**
-   * Enabled
-   * @default true
-   */
-  enabled?: boolean;
-  /**
-   * Bookingcom property id
-   * @minLength 1
-   * @maxLength 255
-   */
-  bookingcom_property_id: string;
-  /**
-   * Api url
-   * @minLength 1
-   * @maxLength 500
-   */
-  api_url: string;
-  /** Api token */
-  api_token?: string | null;
-  /** Username */
-  username?: string | null;
-  /** Password */
-  password?: string | null;
-  /** Has api token */
-  has_api_token?: string;
-  /** Has password */
-  has_password?: string;
-  /**
-   * Last successful sync at
-   * @format date-time
-   */
-  last_successful_sync_at?: string | null;
-  /**
-   * Last synced at
-   * @format date-time
-   */
-  last_synced_at?: string | null;
-  /**
-   * Last sync status
-   * @minLength 1
-   */
-  last_sync_status?: string | null;
-  /**
-   * Last error
-   * @minLength 1
-   */
-  last_error?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at?: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at?: string;
-}
-
-export interface BookingComRoomMapping {
-  /** Id */
-  id?: number;
-  /** Property id */
-  property_id?: number;
-  /**
-   * External room id
-   * @minLength 1
-   * @maxLength 255
-   */
-  external_room_id: string;
-  /** Room id */
-  room_id?: number | null;
-  /** Room type id */
-  room_type_id?: number | null;
-  /**
-   * Is active
-   * @default true
-   */
-  is_active?: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at?: string;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at?: string;
-}
-
-export type BookingComSyncRun = {
-  /** Id */
-  id?: number;
-  /** Property id */
-  property_id?: number;
-  /** Connection id */
-  connection_id?: number | null;
-  /**
-   * Triggered by
-   * @minLength 1
-   */
-  triggered_by?: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status?: string;
-  /** Stats */
-  stats?: string;
-  /**
-   * Error message
-   * @minLength 1
-   */
-  error_message?: string | null;
-  /**
-   * Sync cursor from
-   * @format date-time
-   */
-  sync_cursor_from?: string | null;
-  /**
-   * Sync cursor to
-   * @format date-time
-   */
-  sync_cursor_to?: string | null;
-  /**
-   * Started at
-   * @format date-time
-   */
-  started_at?: string | null;
-  /**
-   * Finished at
-   * @format date-time
-   */
-  finished_at?: string | null;
-};
-
-export interface BookingComSyncError {
-  /** Id */
-  id?: number;
-  /** Sync run id */
-  sync_run_id?: number;
-  /** Property id */
-  property_id?: number;
-  /**
-   * External reservation id
-   * @minLength 1
-   */
-  external_reservation_id?: string | null;
-  /**
-   * External room id
-   * @minLength 1
-   */
-  external_room_id?: string | null;
-  /**
-   * Code
-   * @minLength 1
-   */
-  code?: string;
-  /**
-   * Message
-   * @minLength 1
-   */
-  message?: string;
-  /** Payload */
-  payload?: string;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at?: string;
-}
-
-export interface BookingComStatus {
-  connection: BookingComConnection;
-  latest_run: BookingComSyncRun;
-  recent_errors: BookingComSyncError[];
-}
-
-export interface BookingComManualSync {
-  /**
-   * Full resync
-   * @default false
-   */
-  full_resync?: boolean;
-}
-
-export interface BookingHistory {
-  /** Id */
-  id: number;
-  /** Booking id */
-  booking_id: number;
-  /**
-   * Action
-   * @minLength 1
-   */
-  action: string;
-  /** Previous value */
-  previous_value: string;
-  /** New value */
-  new_value: string;
-  /** User id */
-  user_id?: number | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-}
-
-export interface MealPlanChange {
-  /** Meal plan */
-  meal_plan: "RO" | "BB" | "HB" | "FB" | "AI" | "UAI";
-}
-
-export interface MoveBooking {
-  /** New room id */
-  new_room_id: number;
-  /**
-   * New check in
-   * @format date
-   */
-  new_check_in?: string | null;
-  /**
-   * New check out
-   * @format date
-   */
-  new_check_out?: string | null;
-}
-
-export interface CalendarSlot {
-  /** Id */
-  id: number;
-  /** Room id */
-  room_id: number;
-  /**
-   * Room number
-   * @minLength 1
-   */
-  room_number?: string | null;
-  /**
-   * Room type name
-   * @minLength 1
-   */
-  room_type_name?: string | null;
-  /**
-   * Date
-   * @format date
-   */
-  date: string;
-  /**
-   * Status
-   * @minLength 1
-   */
-  status: string;
-  /**
-   * Hold expires at
-   * @format date-time
-   */
-  hold_expires_at?: string | null;
-}
-
-export interface RoomIds {
-  /** @minItems 1 */
-  room_ids: number[];
-  /**
-   * From date
-   * @format date
-   */
-  from_date: string;
-  /**
-   * To date
-   * @format date
-   */
-  to_date: string;
-  /**
-   * Hold duration minutes
-   * @default 30
-   */
-  hold_duration_minutes?: number;
-}
-
-export interface PropertyImage {
-  /** Id */
-  id?: number;
-  /** Property id */
-  property_id?: number;
-  /**
-   * Image url
-   * @minLength 1
-   */
-  image_url?: string;
-  /**
-   * Order
-   * @default 0
-   */
-  order?: number;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at?: string;
-}
-
-export interface RoomMassUpdateItem {
-  /** Id */
-  id: number;
-  /**
-   * Room number
-   * @minLength 1
-   * @maxLength 20
-   */
-  room_number?: string;
-  /**
-   * Display name
-   * @maxLength 200
-   */
-  display_name?: string | null;
-  /** Floor */
-  floor?: number;
-  /**
-   * Area
-   * @format decimal
-   */
-  area?: string | null;
-  /** Bedroom count */
-  bedroom_count?: number;
-  /** Beds */
-  beds?: string;
-  amenities?: string[];
-  /** Condition */
-  condition?: "clean" | "dirty" | "inspection" | "maintenance";
-  /** Availability */
-  availability?: "available" | "occupied" | "blocked";
-  /** Capacity */
-  capacity?: number;
-  /** Meal plan */
-  meal_plan?: "RO" | "BB" | "HB" | "FB" | "AI" | "UAI";
-  /**
-   * Base price
-   * @format decimal
-   */
-  base_price?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Cover photo index */
-  cover_photo_index?: number;
-  /** Is active */
-  is_active?: boolean;
-}
-
-export type PrefectureDistrictList = {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-};
-
-export interface PrefectureList {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  district?: PrefectureDistrictList;
-}
-
-export interface ApartmentAdminUpdate {
-  /**
-   * Title
-   * @minLength 1
-   */
-  title?: string;
-  /**
-   * Price
-   * @format decimal
-   */
-  price?: string;
-  /** Currency */
-  currency?: "USD" | "UZS";
-  /**
-   * Latitude
-   * @format decimal
-   */
-  latitude?: string | null;
-  /**
-   * Longitude
-   * @format decimal
-   */
-  longitude?: string | null;
-  /** City */
-  city?: string | null;
-  /** Country */
-  country?: string | null;
-  /** Region id */
-  region_id?: number | null;
-  /** District id */
-  district_id?: number | null;
-  /**
-   * Prefecture id
-   * @format uuid
-   */
-  prefecture_id?: string | null;
-  services?: string[];
-  img?: string[];
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string;
-  /** Check in */
-  check_in?: string;
-  /** Check out */
-  check_out?: string;
-  /** Is allowed alcohol */
-  is_allowed_alcohol?: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate?: boolean;
-  /** Is allowed pets */
-  is_allowed_pets?: boolean;
-  /** Is quiet hours */
-  is_quiet_hours?: boolean;
-  /** Apartment number */
-  apartment_number?: string;
-  /** Home number */
-  home_number?: string;
-  /** Entrance number */
-  entrance_number?: string;
-  /** Floor number */
-  floor_number?: string;
-  /** Pass code */
-  pass_code?: string;
-  /** Guests */
-  guests?: number;
-  /** Rooms */
-  rooms?: number;
-  /** Beds */
-  beds?: number;
-  /** Bathrooms */
-  bathrooms?: number;
-  /** Is verified */
-  is_verified?: boolean;
-  /**
-   * Verified at
-   * @format date-time
-   */
-  verified_at?: string | null;
-  /** Verification status */
-  verification_status?: string;
-  /** Is archived */
-  is_archived?: boolean;
-  /** Is recommended */
-  is_recommended?: boolean;
-  /** Is testing */
-  is_testing?: boolean;
-  /** Partner user id */
-  partner_user_id?: number | null;
-  /** Verified by user id */
-  verified_by_user_id?: number | null;
-  /**
-   * Comment count
-   * @min 0
-   */
-  comment_count?: number;
-  /** Legacy property id */
-  legacy_property_id?: number | null;
-}
-
-export type ApartmentPropertyLocationRegionOutput = {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export type ApartmentPropertyLocationDistrictOutput = {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export type ApartmentPropertyLocationPrefectureOutput = {
-  /** Id */
-  id?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export interface ApartmentPropertyLocationOutput {
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  region: ApartmentPropertyLocationRegionOutput;
-  district: ApartmentPropertyLocationDistrictOutput;
-  prefecture: ApartmentPropertyLocationPrefectureOutput;
-}
-
-export interface ApartmentAdminPropertyDetail {
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string | null;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string | null;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string | null;
-  /**
-   * Apartment number
-   * @minLength 1
-   */
-  apartment_number?: string | null;
-  /**
-   * Home number
-   * @minLength 1
-   */
-  home_number?: string | null;
-  /**
-   * Entrance number
-   * @minLength 1
-   */
-  entrance_number?: string | null;
-  /**
-   * Floor number
-   * @minLength 1
-   */
-  floor_number?: string | null;
-  /**
-   * Pass code
-   * @minLength 1
-   */
-  pass_code?: string | null;
-}
-
-export type ApartmentPartnerUser = {
-  /** Id */
-  id: number;
-  /** Role */
-  role?: string | null;
-  /** First name */
-  first_name?: string | null;
-  /** Last name */
-  last_name?: string | null;
-  /** Phone number */
-  phone_number?: string | null;
-  /** Email */
-  email?: string | null;
-  /** Username */
-  username?: string | null;
-  /** Avatar */
-  avatar?: string | null;
-  /** Is active */
-  is_active: boolean;
-  /** Is verified */
-  is_verified: boolean;
-};
-
-export interface ApartmentAdminList {
-  /** Id */
-  id?: number;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  img: string[];
-  /**
-   * Price
-   * @format decimal
-   */
-  price?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  property_location?: ApartmentPropertyLocationOutput;
-  services: (string | null)[];
-  /** Region id */
-  region_id?: number | null;
-  /** District id */
-  district_id?: number | null;
-  /** Prefecture id */
-  prefecture_id?: string | null;
-  /** Guests */
-  guests?: number | null;
-  /** Rooms */
-  rooms?: number | null;
-  /** Beds */
-  beds?: number | null;
-  /** Bathrooms */
-  bathrooms?: number | null;
-  /** Property room */
-  property_room?: Record<string, string | null>;
-  /** Apartment number */
-  apartment_number?: string | null;
-  /** Home number */
-  home_number?: string | null;
-  /** Entrance number */
-  entrance_number?: string | null;
-  /** Floor number */
-  floor_number?: string | null;
-  /** Pass code */
-  pass_code?: string | null;
-  /** Average rating */
-  average_rating?: number | null;
-  /** Is favorite */
-  is_favorite: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Property type id
-   * @format uuid
-   */
-  property_type_id: string;
-  /** Property type */
-  property_type: Record<string, string | null>;
-  /** Verification status */
-  verification_status?: string | null;
-  /** Is recommended */
-  is_recommended?: boolean | null;
-  /** Is verified */
-  is_verified?: boolean;
-  /** Is archived */
-  is_archived?: boolean;
-  /** Is testing */
-  is_testing?: boolean;
-  property_detail?: ApartmentAdminPropertyDetail;
-  partner_user?: ApartmentPartnerUser;
-}
-
-export interface CottageMonthlyPriceItem {
-  /**
-   * Month from
-   * @format date
-   */
-  month_from?: string | null;
-  /**
-   * Month to
-   * @format date
-   */
-  month_to?: string | null;
-  /**
-   * Price per person
-   * @format decimal
-   */
-  price_per_person?: string | null;
-  /**
-   * Price on working days
-   * @format decimal
-   */
-  price_on_working_days?: string | null;
-  /**
-   * Price on weekends
-   * @format decimal
-   */
-  price_on_weekends?: string | null;
-}
-
-export type CottagePartnerUserUpdate = {
-  /** Id */
-  id?: number | null;
-  /** Role */
-  role?: string | null;
-  /** First name */
-  first_name?: string | null;
-  /** Last name */
-  last_name?: string | null;
-  /** Phone number */
-  phone_number?: string | null;
-  /** Email */
-  email?: string | null;
-  /** Username */
-  username?: string | null;
-  /** Avatar */
-  avatar?: string | null;
-  /** Is active */
-  is_active?: boolean;
-  /** Is verified */
-  is_verified?: boolean;
-};
-
-export interface CottageAdminUpdate {
-  /** Title */
-  title?: string;
-  /** Currency */
-  currency?: "USD" | "UZS";
-  /**
-   * Weekend only sunday inclusive
-   * @default false
-   */
-  weekend_only_sunday_inclusive?: boolean;
-  /**
-   * Price per person
-   * @format decimal
-   */
-  price_per_person?: string | null;
-  /**
-   * Price on working days
-   * @format decimal
-   */
-  price_on_working_days?: string | null;
-  /**
-   * Price on weekends
-   * @format decimal
-   */
-  price_on_weekends?: string | null;
-  /**
-   * Month from
-   * @format date
-   */
-  month_from?: string | null;
-  /**
-   * Month to
-   * @format date
-   */
-  month_to?: string | null;
-  /**
-   * Next month from
-   * @format date
-   */
-  next_month_from?: string | null;
-  /**
-   * Next month to
-   * @format date
-   */
-  next_month_to?: string | null;
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  /** Region id */
-  region_id?: string | null;
-  /** District id */
-  district_id?: string | null;
-  /** Prefecture id */
-  prefecture_id?: string | null;
-  /** Description en */
-  description_en?: string | null;
-  /** Description ru */
-  description_ru?: string | null;
-  /** Description uz */
-  description_uz?: string | null;
-  /** Check in */
-  check_in?: string | null;
-  /** Check out */
-  check_out?: string | null;
-  /** Is allowed alcohol */
-  is_allowed_alcohol?: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate?: boolean;
-  /** Is allowed pets */
-  is_allowed_pets?: boolean;
-  /** Is quiet hours */
-  is_quiet_hours?: boolean;
-  services?: (string | null)[];
-  /** Guests */
-  guests?: number | null;
-  /** Rooms */
-  rooms?: number | null;
-  /** Beds */
-  beds?: number | null;
-  /** Bathrooms */
-  bathrooms?: number | null;
-  img?: string[];
-  price?: CottageMonthlyPriceItem[];
-  /** Is verified */
-  is_verified?: boolean;
-  /**
-   * Verified at
-   * @format date-time
-   */
-  verified_at?: string | null;
-  /** Verification status */
-  verification_status?: string | null;
-  /** Is archived */
-  is_archived?: boolean;
-  /** Is recommended */
-  is_recommended?: boolean;
-  /** Is testing */
-  is_testing?: boolean;
-  partner_user?: CottagePartnerUserUpdate;
-  /** Verified by user id */
-  verified_by_user_id?: number | null;
-  /**
-   * Comment count
-   * @min 0
-   */
-  comment_count?: number;
-  /** Legacy property id */
-  legacy_property_id?: number | null;
-}
-
-export type CottagePropertyLocationRegionOutput = {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export type CottagePropertyLocationDistrictOutput = {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export type CottagePropertyLocationPrefectureOutput = {
-  /** Id */
-  id?: string | null;
-  /** Name */
-  name?: string | null;
-};
-
-export interface CottagePropertyLocationOutput {
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  region: CottagePropertyLocationRegionOutput;
-  district: CottagePropertyLocationDistrictOutput;
-  prefecture: CottagePropertyLocationPrefectureOutput;
-}
-
-export type RawRegion = {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  /** Img */
-  img?: string | null;
-};
-
-export type RawDistrict = {
-  /** Id */
-  id?: number | null;
-  /** Region id */
-  region_id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  region?: RawRegion;
-};
-
-export interface CottageAdminPropertyDetail {
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string | null;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string | null;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string | null;
-  /**
-   * Check in
-   * @minLength 1
-   */
-  check_in?: string | null;
-  /**
-   * Check out
-   * @minLength 1
-   */
-  check_out?: string | null;
-  /** Is allowed alcohol */
-  is_allowed_alcohol: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate: boolean;
-  /** Is allowed pets */
-  is_allowed_pets: boolean;
-  /** Is quiet hours */
-  is_quiet_hours: boolean;
-}
-
-export type CottagePartnerUser = {
-  /** Id */
-  id: number;
-  /** Role */
-  role?: string | null;
-  /** First name */
-  first_name?: string | null;
-  /** Last name */
-  last_name?: string | null;
-  /** Phone number */
-  phone_number?: string | null;
-  /** Email */
-  email?: string | null;
-  /** Username */
-  username?: string | null;
-  /** Avatar */
-  avatar?: string | null;
-  /** Is active */
-  is_active: boolean;
-  /** Is verified */
-  is_verified: boolean;
-};
-
-export interface CottageAdminList {
-  /** Id */
-  id?: number;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  img: string[];
-  /**
-   * Price per person
-   * @format decimal
-   */
-  price_per_person?: string | null;
-  /**
-   * Price on working days
-   * @format decimal
-   */
-  price_on_working_days?: string | null;
-  /**
-   * Price on weekends
-   * @format decimal
-   */
-  price_on_weekends?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  property_location?: CottagePropertyLocationOutput;
-  services: (string | null)[];
-  region: RawRegion;
-  district: RawDistrict;
-  /** Prefecture id */
-  prefecture_id?: string | null;
-  /** Guests */
-  guests?: number | null;
-  /** Rooms */
-  rooms?: number | null;
-  /** Beds */
-  beds?: number | null;
-  /** Bathrooms */
-  bathrooms?: number | null;
-  /** Property room */
-  property_room?: Record<string, string | null>;
-  /** Comment count */
-  comment_count: number;
-  /** Average rating */
-  average_rating?: number | null;
-  /** Is favorite */
-  is_favorite: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Property type id
-   * @format uuid
-   */
-  property_type_id: string;
-  /** Property type */
-  property_type: Record<string, string | null>;
-  price?: (string | null)[];
-  /** Verification status */
-  verification_status?: string | null;
-  /** Weekend only sunday inclusive */
-  weekend_only_sunday_inclusive?: boolean | null;
-  /** Is recommended */
-  is_recommended?: boolean | null;
-  /** Is verified */
-  is_verified?: boolean;
-  /** Is archived */
-  is_archived?: boolean;
-  /** Is testing */
-  is_testing?: boolean;
-  /** Description */
-  description?: string | null;
-  property_detail?: CottageAdminPropertyDetail;
-  partner_user?: CottagePartnerUser;
-}
-
-export interface DistrictList {
-  /** Id */
-  id?: number | null;
-  /** Region id */
-  region_id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  region?: RawRegion;
-}
-
-export interface PropertyHotelAdminList {
-  /** Id */
-  id?: number;
-  /**
-   * Guid
-   * @minLength 1
-   */
-  guid?: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title?: string;
-  /**
-   * Description
-   * @minLength 1
-   */
-  description?: string | null;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string | null;
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string | null;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string | null;
-  /**
-   * Address
-   * @minLength 1
-   */
-  address?: string | null;
-  /** @default [] */
-  img?: string[];
-  /** Star rating */
-  star_rating?: number | null;
-  /**
-   * Weel classification
-   * @minLength 1
-   */
-  weel_classification?: string | null;
-  /** @default [] */
-  themes?: string[];
-  /**
-   * City
-   * @minLength 1
-   */
-  city?: string | null;
-  /**
-   * Country
-   * @minLength 1
-   */
-  country?: string | null;
-  /** Latitude */
-  latitude?: number | null;
-  /** Longitude */
-  longitude?: number | null;
-  /**
-   * Min price
-   * @format decimal
-   */
-  min_price?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Timezone */
-  timezone?: string | null;
-  /**
-   * Rating
-   * @format decimal
-   */
-  rating?: string | null;
-  /**
-   * Review count
-   * @default 0
-   */
-  review_count?: number;
-  /**
-   * Booking count
-   * @default 0
-   */
-  booking_count?: number;
-  /**
-   * Available rooms
-   * @default 0
-   */
-  available_rooms?: number;
-  /** @default [] */
-  amenities?: string[];
-  /** @default [] */
-  amenity_ids?: string[];
-  /** @default [] */
-  services?: Record<string, string | null>[];
-  /** @default [] */
-  property_services?: Record<string, string | null>[];
-  /**
-   * Legal info
-   * @default {}
-   */
-  legal_info?: Record<string, string | null>;
-  /**
-   * Check in time
-   * @minLength 1
-   */
-  check_in_time?: string | null;
-  /**
-   * Check out time
-   * @minLength 1
-   */
-  check_out_time?: string | null;
-  /**
-   * Cancellation policy
-   * @minLength 1
-   */
-  cancellation_policy?: string | null;
-  /**
-   * Policies
-   * @default {}
-   */
-  policies?: Record<string, string | null>;
-  /** Is favorite */
-  is_favorite?: boolean;
-  /** Is verified */
-  is_verified?: boolean;
-  /** Is active */
-  is_active?: boolean;
-  /** Is testing */
-  is_testing?: boolean;
-  /** Is archived */
-  is_archived?: boolean;
-  /** Is recommended */
-  is_recommended?: boolean;
-  /** Verification status */
-  verification_status?: string | null;
-  /** Tenant schema */
-  tenant_schema?: string | null;
-  /**
-   * Organization
-   * @default {}
-   */
-  organization?: Record<string, string | null>;
-  /**
-   * Owner user
-   * @default {}
-   */
-  owner_user?: Record<string, string | null>;
-  /**
-   * Property detail
-   * @default {}
-   */
-  property_detail?: Record<string, string | null>;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at?: string | null;
-  /**
-   * Updated at
-   * @format date-time
-   */
-  updated_at?: string | null;
-}
-
-export interface HotelAdminPropertyDetail {
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string | null;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string | null;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string | null;
-  /** Address */
-  address?: string | null;
-  /** Check in time */
-  check_in_time?: string | null;
-  /** Check out time */
-  check_out_time?: string | null;
-  /** Cancellation policy */
-  cancellation_policy?: string | null;
-  /** Timezone */
-  timezone?: string | null;
-  amenities: string[];
-  /** Is allowed alcohol */
-  is_allowed_alcohol: boolean;
-  /** Is allowed pets */
-  is_allowed_pets: boolean;
-  /** Is quiet hours */
-  is_quiet_hours: boolean;
-  /** Star rating */
-  star_rating?: number | null;
-}
-
-export interface HotelAdminUpdate {
-  /** Organization id */
-  organization_id?: number | null;
-  /** Owner user id */
-  owner_user_id?: number | null;
-  /**
-   * Tenant schema
-   * @minLength 1
-   */
-  tenant_schema?: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title?: string;
-  /** Description ru */
-  description_ru?: string | null;
-  /** Description uz */
-  description_uz?: string | null;
-  /** Description en */
-  description_en?: string | null;
-  /** Address */
-  address?: string | null;
-  /** City */
-  city?: string | null;
-  /** Country */
-  country?: string | null;
-  /**
-   * Latitude
-   * @format decimal
-   */
-  latitude?: string | null;
-  /**
-   * Longitude
-   * @format decimal
-   */
-  longitude?: string | null;
-  /**
-   * Star rating
-   * @min 1
-   * @max 7
-   */
-  star_rating?: number | null;
-  amenities?: string[];
-  /** Check in time */
-  check_in_time?: string | null;
-  /** Check out time */
-  check_out_time?: string | null;
-  /** Cancellation policy */
-  cancellation_policy?: string | null;
-  /** Is quiet hours */
-  is_quiet_hours?: boolean;
-  /** Is allowed alcohol */
-  is_allowed_alcohol?: boolean;
-  /** Is allowed pets */
-  is_allowed_pets?: boolean;
-  /** Quiet hours */
-  quiet_hours?: boolean;
-  /** Alcohol allowed */
-  alcohol_allowed?: boolean;
-  /** Pets allowed */
-  pets_allowed?: boolean;
-  /** Timezone */
-  timezone?: string | null;
-  /** Is active */
-  is_active?: boolean;
-  /** Is testing */
-  is_testing?: boolean;
-  /** Is verified */
-  is_verified?: boolean;
-  /** Is archived */
-  is_archived?: boolean;
-  /** Is recommended */
-  is_recommended?: boolean;
-  /** Verification status */
-  verification_status?: "waiting" | "accepted" | "cancelled" | null;
-  img?: string[];
-  /** Legal info */
-  legal_info?: Record<string, string | null>;
-  /** Currency */
-  currency?: string | null;
-  property_detail?: HotelAdminPropertyDetail;
-}
-
-export interface RegionList {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  /** Img */
-  img?: string | null;
-}
-
-export interface ApartmentList {
-  /** Id */
-  id?: number;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  img: string[];
-  /**
-   * Price
-   * @format decimal
-   */
-  price?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  property_location?: ApartmentPropertyLocationOutput;
-  services: (string | null)[];
-  /** Region id */
-  region_id?: number | null;
-  /** District id */
-  district_id?: number | null;
-  /** Prefecture id */
-  prefecture_id?: string | null;
-  /** Guests */
-  guests?: number | null;
-  /** Rooms */
-  rooms?: number | null;
-  /** Beds */
-  beds?: number | null;
-  /** Bathrooms */
-  bathrooms?: number | null;
-  /** Property room */
-  property_room?: Record<string, string | null>;
-  /** Apartment number */
-  apartment_number?: string | null;
-  /** Home number */
-  home_number?: string | null;
-  /** Entrance number */
-  entrance_number?: string | null;
-  /** Floor number */
-  floor_number?: string | null;
-  /** Pass code */
-  pass_code?: string | null;
-  /** Average rating */
-  average_rating?: number | null;
-  /** Is favorite */
-  is_favorite: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Property type id
-   * @format uuid
-   */
-  property_type_id: string;
-  /** Property type */
-  property_type: Record<string, string | null>;
-}
-
-export interface ApartmentCreate {
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  /**
-   * Price
-   * @format decimal
-   */
-  price?: string;
-  /**
-   * Currency
-   * @default "UZS"
-   */
-  currency?: "USD" | "UZS";
-  /**
-   * Latitude
-   * @format decimal
-   */
-  latitude?: string | null;
-  /**
-   * Longitude
-   * @format decimal
-   */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  /** Region id */
-  region_id?: number | null;
-  /** District id */
-  district_id?: number | null;
-  /**
-   * Prefecture id
-   * @format uuid
-   */
-  prefecture_id?: string | null;
-  services?: string[];
-  img?: string[];
-  /** Apartment number */
-  apartment_number: number;
-  /** Home number */
-  home_number: number;
-  /** Entrance number */
-  entrance_number: number;
-  /** Floor number */
-  floor_number: number;
-  /** Pass code */
-  pass_code: number;
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru: string;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz: string;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string;
-  /** Check in */
-  check_in: string;
-  /** Check out */
-  check_out: string;
-  /** Is allowed alcohol */
-  is_allowed_alcohol: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate: boolean;
-  /** Is allowed pets */
-  is_allowed_pets: boolean;
-  /** Is quiet hours */
-  is_quiet_hours: boolean;
-  /** Guests */
-  guests: number;
-  /** Rooms */
-  rooms: number;
-  /** Beds */
-  beds: number;
-  /** Bathrooms */
-  bathrooms: number;
-}
-
-export interface ApartmentUpdate {
-  /**
-   * Title
-   * @minLength 1
-   */
-  title?: string;
-  /**
-   * Price
-   * @format decimal
-   */
-  price?: string;
-  /** Currency */
-  currency?: "USD" | "UZS";
-  /**
-   * Latitude
-   * @format decimal
-   */
-  latitude?: string | null;
-  /**
-   * Longitude
-   * @format decimal
-   */
-  longitude?: string | null;
-  /** City */
-  city?: string | null;
-  /** Country */
-  country?: string | null;
-  /** Region id */
-  region_id?: number | null;
-  /** District id */
-  district_id?: number | null;
-  /**
-   * Prefecture id
-   * @format uuid
-   */
-  prefecture_id?: string | null;
-  services?: string[];
-  img?: string[];
-  /**
-   * Description ru
-   * @minLength 1
-   */
-  description_ru?: string;
-  /**
-   * Description uz
-   * @minLength 1
-   */
-  description_uz?: string;
-  /**
-   * Description en
-   * @minLength 1
-   */
-  description_en?: string;
-  /** Check in */
-  check_in?: string;
-  /** Check out */
-  check_out?: string;
-  /** Is allowed alcohol */
-  is_allowed_alcohol?: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate?: boolean;
-  /** Is allowed pets */
-  is_allowed_pets?: boolean;
-  /** Is quiet hours */
-  is_quiet_hours?: boolean;
-  /** Apartment number */
-  apartment_number?: string;
-  /** Home number */
-  home_number?: string;
-  /** Entrance number */
-  entrance_number?: string;
-  /** Floor number */
-  floor_number?: string;
-  /** Pass code */
-  pass_code?: string;
-  /** Guests */
-  guests?: number;
-  /** Rooms */
-  rooms?: number;
-  /** Beds */
-  beds?: number;
-  /** Bathrooms */
-  bathrooms?: number;
-}
-
-export interface RawPropertyReviewClient {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** First name */
-  first_name?: string | null;
-  /** Last name */
-  last_name?: string | null;
-}
-
-export interface RawPropertyReview {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  client: RawPropertyReviewClient;
-  /**
-   * Rating
-   * @format decimal
-   */
-  rating?: string | null;
-  /** Comment */
-  comment?: string | null;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-}
-
-export interface RawPropertyReviewCreate {
-  /**
-   * Rating
-   * @format decimal
-   */
-  rating: string;
-  /** Comment */
-  comment?: string | null;
-}
-
-export interface CottageList {
-  /** Id */
-  id?: number;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  img: string[];
-  /**
-   * Price per person
-   * @format decimal
-   */
-  price_per_person?: string | null;
-  /**
-   * Price on working days
-   * @format decimal
-   */
-  price_on_working_days?: string | null;
-  /**
-   * Price on weekends
-   * @format decimal
-   */
-  price_on_weekends?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  property_location?: CottagePropertyLocationOutput;
-  services: (string | null)[];
-  region: RawRegion;
-  district: RawDistrict;
-  /** Prefecture id */
-  prefecture_id?: string | null;
-  /** Guests */
-  guests?: number | null;
-  /** Rooms */
-  rooms?: number | null;
-  /** Beds */
-  beds?: number | null;
-  /** Bathrooms */
-  bathrooms?: number | null;
-  /** Property room */
-  property_room?: Record<string, string | null>;
-  /** Comment count */
-  comment_count: number;
-  /** Average rating */
-  average_rating?: number | null;
-  /** Is favorite */
-  is_favorite: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Property type id
-   * @format uuid
-   */
-  property_type_id: string;
-  /** Property type */
-  property_type: Record<string, string | null>;
-  price?: (string | null)[];
-}
-
-export interface PropertyPriceHistogramBucket {
-  /**
-   * Min price
-   * @format decimal
-   */
-  min_price: string;
-  /**
-   * Max price
-   * @format decimal
-   */
-  max_price: string;
-  /** Count */
-  count: number;
-}
-
-export interface PropertyPriceHistogram {
-  /**
-   * Currency
-   * @minLength 1
-   */
-  currency: string;
-  /** Total */
-  total: number;
-  /**
-   * Min price
-   * @format decimal
-   */
-  min_price?: string | null;
-  /**
-   * Max price
-   * @format decimal
-   */
-  max_price?: string | null;
-  buckets: PropertyPriceHistogramBucket[];
-}
-
-export interface LocationPrefecture {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-}
-
-export interface LocationDistrictList {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  prefectures?: LocationPrefecture[];
-}
-
-export interface LocationRegionList {
-  /** Id */
-  id?: number | null;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  districts?: LocationDistrictList[];
-}
-
-export interface RegionsResponse {
-  regions: LocationRegionList[];
-}
-
-export interface PropertyMapPin {
-  /**
-   * Guid
-   * @minLength 1
-   */
-  guid: string;
-  /**
-   * Kind
-   * @minLength 1
-   */
-  kind: string;
-  /** Latitude */
-  latitude: number;
-  /** Longitude */
-  longitude: number;
-  /**
-   * Price
-   * @format decimal
-   */
-  price?: string | null;
-  /** Currency */
-  currency: string;
-  /** Is favorite */
-  is_favorite: boolean;
-}
-
-export interface PropertyMapCluster {
-  /** Latitude */
-  latitude: number;
-  /** Longitude */
-  longitude: number;
-  /** Count */
-  count: number;
-  /**
-   * Min price
-   * @format decimal
-   */
-  min_price?: string | null;
-  /** Currency */
-  currency: string;
-}
-
-export interface PropertyMapResponse {
-  /** Total */
-  total: number;
-  /** Truncated */
-  truncated: boolean;
-  pins: PropertyMapPin[];
-  clusters: PropertyMapCluster[];
-}
-
-export interface PropertyCard {
-  /**
-   * Guid
-   * @minLength 1
-   */
-  guid: string;
-  /**
-   * Kind
-   * @minLength 1
-   */
-  kind: string;
-  /**
-   * Property type id
-   * @minLength 1
-   */
-  property_type_id?: string | null;
-  /** Title */
-  title: string;
-  img: string[];
-  /**
-   * Price
-   * @format decimal
-   */
-  price?: string | null;
-  /**
-   * Price per person
-   * @format decimal
-   */
-  price_per_person?: string | null;
-  /** Currency */
-  currency: string;
-  /** Rating */
-  rating?: number | null;
-  /** Comment count */
-  comment_count: number;
-  /** Location label */
-  location_label: string;
-  /** Guests */
-  guests?: number | null;
-  /** Star rating */
-  star_rating?: number | null;
-  /** Latitude */
-  latitude?: number | null;
-  /** Longitude */
-  longitude?: number | null;
-  /** Is favorite */
-  is_favorite: boolean;
-}
-
-export interface ApartmentPartnerList {
-  /** Id */
-  id?: number;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  img: string[];
-  /**
-   * Price
-   * @format decimal
-   */
-  price?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  property_location?: ApartmentPropertyLocationOutput;
-  services: (string | null)[];
-  /** Region id */
-  region_id?: number | null;
-  /** District id */
-  district_id?: number | null;
-  /** Prefecture id */
-  prefecture_id?: string | null;
-  /** Guests */
-  guests?: number | null;
-  /** Rooms */
-  rooms?: number | null;
-  /** Beds */
-  beds?: number | null;
-  /** Bathrooms */
-  bathrooms?: number | null;
-  /** Property room */
-  property_room?: Record<string, string | null>;
-  /** Apartment number */
-  apartment_number?: string | null;
-  /** Home number */
-  home_number?: string | null;
-  /** Entrance number */
-  entrance_number?: string | null;
-  /** Floor number */
-  floor_number?: string | null;
-  /** Pass code */
-  pass_code?: string | null;
-  /** Average rating */
-  average_rating?: number | null;
-  /** Is favorite */
-  is_favorite: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Property type id
-   * @format uuid
-   */
-  property_type_id: string;
-  /** Property type */
-  property_type: Record<string, string | null>;
-  /** Verification status */
-  verification_status?: string | null;
-  /** Is recommended */
-  is_recommended?: boolean | null;
-}
-
-export interface CottagePartnerList {
-  /** Id */
-  id?: number;
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  img: string[];
-  /**
-   * Price per person
-   * @format decimal
-   */
-  price_per_person?: string | null;
-  /**
-   * Price on working days
-   * @format decimal
-   */
-  price_on_working_days?: string | null;
-  /**
-   * Price on weekends
-   * @format decimal
-   */
-  price_on_weekends?: string | null;
-  /** Currency */
-  currency?: string | null;
-  /** Latitude */
-  latitude?: string | null;
-  /** Longitude */
-  longitude?: string | null;
-  /** Country */
-  country?: string | null;
-  /** City */
-  city?: string | null;
-  property_location?: CottagePropertyLocationOutput;
-  services: (string | null)[];
-  region: RawRegion;
-  district: RawDistrict;
-  /** Prefecture id */
-  prefecture_id?: string | null;
-  /** Guests */
-  guests?: number | null;
-  /** Rooms */
-  rooms?: number | null;
-  /** Beds */
-  beds?: number | null;
-  /** Bathrooms */
-  bathrooms?: number | null;
-  /** Property room */
-  property_room?: Record<string, string | null>;
-  /** Comment count */
-  comment_count: number;
-  /** Average rating */
-  average_rating?: number | null;
-  /** Is favorite */
-  is_favorite: boolean;
-  /** Is allowed corporate */
-  is_allowed_corporate: boolean;
-  /**
-   * Created at
-   * @format date-time
-   */
-  created_at: string;
-  /**
-   * Property type id
-   * @format uuid
-   */
-  property_type_id: string;
-  /** Property type */
-  property_type: Record<string, string | null>;
-  price?: (string | null)[];
-  /** Verification status */
-  verification_status?: string | null;
-  /** Weekend only sunday inclusive */
-  weekend_only_sunday_inclusive?: boolean | null;
-  /** Is recommended */
-  is_recommended?: boolean | null;
-}
-
 export interface RecommendationItem {
   /**
    * Property guid
@@ -7830,46 +4231,6 @@ export interface RecommendationItem {
   property_kind: string;
   /** Similarity */
   similarity: number;
-}
-
-export interface PropertyServiceList {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid?: string | null;
-  /** Title */
-  title?: string | null;
-  /** Icon url */
-  icon_url?: string | null;
-  /**
-   * Category key
-   * @minLength 1
-   */
-  category_key?: string | null;
-}
-
-export interface RawPropertyType {
-  /**
-   * Guid
-   * @format uuid
-   */
-  guid: string;
-  /**
-   * Title
-   * @minLength 1
-   */
-  title: string;
-  /**
-   * Icon url
-   * @minLength 1
-   */
-  icon_url?: string | null;
-  /**
-   * Kind
-   * @minLength 1
-   */
-  kind: string;
 }
 
 export interface AdminBanner {
@@ -8362,54 +4723,6 @@ export type AdminAuthB2BSupportReadData = SupportMessage[];
 
 export type AdminAuthB2BSupportCreateData = SupportMessage;
 
-export type AdminAuthHotelsListData = PropertyHotelCard[];
-
-export type AdminAuthHotelsReadData = Property;
-
-export type AdminAuthHotelsPartialUpdateData = Property;
-
-export type AdminAuthHotelsAnalyticsListData = AnalyticsResponse;
-
-export type AdminAuthHotelsBookingsListData = Booking[];
-
-export type AdminAuthHotelsBookingsCreateCreateData = Booking;
-
-export type AdminAuthHotelsBookingsReadData = Booking;
-
-export type AdminAuthHotelsBookingsPartialUpdateData = Booking;
-
-export type AdminAuthHotelsBookingsAcceptCreateData = Booking;
-
-export type AdminAuthHotelsBookingsCancelCreateData = Booking;
-
-export type AdminAuthHotelsBookingsCheckInCreateData = Booking;
-
-export type AdminAuthHotelsBookingsCheckOutCreateData = Booking;
-
-export type AdminAuthHotelsBookingsMoveCreateData = Booking;
-
-export type AdminAuthHotelsCalendarListData = object[];
-
-export type AdminAuthHotelsClassifyPartialUpdateData = Property;
-
-export type AdminAuthHotelsReviewsListData = Review[];
-
-export type AdminAuthHotelsReviewsHideCreateData = Review;
-
-export type AdminAuthHotelsReviewsRespondCreateData = Review;
-
-export type AdminAuthHotelsRoomTypesListData = RoomType[];
-
-export type AdminAuthHotelsRoomTypesCreateData = RoomType;
-
-export type AdminAuthHotelsRoomsListData = Room[];
-
-export type AdminAuthHotelsRoomsCreateData = Room;
-
-export type AdminAuthHotelsRoomsPartialUpdateData = any;
-
-export type AdminAuthHotelsRoomsImagesCreateData = any;
-
 export type AdminAuthLoginCreateData = any;
 
 export type AdminAuthMeListData = any;
@@ -8422,7 +4735,47 @@ export type AdminAuthUsersClientsListData = any;
 
 export type AdminAuthUsersPartnersListData = any;
 
-export type AdminAuthUsersPmsListData = any;
+export type AviaBalanceListData = any;
+
+export type AviaBookingsListData = AviaBooking[];
+
+export type AviaBookingsCreateData = AviaBooking;
+
+export type AviaBookingsReadData = AviaBooking;
+
+export type AviaBookingsCancelCreateData = any;
+
+export type AviaBookingsCancelDeleteData = AviaBooking;
+
+export type AviaBookingsCheckPriceListData = any;
+
+export type AviaBookingsEventsListData = any;
+
+export type AviaBookingsFiscalizationListData = any;
+
+export type AviaBookingsPaymentPermissionListData = any;
+
+export type AviaBookingsPaymentCreateData = AviaBooking;
+
+export type AviaBookingsReceiptListData = any;
+
+export type AviaBookingsRefreshCreateData = any;
+
+export type AviaBookingsRefundAmountListData = any;
+
+export type AviaBookingsRulesListData = any;
+
+export type AviaCallbackStatusCreateData = any;
+
+export type AviaOffersSearchCreateData = OfferSearch;
+
+export type AviaOffersReadData = any;
+
+export type AviaOffersFareFamilyListData = any;
+
+export type AviaOffersRulesListData = any;
+
+export type AviaScheduleListData = any;
 
 export interface B2BAuthLoginCreateData {
   detail?: string;
@@ -8501,30 +4854,6 @@ export type B2BEmployeesPartialUpdateData = B2BEmployee;
 
 export type B2BEmployeesDeleteData = any;
 
-export type B2BHotelsBookingsListData = HotelBookingRequest[];
-
-export type B2BHotelsBookingsCreateData = HotelBookingRequestDetail;
-
-export type B2BHotelsBookingsReadData = HotelBookingRequestDetail;
-
-export type B2BHotelsBookingsCancelCreateData = HotelBookingRequestDetail;
-
-export type B2BHotelsCitiesListData = HotelCityList;
-
-export type B2BHotelsMonthlySummaryListData = HotelMonthlySummary;
-
-export type B2BHotelsRecommendationsListData = any;
-
-export type B2BHotelsSearchListData = HotelSearchPage;
-
-export type B2BHotelsTopByBookingsListData = TopHotelByBookings[];
-
-export type B2BHotelsCalendarListData = B2BHotelCalendar[];
-
-export type B2BHotelsCardListData = HotelCard;
-
-export type B2BHotelsRoomsListData = RoomAvailability[];
-
 export type B2BLeadRequestsCreateData = B2BLeadRequest;
 
 export type B2BRecentTripsEmployeesListData = RecentTripEmployee[];
@@ -8573,7 +4902,51 @@ export type B2BTripsVoucherListData = TravelVoucher;
 
 export type B2BTripsVoucherCreateData = TravelVoucher;
 
+export type B2BWorkspaceAccessCatalogueListData = any;
+
+export type B2BWorkspaceAccessRolesListData = any;
+
+export type B2BWorkspaceAccessRolesUpdateData = RoleAccess;
+
+export type B2BWorkspaceAccountDeviceTokenCreateData = any;
+
+export type B2BWorkspaceAccountInvitesReadData = any;
+
+export type B2BWorkspaceAccountInvitesCreateData = any;
+
+export type B2BWorkspaceAccountJoinCodeListData = any;
+
+export type B2BWorkspaceAccountJoinRequestsListData = any;
+
+export type B2BWorkspaceAccountJoinRequestsCreateData = JoinRequest;
+
+export type B2BWorkspaceAccountMeListData = any;
+
+export type B2BWorkspaceAccountMeUpdateData = Profile;
+
+export type B2BWorkspaceAccountMeDeleteData = any;
+
+export type B2BWorkspaceAccountMeDeletionListData = any;
+
+export type B2BWorkspaceAccountOrgsWorkspacesListData = any;
+
+export type B2BWorkspaceAccountUsernameCheckListData = any;
+
+export type B2BWorkspaceAccountUsernameSuggestionListData = any;
+
+export type B2BWorkspaceAccountWorkspacesListData = any;
+
+export type B2BWorkspaceAccountWorkspacesCreateData = WorkspaceCreate;
+
+export type B2BWorkspaceAccountWorkspacesSearchListData = any;
+
+export type B2BWorkspaceAccountWorkspacesOpenCreateData = any;
+
+export type B2BWorkspaceAppVersionListData = any;
+
 export type B2BWorkspaceAttendanceListData = AttendanceDay;
+
+export type B2BWorkspaceAttendanceAbsenceCreateData = AttendanceDay;
 
 export type B2BWorkspaceAttendanceCheckInCreateData = AttendanceDay;
 
@@ -8582,6 +4955,8 @@ export type B2BWorkspaceAttendanceLocationListData = AttendanceLocation;
 export type B2BWorkspaceAttendanceLocationUpdateData = AttendanceLocation;
 
 export type B2BWorkspaceAttendanceCreateData = AttendanceDay;
+
+export type B2BWorkspaceAuditListData = any;
 
 export type B2BWorkspaceAuthLoginCreateData = any;
 
@@ -8605,6 +4980,10 @@ export type B2BWorkspaceChatsMessagesDeleteData = any;
 
 export type B2BWorkspaceChatsReadCreateData = any;
 
+export type B2BWorkspaceCrmCustomersListData = CrmCustomerList;
+
+export type B2BWorkspaceCrmCustomersReadData = CrmCustomerDetail;
+
 export type B2BWorkspaceCustomersListData = CustomerList;
 
 export type B2BWorkspaceEmployeeOfMonthListData = EmployeeOfMonth;
@@ -8612,6 +4991,10 @@ export type B2BWorkspaceEmployeeOfMonthListData = EmployeeOfMonth;
 export type B2BWorkspaceEmployeeOfMonthCreateData = EmployeeOfMonth;
 
 export type B2BWorkspaceEmployeeOfMonthStatsListData = EmployeeMonthlyStat[];
+
+export type B2BWorkspaceEmployeesAccessListData = any;
+
+export type B2BWorkspaceEmployeesAccessUpdateData = EmployeeAccess;
 
 export type B2BWorkspaceEventsListData = CalendarEvent[];
 
@@ -8627,15 +5010,33 @@ export type B2BWorkspaceFilesListData = WorkspaceFileList;
 
 export type B2BWorkspaceFilesCreateData = WorkspaceFile;
 
+export type B2BWorkspaceFilesPartialUpdateData = WorkspaceFile;
+
 export type B2BWorkspaceFilesDeleteData = any;
 
-export type B2BWorkspaceHotelsListData = any;
+export type B2BWorkspaceFoldersListData = WorkspaceFolderList;
+
+export type B2BWorkspaceFoldersCreateData = WorkspaceFolder;
+
+export type B2BWorkspaceFoldersDeleteData = any;
+
+export type B2BWorkspaceInvitesListData = any;
+
+export type B2BWorkspaceInvitesCreateData = InviteCreate;
+
+export type B2BWorkspaceInvitesRevokeCreateData = any;
+
+export type B2BWorkspaceJoinRequestsListData = any;
+
+export type B2BWorkspaceJoinRequestsCreateData = JoinDecision;
 
 export type B2BWorkspaceLeadsListData = LeadList;
 
 export type B2BWorkspaceLeadsCreateData = Lead;
 
 export type B2BWorkspaceLeadsReadData = LeadDetail;
+
+export type B2BWorkspaceLeadsDeleteData = any;
 
 export type B2BWorkspaceLeadsAssignCreateData = Lead;
 
@@ -8691,9 +5092,21 @@ export type B2BWorkspaceMeListData = Me;
 
 export type B2BWorkspaceMeDeviceTokenCreateData = any;
 
+export type B2BWorkspaceMeProfileUpdateData = Me;
+
+export type B2BWorkspaceMeUsernameUpdateData = Me;
+
 export type B2BWorkspaceNotificationsListData = B2BNotification[];
 
 export type B2BWorkspaceNotificationsReadCreateData = any;
+
+export type B2BWorkspaceOrgPeopleListData = OrgPerson[];
+
+export type B2BWorkspaceRequestsListData = SecondmentRequest[];
+
+export type B2BWorkspaceRequestsCreate1Data = SecondmentRequest;
+
+export type B2BWorkspaceRequestsCreate2Data = SecondmentRequest;
 
 export type B2BWorkspaceStorageListData = StorageUsage;
 
@@ -8701,9 +5114,15 @@ export type B2BWorkspaceSupportListData = SupportMessage[];
 
 export type B2BWorkspaceSupportCreateData = SupportMessage;
 
+export type B2BWorkspaceSwitchListData = any;
+
+export type B2BWorkspaceSwitchCreateData = any;
+
 export type B2BWorkspaceTasksListData = TaskList;
 
 export type B2BWorkspaceTasksCreateData = Task;
+
+export type B2BWorkspaceTasksActivityListData = any;
 
 export type B2BWorkspaceTasksReadData = Task;
 
@@ -8717,109 +5136,15 @@ export type B2BWorkspaceTasksStatusCreateData = Task;
 
 export type B2BWorkspaceTasksSubtasksToggleCreateData = Task;
 
+export type B2BWorkspaceTasksVoiceCreateData = Task;
+
+export type B2BWorkspaceTasksVoiceDeleteData = Task;
+
 export type B2BWorkspaceTeamListData = TeamMember[];
 
-export interface BookingAdminBookingsListData {
-  count: number;
-  /** @format uri */
-  next?: string | null;
-  /** @format uri */
-  previous?: string | null;
-  results: RawAdminBookingList[];
-}
+export type B2BWorkspaceTrashListData = any;
 
-export type BookingClientListData = RawClientBookingList[];
-
-export interface BookingClientCreateData {
-  /** @format uuid */
-  booking_id?: string;
-  partner?: {
-    username?: string;
-    first_name?: string;
-    last_name?: string;
-    phone_number?: string;
-  };
-  /** @format date */
-  check_in?: string;
-  /** @format date */
-  check_out?: string;
-  property_location?: {
-    latitude?: number;
-    longitude?: number;
-  };
-  status?: string;
-}
-
-export type BookingClientHistoryListData = RawClientBookingHistoryList[];
-
-export type BookingClientHistoryReadData = any;
-
-export interface CreateHotelBookingData {
-  booking_id?: number;
-  booking_number?: string;
-  status?: string;
-  total_cost?: string;
-  hold_amount?: string;
-  /** @format date */
-  check_in?: string;
-  /** @format date */
-  check_out?: string;
-  adult_count?: number;
-  child_count?: number;
-}
-
-export type ListClientHotelBookingsData = HotelBookingList[];
-
-export type GetClientHotelBookingDetailData = HotelBookingDetail;
-
-export interface CancelClientHotelBookingData {
-  detail?: string;
-}
-
-export type BookingClientReadData = any;
-
-export type BookingClientCancelCreateData = any;
-
-export type GetHotelCalendarData = {
-  room_id?: number;
-  room_name?: string;
-  /** @format date */
-  date?: string;
-  status?: string;
-}[];
-
-export type ListHotelRoomsData = object[];
-
-export interface GetHotelRoomPriceData {
-  nights?: number;
-  total?: number;
-  hold_amount?: number;
-  remaining_on_arrival?: number;
-}
-
-export type BookingPartnerListData = RawPartnerBookingList[];
-
-export type BookingPartnerAcceptCreateData = any;
-
-export type BookingPartnerCancelCreateData = any;
-
-export type BookingPartnerCompleteCreateData = any;
-
-export type BookingPartnerNoShowCreateData = any;
-
-export type BookingPropertiesCalendarListData = RawCalendarDate[];
-
-export type BookingPropertiesCalendarBlockCreateData =
-  RawPropertyCalendarDateRange;
-
-export type BookingPropertiesCalendarHoldCreateData =
-  RawPropertyCalendarDateRange;
-
-export type BookingPropertiesCalendarUnblockCreateData =
-  RawPropertyCalendarDateRange;
-
-export type BookingPropertiesCalendarUnholdCreateData =
-  RawPropertyCalendarDateRange;
+export type B2BWorkspaceTrashRestoreCreateData = any;
 
 export type ChatConversationsData = ChatMessage[];
 
@@ -8841,17 +5166,45 @@ export type DocumentsRecipientsCreateData = DocumentRecipient;
 
 export type DocumentsStatusPartialUpdateData = Document;
 
-export type HotelsSearchListData = HotelSearchPage;
+export type HotelsListData = Hotel[];
 
-export type HotelsReadData = HotelDetail;
+export type HotelsBalanceListData = any;
 
-export type HotelsCalendarListData = HotelCalendar[];
+export type HotelsBookingsListData = HotelBooking[];
 
-export type HotelsReviewsListData = ReviewList[];
+export type HotelsBookingsCreateData = HotelBooking;
 
-export type HotelsRoomsListData = RoomAvailability[];
+export type HotelsBookingsReadData = HotelBooking;
 
-export type HotelsRoomsPriceListData = StayPrice;
+export type HotelsBookingsCancelCreateData = any;
+
+export type HotelsBookingsCancelDeleteData = HotelBooking;
+
+export type HotelsBookingsConfirmCreateData = HotelBooking;
+
+export type HotelsBookingsEventsListData = any;
+
+export type HotelsBookingsRefreshCreateData = any;
+
+export type HotelsBookingsRoomsListData = HotelBookingRoom[];
+
+export type HotelsCitiesListData = City[];
+
+export type HotelsMonthlySummaryListData = MonthlySummary;
+
+export type HotelsQuoteCreateData = Quote;
+
+export type HotelsRecommendationsListData = RecommendedHotel[];
+
+export type HotelsReferenceReadData = any;
+
+export type HotelsSearchCreateData = HotelSearch;
+
+export type HotelsSyncStatusListData = any;
+
+export type HotelsTopByBookingsListData = TopHotel[];
+
+export type HotelsReadData = Hotel;
 
 export type LogsFrontendCreateData = any;
 
@@ -8873,827 +5226,7 @@ export type NotificationPartnerReadCreateData = any;
 
 export type PaymentExchangeRateListData = any;
 
-export type PlatformLoginCreateData = PmsOtpSendResponse;
-
-export type PlatformLoginVerifyCreateData = PmsLoginResponse;
-
-export type PlatformMeListData = PmsMeResponse;
-
-export type PlatformMePartialUpdateData = PmsMeResponse;
-
-export interface PlatformMeDeleteData {
-  detail?: string;
-}
-
-export interface PlatformMeDeleteRequestCreateData {
-  detail?: string;
-  phone_number?: string;
-  expires_in?: string;
-}
-
-export type PlatformOrganizationListData = Organization;
-
-export type PlatformOrganizationCreateData = OrganizationCreateResponse;
-
-export type PlatformOrganizationPartialUpdateData = Organization;
-
-export type PlatformOrganizationMembersListData = OrganizationMember[];
-
-export type PlatformOrganizationMembersCreateData = OrganizationMember;
-
-export type PlatformOrganizationMembersPartialUpdateData = OrganizationMember;
-
-export type PlatformOrganizationMembersDeleteData = any;
-
-export type PlatformRegisterCreateData = PmsOtpSendResponse;
-
-export type PlatformRegisterVerifyCreateData = PmsLoginResponse;
-
-export type PlatformSwitchOrganizationCreateData = PmsSwitchOrgResponse;
-
-export type PlatformTokenRefreshCreateData = PmsTokenRefreshResponse;
-
-export type PmsGuestsListData = Guest[];
-
-export type PmsGuestsCreateData = Guest;
-
-export type PmsGuestsReadData = Guest;
-
-export type PmsGuestsPartialUpdateData = Guest;
-
-export type PmsPropertiesListData = Property[];
-
-export type PmsPropertiesCreateData = Property;
-
-export type PmsPropertiesReadData = Property;
-
-export type PmsPropertiesPartialUpdateData = Property;
-
-export type PmsPropertiesDeleteData = any;
-
-export type PmsPropertiesAnalyticsListData = AnalyticsResponse;
-
-/** @format binary */
-export type PmsPropertiesAnalyticsExportListData = File;
-
-export type PmsPropertiesBookingComConnectionListData = BookingComConnection;
-
-export type PmsPropertiesBookingComConnectionUpdateData = BookingComConnection;
-
-export type PmsPropertiesBookingComConnectionDeleteData = any;
-
-export type PmsPropertiesBookingComMappingsListData = BookingComRoomMapping[];
-
-export type PmsPropertiesBookingComMappingsUpdateData = BookingComRoomMapping[];
-
-export type PmsPropertiesBookingComStatusListData = BookingComStatus;
-
-export type PmsPropertiesBookingComSyncCreateData = BookingComStatus;
-
-export type PmsPropertiesBookingsListData = Booking[];
-
-export type PmsPropertiesBookingsCreateData = Booking;
-
-export type PmsPropertiesBookingsReadData = Booking;
-
-export type PmsPropertiesBookingsPartialUpdateData = Booking;
-
-export type PmsPropertiesBookingsAcceptCreateData = Booking;
-
-export type PmsPropertiesBookingsCancelCreateData = Booking;
-
-export type PmsPropertiesBookingsCheckInCreateData = Booking;
-
-export type PmsPropertiesBookingsCheckOutCreateData = Booking;
-
-export type PmsPropertiesBookingsHistoryListData = BookingHistory[];
-
-export type PmsPropertiesBookingsMealPlanCreateData = Booking;
-
-export type PmsPropertiesBookingsMoveCreateData = Booking;
-
-export type PmsPropertiesBookingsVoucherListData = Booking;
-
-export type PmsPropertiesBookingsVoucherCreateData = Booking;
-
-export type PmsPropertiesCalendarListData = CalendarSlot[];
-
-export type PmsPropertiesCalendarBlockCreateData = CalendarSlot[];
-
-export type PmsPropertiesCalendarHoldCreateData = CalendarSlot[];
-
-export interface PmsPropertiesCalendarUnblockCreateData {
-  unblocked?: number;
-}
-
-export interface PmsPropertiesCalendarUnholdCreateData {
-  unheld?: number;
-}
-
-export type PmsPropertiesImagesCreateData = PropertyImage;
-
-export type PmsPropertiesImagesDeleteData = any;
-
-export type PmsPropertiesReviewsListData = Review[];
-
-export type PmsPropertiesReviewsCreateData = Review;
-
-export type PmsPropertiesReviewsComplainCreateData = Review;
-
-export type PmsPropertiesReviewsRespondCreateData = Review;
-
-export type PmsPropertiesRoomTypesListData = RoomType[];
-
-export type PmsPropertiesRoomTypesCreateData = RoomType;
-
-export type PmsPropertiesRoomTypesReadData = RoomType;
-
-export type PmsPropertiesRoomTypesPartialUpdateData = RoomType;
-
-export type PmsPropertiesRoomTypesDeleteData = any;
-
-export type PmsPropertiesRoomsListData = Room[];
-
-export type PmsPropertiesRoomsCreateData = Room;
-
-export type PmsPropertiesRoomsMassUpdateCreateData = Room[];
-
-export type PmsPropertiesRoomsReadData = Room;
-
-export type PmsPropertiesRoomsPartialUpdateData = Room;
-
-export type PmsPropertiesRoomsDeleteData = any;
-
-export interface PmsPropertiesRoomsImagesCreateData {
-  image_url?: string;
-}
-
-export type ListPrefecturesData = PrefectureList[];
-
-export type PropertyAdminAllListData = {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  property_type?: object;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-}[];
-
-export type PropertyAdminApartmentsCreateData = ApartmentAdminList;
-
-export type PropertyAdminApartmentsReadData = ApartmentAdminList;
-
-export type PropertyAdminApartmentsPartialUpdateData = ApartmentAdminList;
-
-export type AdminCreatePropertyImageApartmentsData = {
-  /** @format uuid */
-  guid?: string;
-  order?: number;
-  is_pending?: boolean;
-  image_url?: string;
-}[];
-
-export type PropertyAdminCottagesCreateData = CottageAdminList;
-
-export type PropertyAdminCottagesReadData = CottageAdminList;
-
-export type PropertyAdminCottagesPartialUpdateData = CottageAdminList;
-
-export type AdminCreatePropertyImageCottagesData = {
-  /** @format uuid */
-  guid?: string;
-  order?: number;
-  is_pending?: boolean;
-  image_url?: string;
-}[];
-
-export type PropertyAdminDistrictsListData = DistrictList[];
-
-export type PropertyAdminHotelOrganizationsListData = object[];
-
-export type PropertyAdminHotelsListData = PropertyHotelAdminList[];
-
-export type PropertyAdminHotelsCreateData = PropertyHotelAdminList;
-
-export type PropertyAdminHotelsReadData = PropertyHotelAdminList;
-
-export type PropertyAdminHotelsPartialUpdateData = PropertyHotelAdminList;
-
-export type PropertyAdminHotelsDeleteData = any;
-
-export type AdminCreateHotelImageData = object[];
-
-export type AdminDeleteHotelImageData = any;
-
-export type PropertyAdminPrefecturesListData = PrefectureList[];
-
-export type PropertyAdminRegionsListData = RegionList[];
-
-export type AdminListPropertyTypesData = {
-  /** @format uuid */
-  guid?: string;
-  title_en?: string;
-  title_ru?: string;
-  title_uz?: string;
-  icon_url?: string | null;
-  kind?: string;
-}[];
-
-export interface AdminUploadPropertyTypeIconData {
-  /** @format uuid */
-  guid?: string;
-  icon_url?: string;
-}
-
-export type ListApartmentsData = ApartmentList[];
-
-export interface CreateApartmentData {
-  detail?: string;
-  /** @format uuid */
-  property_id?: string;
-  status_code?: number;
-}
-
-export interface PropertyApartmentsReadData {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  img?: string[];
-  /** @format date-time */
-  created_at?: string;
-  currency?: string | null;
-  /**
-   * Apartment price in UZS (converted from USD if needed). Null for cottages.
-   * @format decimal
-   */
-  price?: number | null;
-  /**
-   * Cottage price per person in UZS. Null for apartments.
-   * @format decimal
-   */
-  price_per_person?: number | null;
-  /**
-   * Cottage working-day price in UZS. Null for apartments.
-   * @format decimal
-   */
-  price_on_working_days?: number | null;
-  /**
-   * Cottage weekend price in UZS. Null for apartments.
-   * @format decimal
-   */
-  price_on_weekends?: number | null;
-  /** Cottage monthly price breakdown. Empty/null for apartments. */
-  monthly_prices?: {
-    /**
-     * First day of the month (YYYY-MM-DD).
-     * @format date
-     */
-    month_from: string;
-    /**
-     * Last day of the month (YYYY-MM-DD).
-     * @format date
-     */
-    month_to: string;
-    /** @format double */
-    price_per_person?: number | null;
-    /** @format double */
-    price_on_working_days?: number | null;
-    /** @format double */
-    price_on_weekends?: number | null;
-  }[];
-  weekend_only_sunday_inclusive?: boolean | null;
-  /** Localized description for cottages. */
-  description?: string | null;
-  /** English description for apartments. */
-  description_en?: string | null;
-  /** Russian description for apartments. */
-  description_ru?: string | null;
-  /** Uzbek description for apartments (falls back to en/ru if empty). */
-  description_uz?: string | null;
-  comment_count?: number;
-  /** @format float */
-  average_rating?: number | null;
-  is_favorite?: boolean;
-  /** List of service UUIDs (apartments). */
-  services?: string[] | null;
-  /** List of service UUIDs (cottages). */
-  property_services?: string[] | null;
-  region_id?: number | null;
-  district_id?: number | null;
-  prefecture_id?: string | null;
-  latitude?: string | null;
-  longitude?: string | null;
-  country?: string | null;
-  city?: string | null;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-  apartment_number?: string | null;
-  home_number?: string | null;
-  entrance_number?: string | null;
-  floor_number?: string | null;
-  pass_code?: string | null;
-  /** @format time */
-  check_in?: string | null;
-  /** @format time */
-  check_out?: string | null;
-  is_allowed_alcohol?: boolean;
-  is_allowed_corporate?: boolean;
-  is_allowed_pets?: boolean;
-  is_quiet_hours?: boolean;
-  guests?: number | null;
-  rooms?: number | null;
-  beds?: number | null;
-  bathrooms?: number | null;
-  property_room?: {
-    /** @format uuid */
-    guid?: string | null;
-    guests?: number | null;
-    rooms?: number | null;
-    beds?: number | null;
-    bathrooms?: number | null;
-  };
-}
-
-export interface FullUpdatePropertyData {
-  detail?: string;
-  status_code?: number;
-  warning?: string | null;
-}
-
-export interface CreatePropertyImageApartmentsData {
-  detail?: string;
-  status?: string;
-}
-
-export interface UpdatePropertyImageApartmentsData {
-  detail?: string;
-  status?: string;
-}
-
-export type ListPartnerPropertyReviewsApartmentsData = RawPropertyReview[];
-
-export type ListPropertyReviewsApartmentsData = RawPropertyReview[];
-
-export type CreatePropertyReviewApartmentsData = RawPropertyReview;
-
-export type ListCategoriesData = object[];
-
-export type ListCategoryPropertyRecommendationsData = object[];
-
-export type ListCategoryLatestPropertiesData = object[];
-
-export type ListCottagesData = CottageList[];
-
-export interface CreateCottageData {
-  detail?: string;
-  /** @format uuid */
-  property_id?: string;
-  status_code?: number;
-}
-
-export interface PropertyCottagesReadData {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  img?: string[];
-  /** @format date-time */
-  created_at?: string;
-  currency?: string | null;
-  /**
-   * Apartment price in UZS (converted from USD if needed). Null for cottages.
-   * @format decimal
-   */
-  price?: number | null;
-  /**
-   * Cottage price per person in UZS. Null for apartments.
-   * @format decimal
-   */
-  price_per_person?: number | null;
-  /**
-   * Cottage working-day price in UZS. Null for apartments.
-   * @format decimal
-   */
-  price_on_working_days?: number | null;
-  /**
-   * Cottage weekend price in UZS. Null for apartments.
-   * @format decimal
-   */
-  price_on_weekends?: number | null;
-  /** Cottage monthly price breakdown. Empty/null for apartments. */
-  monthly_prices?: {
-    /**
-     * First day of the month (YYYY-MM-DD).
-     * @format date
-     */
-    month_from: string;
-    /**
-     * Last day of the month (YYYY-MM-DD).
-     * @format date
-     */
-    month_to: string;
-    /** @format double */
-    price_per_person?: number | null;
-    /** @format double */
-    price_on_working_days?: number | null;
-    /** @format double */
-    price_on_weekends?: number | null;
-  }[];
-  weekend_only_sunday_inclusive?: boolean | null;
-  /** Localized description for cottages. */
-  description?: string | null;
-  /** English description for apartments. */
-  description_en?: string | null;
-  /** Russian description for apartments. */
-  description_ru?: string | null;
-  /** Uzbek description for apartments (falls back to en/ru if empty). */
-  description_uz?: string | null;
-  comment_count?: number;
-  /** @format float */
-  average_rating?: number | null;
-  is_favorite?: boolean;
-  /** List of service UUIDs (apartments). */
-  services?: string[] | null;
-  /** List of service UUIDs (cottages). */
-  property_services?: string[] | null;
-  region_id?: number | null;
-  district_id?: number | null;
-  prefecture_id?: string | null;
-  latitude?: string | null;
-  longitude?: string | null;
-  country?: string | null;
-  city?: string | null;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-  apartment_number?: string | null;
-  home_number?: string | null;
-  entrance_number?: string | null;
-  floor_number?: string | null;
-  pass_code?: string | null;
-  /** @format time */
-  check_in?: string | null;
-  /** @format time */
-  check_out?: string | null;
-  is_allowed_alcohol?: boolean;
-  is_allowed_corporate?: boolean;
-  is_allowed_pets?: boolean;
-  is_quiet_hours?: boolean;
-  guests?: number | null;
-  rooms?: number | null;
-  beds?: number | null;
-  bathrooms?: number | null;
-  property_room?: {
-    /** @format uuid */
-    guid?: string | null;
-    guests?: number | null;
-    rooms?: number | null;
-    beds?: number | null;
-    bathrooms?: number | null;
-  };
-}
-
-export interface PartialUpdateCottageData {
-  detail?: string;
-  status_code?: number;
-  warning?: string | null;
-}
-
-export interface CreatePropertyImageCottagesData {
-  detail?: string;
-  status?: string;
-}
-
-export interface UpdatePropertyImageCottagesData {
-  detail?: string;
-  status?: string;
-}
-
-export type ListPartnerPropertyReviewsCottagesData = RawPropertyReview[];
-
-export type ListPropertyReviewsCottagesData = RawPropertyReview[];
-
-export type CreatePropertyReviewCottagesData = RawPropertyReview;
-
-export interface ListSearchDestinationsData {
-  nearby?: object[];
-  recommended?: object[];
-}
-
-export type ListDistrictsData = DistrictList[];
-
-export type GetPropertyFilterMetaData = any;
-
-export type GetPropertyPriceHistogramData = PropertyPriceHistogram;
-
-export type ListHotelsData = PropertyHotelCard[];
-
-export type PropertyHotelsReadData = HotelDetail;
-
-export type ListHotelReviewsData = object[];
-
-export type CreateHotelReviewData = object;
-
-export type ListLocationsData = RegionsResponse;
-
-export type ListPropertyMapPinsData = PropertyMapResponse;
-
-export type ListPropertyMapCardsData = PropertyCard[];
-
-export type ListAllPartnerPropertiesData = {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  property_type?: object;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-}[];
-
-export type ListPartnerApartmentsData = ApartmentPartnerList[];
-
-export type ListPartnerCottagesData = CottagePartnerList[];
-
-export type ListPartnerPropertiesData = {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  property_type?: object;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-}[];
-
-export interface GetPropertyAnalyticsData {
-  property?: {
-    /** @format uuid */
-    guid?: string;
-    title?: string;
-    image_url?: string | null;
-    city?: string | null;
-  };
-  range?: string;
-  bookings_overview?: object;
-  bookings_activity?: object[];
-  income_overview?: {
-    balance_amount?: string;
-    currency?: string;
-    bars?: object[];
-  };
-}
-
-export type ListPrefecturesPrefecturesData = PrefectureList[];
-
-export type ListPropertiesData = {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  property_type?: object;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-}[];
-
-export interface CreatePropertyData {
-  detail?: string;
-  /** @format uuid */
-  property_id?: string;
-  status_code?: number;
-}
-
-export type ListSavedPropertiesData = {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  property_type?: object;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-}[];
-
-export interface FilterPropertyByLinkData {
-  /** @format uuid */
-  guid?: string | null;
-}
-
-export type ListRecommendationsData = {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  property_type?: object;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-}[];
-
 export type GetPersonalizedRecommendationsData = RecommendationItem[];
-
-export type ListRegionsData = RegionList[];
-
-export type ListPropertiesByRegionData = {
-  /** @format uuid */
-  guid?: string;
-  title?: string;
-  property_type?: object;
-  property_location?: {
-    latitude?: string | null;
-    longitude?: string | null;
-    country?: string | null;
-    city?: string | null;
-    region?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    district?: {
-      id?: number | null;
-      /** @format uuid */
-      guid?: string | null;
-      name?: string | null;
-    };
-    prefecture?: {
-      id?: string | null;
-      name?: string | null;
-    };
-  };
-}[];
-
-export type SearchPropertiesData = PropertyCard[];
-
-export type ListPropertyServicesData = PropertyServiceList[];
-
-export type ListPropertyTypesData = RawPropertyType[];
-
-export interface ToggleHotelFavoriteData {
-  detail?: string;
-  is_favorite?: boolean;
-}
-
-export type PropertyFavoriteDeleteData = any;
-
-export interface TogglePropertyFavoriteData {
-  detail?: string;
-  is_favorite?: boolean;
-}
-
-export interface RemovePropertyFavoriteData {
-  detail?: string;
-  is_favorite?: boolean;
-}
 
 export type StoryAdminBannersListData = AdminBanner[];
 
@@ -10452,447 +5985,6 @@ export namespace AdminAuth {
   }
 
   /**
-   * @description List all hotels across all organizations — admin view
-   * @tags api
-   * @name AdminAuthHotelsList
-   * @request GET:/admin-auth/hotels/
-   * @secure
-   */
-  export namespace AdminAuthHotelsList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name AdminAuthHotelsRead
-   * @request GET:/admin-auth/hotels/{property_id}/
-   * @secure
-   */
-  export namespace AdminAuthHotelsRead {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsReadData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name AdminAuthHotelsPartialUpdate
-   * @request PATCH:/admin-auth/hotels/{property_id}/
-   * @secure
-   */
-  export namespace AdminAuthHotelsPartialUpdate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = Property;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsPartialUpdateData;
-  }
-
-  /**
-   * @description Analytics data for a property
-   * @tags api
-   * @name AdminAuthHotelsAnalyticsList
-   * @request GET:/admin-auth/hotels/{property_id}/analytics/
-   * @secure
-   */
-  export namespace AdminAuthHotelsAnalyticsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {
-      /**
-       * Start date
-       * @format date
-       */
-      date_from: string;
-      /**
-       * End date
-       * @format date
-       */
-      date_to: string;
-      /** Chart metric */
-      metric?: "check_ins" | "revenue" | "bookings" | "occupancy";
-      /** Room category filter */
-      category?: string;
-      /** Floor filter */
-      floor?: string;
-      /** Room number search */
-      search?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsAnalyticsListData;
-  }
-
-  /**
-   * @description Admin view of hotel bookings
-   * @tags api
-   * @name AdminAuthHotelsBookingsList
-   * @request GET:/admin-auth/hotels/{property_id}/bookings/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsListData;
-  }
-
-  /**
-   * @description Quick-create a booking
-   * @tags api
-   * @name AdminAuthHotelsBookingsCreateCreate
-   * @request POST:/admin-auth/hotels/{property_id}/bookings/create/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsCreateCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsCreateCreateData;
-  }
-
-  /**
-   * @description Get or update a specific booking
-   * @tags api
-   * @name AdminAuthHotelsBookingsRead
-   * @request GET:/admin-auth/hotels/{property_id}/bookings/{booking_id}/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsRead {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsReadData;
-  }
-
-  /**
-   * @description Get or update a specific booking
-   * @tags api
-   * @name AdminAuthHotelsBookingsPartialUpdate
-   * @request PATCH:/admin-auth/hotels/{property_id}/bookings/{booking_id}/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsPartialUpdate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsPartialUpdateData;
-  }
-
-  /**
-   * @description Accept a booking
-   * @tags api
-   * @name AdminAuthHotelsBookingsAcceptCreate
-   * @request POST:/admin-auth/hotels/{property_id}/bookings/{booking_id}/accept/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsAcceptCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsAcceptCreateData;
-  }
-
-  /**
-   * @description Cancel a booking
-   * @tags api
-   * @name AdminAuthHotelsBookingsCancelCreate
-   * @request POST:/admin-auth/hotels/{property_id}/bookings/{booking_id}/cancel/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsCancelCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsCancelCreateData;
-  }
-
-  /**
-   * @description Check in a booking
-   * @tags api
-   * @name AdminAuthHotelsBookingsCheckInCreate
-   * @request POST:/admin-auth/hotels/{property_id}/bookings/{booking_id}/check-in/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsCheckInCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsCheckInCreateData;
-  }
-
-  /**
-   * @description Check out a booking
-   * @tags api
-   * @name AdminAuthHotelsBookingsCheckOutCreate
-   * @request POST:/admin-auth/hotels/{property_id}/bookings/{booking_id}/check-out/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsCheckOutCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsCheckOutCreateData;
-  }
-
-  /**
-   * @description Move booking to a different room / date range (drag on calendar)
-   * @tags api
-   * @name AdminAuthHotelsBookingsMoveCreate
-   * @request POST:/admin-auth/hotels/{property_id}/bookings/{booking_id}/move/
-   * @secure
-   */
-  export namespace AdminAuthHotelsBookingsMoveCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsBookingsMoveCreateData;
-  }
-
-  /**
-   * @description Mirrored calendar — uses same PMS availability data
-   * @tags api
-   * @name AdminAuthHotelsCalendarList
-   * @request GET:/admin-auth/hotels/{property_id}/calendar/
-   * @secure
-   */
-  export namespace AdminAuthHotelsCalendarList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {
-      /** @format date */
-      from_date?: string;
-      /** @format date */
-      to_date?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsCalendarListData;
-  }
-
-  /**
-   * @description Assign star rating and Weel classification to a hotel
-   * @tags api
-   * @name AdminAuthHotelsClassifyPartialUpdate
-   * @request PATCH:/admin-auth/hotels/{property_id}/classify/
-   * @secure
-   */
-  export namespace AdminAuthHotelsClassifyPartialUpdate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = ClassifyProperty;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsClassifyPartialUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name AdminAuthHotelsReviewsList
-   * @request GET:/admin-auth/hotels/{property_id}/reviews/
-   * @secure
-   */
-  export namespace AdminAuthHotelsReviewsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsReviewsListData;
-  }
-
-  /**
-   * @description Admin can hide/complain a review
-   * @tags api
-   * @name AdminAuthHotelsReviewsHideCreate
-   * @request POST:/admin-auth/hotels/{property_id}/reviews/{review_id}/hide/
-   * @secure
-   */
-  export namespace AdminAuthHotelsReviewsHideCreate {
-    export type RequestParams = {
-      propertyId: string;
-      reviewId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = ReviewComplain;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsReviewsHideCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name AdminAuthHotelsReviewsRespondCreate
-   * @request POST:/admin-auth/hotels/{property_id}/reviews/{review_id}/respond/
-   * @secure
-   */
-  export namespace AdminAuthHotelsReviewsRespondCreate {
-    export type RequestParams = {
-      propertyId: string;
-      reviewId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = ReviewRespond;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsReviewsRespondCreateData;
-  }
-
-  /**
-   * @description Room type listing and creation for a hotel
-   * @tags api
-   * @name AdminAuthHotelsRoomTypesList
-   * @request GET:/admin-auth/hotels/{property_id}/room-types/
-   * @secure
-   */
-  export namespace AdminAuthHotelsRoomTypesList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsRoomTypesListData;
-  }
-
-  /**
-   * @description Room type listing and creation for a hotel
-   * @tags api
-   * @name AdminAuthHotelsRoomTypesCreate
-   * @request POST:/admin-auth/hotels/{property_id}/room-types/
-   * @secure
-   */
-  export namespace AdminAuthHotelsRoomTypesCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RoomType;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsRoomTypesCreateData;
-  }
-
-  /**
-   * @description Mirrored room inventory — uses same PMS data source
-   * @tags api
-   * @name AdminAuthHotelsRoomsList
-   * @request GET:/admin-auth/hotels/{property_id}/rooms/
-   * @secure
-   */
-  export namespace AdminAuthHotelsRoomsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsRoomsListData;
-  }
-
-  /**
-   * @description Mirrored room inventory — uses same PMS data source
-   * @tags api
-   * @name AdminAuthHotelsRoomsCreate
-   * @request POST:/admin-auth/hotels/{property_id}/rooms/
-   * @secure
-   */
-  export namespace AdminAuthHotelsRoomsCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = AdminHotelRoomCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsRoomsCreateData;
-  }
-
-  /**
-   * @description Update room fields for inspection/editing workflow
-   * @tags api
-   * @name AdminAuthHotelsRoomsPartialUpdate
-   * @request PATCH:/admin-auth/hotels/{property_id}/rooms/{room_id}/
-   * @secure
-   */
-  export namespace AdminAuthHotelsRoomsPartialUpdate {
-    export type RequestParams = {
-      propertyId: string;
-      roomId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsRoomsPartialUpdateData;
-  }
-
-  /**
-   * @description Upload an image for a specific room
-   * @tags api
-   * @name AdminAuthHotelsRoomsImagesCreate
-   * @request POST:/admin-auth/hotels/{property_id}/rooms/{room_id}/images/
-   * @secure
-   */
-  export namespace AdminAuthHotelsRoomsImagesCreate {
-    export type RequestParams = {
-      propertyId: string;
-      roomId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthHotelsRoomsImagesCreateData;
-  }
-
-  /**
    * @description Admin login endpoint - only for staff/superuser
    * @tags api
    * @name AdminAuthLoginCreate
@@ -10982,20 +6074,373 @@ export namespace AdminAuth {
     export type RequestHeaders = {};
     export type ResponseBody = AdminAuthUsersPartnersListData;
   }
+}
 
+export namespace Avia {
   /**
-   * @description List all PMS/hotel owner users - admin only
+   * @description Staff-facing: an exhausted deposit stops every payment, so this needs to be visible before the first customer discovers it.
    * @tags api
-   * @name AdminAuthUsersPmsList
-   * @request GET:/admin-auth/users/pms/
+   * @name AviaBalanceList
+   * @summary GET /api/avia/balance/ — the deposit ticketing draws on.
+   * @request GET:/avia/balance/
    * @secure
    */
-  export namespace AdminAuthUsersPmsList {
+  export namespace AviaBalanceList {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = AdminAuthUsersPmsListData;
+    export type ResponseBody = AviaBalanceListData;
+  }
+
+  /**
+   * @description GET/POST /api/avia/bookings/ — this caller's orders, and new ones.
+   * @tags api
+   * @name AviaBookingsList
+   * @request GET:/avia/bookings/
+   * @secure
+   */
+  export namespace AviaBookingsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsListData;
+  }
+
+  /**
+   * @description GET/POST /api/avia/bookings/ — this caller's orders, and new ones.
+   * @tags api
+   * @name AviaBookingsCreate
+   * @request POST:/avia/bookings/
+   * @secure
+   */
+  export namespace AviaBookingsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = B2BCreateBooking;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsCreateData;
+  }
+
+  /**
+   * @description GET /api/avia/bookings/{guid}/ — the local copy, optionally refreshed.
+   * @tags api
+   * @name AviaBookingsRead
+   * @request GET:/avia/bookings/{guid}/
+   * @secure
+   */
+  export namespace AviaBookingsRead {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsReadData;
+  }
+
+  /**
+   * @description Same operation for clients that cannot issue a DELETE.
+   * @tags api
+   * @name AviaBookingsCancelCreate
+   * @request POST:/avia/bookings/{guid}/cancel/
+   * @secure
+   */
+  export namespace AviaBookingsCancelCreate {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsCancelCreateData;
+  }
+
+  /**
+   * @description Which call to make depends on where the order is, and getting it wrong either fails or costs a penalty that did not have to be paid: * unpaid          → cancel-unpaid, free * paid / ticketed → void, a full refund with no penalty when the fare allows it, otherwise auto-cancel with the penalty * neither         → manual-refund, which raises it with Bookhara's call centre `mode` forces one of them; by default the cheapest applicable one is used.
+   * @tags api
+   * @name AviaBookingsCancelDelete
+   * @summary DELETE /api/avia/bookings/{guid}/ — cancel or refund, whichever applies.
+   * @request DELETE:/avia/bookings/{guid}/cancel/
+   * @secure
+   */
+  export namespace AviaBookingsCancelDelete {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsCancelDeleteData;
+  }
+
+  /**
+   * @description GET /api/avia/bookings/{guid}/check-price/ — has the fare moved?
+   * @tags api
+   * @name AviaBookingsCheckPriceList
+   * @request GET:/avia/bookings/{guid}/check-price/
+   * @secure
+   */
+  export namespace AviaBookingsCheckPriceList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsCheckPriceListData;
+  }
+
+  /**
+   * @description GET /api/avia/bookings/{guid}/events/ — the status history we recorded.
+   * @tags api
+   * @name AviaBookingsEventsList
+   * @request GET:/avia/bookings/{guid}/events/
+   * @secure
+   */
+  export namespace AviaBookingsEventsList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsEventsListData;
+  }
+
+  /**
+   * @description GET /api/avia/bookings/{guid}/fiscalization/ — receipt data for the OFD.
+   * @tags api
+   * @name AviaBookingsFiscalizationList
+   * @request GET:/avia/bookings/{guid}/fiscalization/
+   * @secure
+   */
+  export namespace AviaBookingsFiscalizationList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsFiscalizationListData;
+  }
+
+  /**
+   * @description GET /api/avia/bookings/{guid}/payment-permission/.
+   * @tags api
+   * @name AviaBookingsPaymentPermissionList
+   * @request GET:/avia/bookings/{guid}/payment-permission/
+   * @secure
+   */
+  export namespace AviaBookingsPaymentPermissionList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsPaymentPermissionListData;
+  }
+
+  /**
+   * @description This is the point of no return: it moves real money and hands the order to the carrier for issuing. The price is re-checked first, and a change stops the payment with a 409 so a person can agree to the new amount.
+   * @tags api
+   * @name AviaBookingsPaymentCreate
+   * @summary POST /api/avia/bookings/{guid}/payment/ — charge the deposit and ticket.
+   * @request POST:/avia/bookings/{guid}/payment/
+   * @secure
+   */
+  export namespace AviaBookingsPaymentCreate {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsPaymentCreateData;
+  }
+
+  /**
+   * @description GET /api/avia/bookings/{guid}/receipt/ — itinerary PDFs, per passenger.
+   * @tags api
+   * @name AviaBookingsReceiptList
+   * @request GET:/avia/bookings/{guid}/receipt/
+   * @secure
+   */
+  export namespace AviaBookingsReceiptList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsReceiptListData;
+  }
+
+  /**
+   * @description POST /api/avia/bookings/{guid}/refresh/ — re-read from Bookhara.
+   * @tags api
+   * @name AviaBookingsRefreshCreate
+   * @request POST:/avia/bookings/{guid}/refresh/
+   * @secure
+   */
+  export namespace AviaBookingsRefreshCreate {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsRefreshCreateData;
+  }
+
+  /**
+   * @description GET /api/avia/bookings/{guid}/refund-amount/ — refund minus penalty.
+   * @tags api
+   * @name AviaBookingsRefundAmountList
+   * @request GET:/avia/bookings/{guid}/refund-amount/
+   * @secure
+   */
+  export namespace AviaBookingsRefundAmountList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsRefundAmountListData;
+  }
+
+  /**
+   * @description GET /api/avia/bookings/{guid}/rules/ — fare conditions after booking.
+   * @tags api
+   * @name AviaBookingsRulesList
+   * @request GET:/avia/bookings/{guid}/rules/
+   * @secure
+   */
+  export namespace AviaBookingsRulesList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaBookingsRulesListData;
+  }
+
+  /**
+   * @description The endpoint is unauthenticated in the usual sense — Bookhara has no token of ours — so the `X-Auth` header is the whole of the authentication, and it is checked before the body is looked at.
+   * @tags api
+   * @name AviaCallbackStatusCreate
+   * @summary POST /api/avia/callback/status/ — Bookhara telling us an order moved.
+   * @request POST:/avia/callback/status/
+   * @secure
+   */
+  export namespace AviaCallbackStatusCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaCallbackStatusCreateData;
+  }
+
+  /**
+   * @description POST /api/avia/offers/search — priced itineraries for a route.
+   * @tags api
+   * @name AviaOffersSearchCreate
+   * @request POST:/avia/offers/search/
+   * @secure
+   */
+  export namespace AviaOffersSearchCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = OfferSearch;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaOffersSearchCreateData;
+  }
+
+  /**
+   * @description Offers live for hours, not days. A 404 here means the offer aged out and the caller has to search again — which is what the response says.
+   * @tags api
+   * @name AviaOffersRead
+   * @summary GET /api/avia/offers/{offer_id} — re-check seats and price.
+   * @request GET:/avia/offers/{offer_id}/
+   * @secure
+   */
+  export namespace AviaOffersRead {
+    export type RequestParams = {
+      offerId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaOffersReadData;
+  }
+
+  /**
+   * @description GET /api/avia/offers/{offer_id}/fare-family — the upsell ladder.
+   * @tags api
+   * @name AviaOffersFareFamilyList
+   * @request GET:/avia/offers/{offer_id}/fare-family/
+   * @secure
+   */
+  export namespace AviaOffersFareFamilyList {
+    export type RequestParams = {
+      offerId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaOffersFareFamilyListData;
+  }
+
+  /**
+   * @description GET /api/avia/offers/{offer_id}/rules — fare conditions per direction.
+   * @tags api
+   * @name AviaOffersRulesList
+   * @request GET:/avia/offers/{offer_id}/rules/
+   * @secure
+   */
+  export namespace AviaOffersRulesList {
+    export type RequestParams = {
+      offerId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaOffersRulesListData;
+  }
+
+  /**
+   * @description GET /api/avia/schedule — published flights, without prices.
+   * @tags api
+   * @name AviaScheduleList
+   * @request GET:/avia/schedule/
+   * @secure
+   */
+  export namespace AviaScheduleList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** @format date */
+      departure_from: string;
+      /** @format date */
+      departure_to: string;
+      /**
+       * @minLength 3
+       * @maxLength 3
+       */
+      airport_from?: string;
+      /**
+       * @minLength 3
+       * @maxLength 3
+       */
+      airport_to?: string;
+      airlines?: string[];
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AviaScheduleListData;
   }
 }
 
@@ -11356,7 +6801,7 @@ export namespace B2B {
       /** Employee status (default: available) */
       status?: "available" | "on_trip" | "blocked";
       /** Employee role (default: employee) */
-      role?: "owner" | "performer" | "employee";
+      role?: "owner" | "performer" | "lider" | "employee";
     };
     export type RequestHeaders = {};
     export type ResponseBody = B2BEmployeesCreateData;
@@ -11498,327 +6943,6 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BEmployeesDeleteData;
-  }
-
-  /**
-   * @description Each booking request, including requests with multiple rooms and employees, appears here as a single row with `room_count` and `employee_count`. For the full details, use `GET /b2b/hotels/bookings/<id>/`.
-   * @tags B2B / Hotels
-   * @name B2BHotelsBookingsList
-   * @summary List company booking requests
-   * @request GET:/b2b/hotels/bookings/
-   * @secure
-   */
-  export namespace B2BHotelsBookingsList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Filter by business trip. */
-      trip_id?: number;
-      /** Filter by status. */
-      status?: "pending" | "confirmed" | "rejected" | "cancelled";
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsBookingsListData;
-  }
-
-  /**
-   * @description Final step 2 submission: send `hotel_guid`, dates, and the employees assigned to each room (`employee_ids`, 1 or 2 people per room depending on capacity). The server will: (1) re-check availability for each room, (2) create a `pms_booking` for each room in the hotel's tenant schema, and (3) attach employees to the trip's `TripEmployee` rows. The whole process runs in a single transaction, so if any room is unavailable nothing is created. The resulting hotel booking request starts in `pending`; if the hotel accepts it becomes `confirmed`, and if it is rejected it becomes `rejected`.
-   * @tags B2B / Hotels
-   * @name B2BHotelsBookingsCreate
-   * @summary Submit a booking request (rooms + employees, owner or performer)
-   * @request POST:/b2b/hotels/bookings/
-   * @secure
-   */
-  export namespace B2BHotelsBookingsCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = HotelBookingRequestCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsBookingsCreateData;
-  }
-
-  /**
-   * @description GET /b2b/hotels/bookings/<booking_id>/ Bitta bron so'rovining to'liq tafsiloti — bosishda "hammasi ko'rinadi": mehmonxona, sanalar, holat, va har bir xona + unga biriktirilgan xodimlar ro'yxati.
-   * @tags B2B / Hotels
-   * @name B2BHotelsBookingsRead
-   * @summary Get company booking request details
-   * @request GET:/b2b/hotels/bookings/{booking_id}/
-   * @secure
-   */
-  export namespace B2BHotelsBookingsRead {
-    export type RequestParams = {
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsBookingsReadData;
-  }
-
-  /**
-   * @description Cancels every active room booking in the request. Only pending or confirmed bookings can be cancelled, and only before check-in.
-   * @tags B2B / Hotels
-   * @name B2BHotelsBookingsCancelCreate
-   * @summary Cancel a grouped hotel booking
-   * @request POST:/b2b/hotels/bookings/{booking_id}/cancel/
-   * @secure
-   */
-  export namespace B2BHotelsBookingsCancelCreate {
-    export type RequestParams = {
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsBookingsCancelCreateData;
-  }
-
-  /**
-   * @description Powers the destination suggestions in hotel search. Cities are returned with the number of bookable hotels in each, most first, and follow the same visibility rules as `/b2b/hotels/search/` so a suggested city never yields an empty result.
-   * @tags B2B / Executer
-   * @name B2BHotelsCitiesList
-   * @summary List cities that have bookable hotels
-   * @request GET:/b2b/hotels/cities/
-   * @secure
-   */
-  export namespace B2BHotelsCitiesList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsCitiesListData;
-  }
-
-  /**
-   * @description `month_spend` is the sum of confirmed hotel bookings' room prices for the current calendar month. `top_hotels` lists up to 5 hotels booked this month, ordered by `booking_count` descending.
-   * @tags B2B / Statistics
-   * @name B2BHotelsMonthlySummaryList
-   * @summary This month's hotel spend + top booked hotels
-   * @request GET:/b2b/hotels/monthly-summary/
-   * @secure
-   */
-  export namespace B2BHotelsMonthlySummaryList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsMonthlySummaryListData;
-  }
-
-  /**
-   * @description Return up to `limit` recommended hotels (default 4, max 12). `limit_status` is `limit_exceeded` when the hotel's nightly price is above the company's travel-policy limit, otherwise `within_limit`. Without a configured company-wide limit, all hotels are returned as `within_limit`.
-   * @tags B2B / Statistics
-   * @name B2BHotelsRecommendationsList
-   * @summary Hotel recommendations for the dashboard
-   * @request GET:/b2b/hotels/recommendations/
-   * @secure
-   */
-  export namespace B2BHotelsRecommendationsList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /**
-       * Number of hotels to return (1-12). Default 4.
-       * @default 4
-       */
-      limit?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsRecommendationsListData;
-  }
-
-  /**
-   * @description Choose a hotel for a business trip. Use `sort_by` for sorting: `popular`, `weel_recommended`, `cheap`, or `expensive`. For map-based selection, provide `lat`, `lon`, and `radius_km`. If `check_in`, `check_out`, and `guests` are provided, only hotels that can accommodate the stay are returned. If one room is not enough, the response includes the best matching room combination for that hotel as `matching_rooms` (for example, two rooms with capacities 3 and 4 for 7 guests). If `budget_max` is provided, the hotel and matching room selection must stay within the total estimated price for the selected dates. Each result includes `total_estimated_price`. `guid` is more reliable than the numeric `id` because the hotel can be searched across multiple tenant schemas.
-   * @tags B2B / Executer
-   * @name B2BHotelsSearchList
-   * @summary Search and filter hotels (owner or performer)
-   * @request GET:/b2b/hotels/search/
-   * @secure
-   */
-  export namespace B2BHotelsSearchList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      city?: string;
-      /** @format date */
-      check_in?: string;
-      /** @format date */
-      check_out?: string;
-      /**
-       * @min 1
-       * @default 1
-       */
-      guests?: number;
-      /** @min 1 */
-      adults?: number;
-      /** @min 0 */
-      children?: number;
-      /** @min 0 */
-      babies?: number;
-      /**
-       * @min 1
-       * @max 5
-       */
-      star_rating?: number | null;
-      weel_classification?:
-        | "standard"
-        | "essential"
-        | "comfort"
-        | "comfort_plus"
-        | "business"
-        | "premium"
-        | "signature";
-      is_recommended?: boolean | null;
-      themes?: string[];
-      /** @format decimal */
-      price_min?: string | null;
-      /** @format decimal */
-      price_max?: string | null;
-      /** @format decimal */
-      budget_max?: string | null;
-      room_types?: string;
-      room_type_presets?: string;
-      rate_plans?: string;
-      meal_plans?: string;
-      /** @min 1 */
-      min_capacity?: number;
-      /** @min 1 */
-      max_capacity?: number;
-      lat?: number | null;
-      lon?: number | null;
-      /**
-       * @min 0.1
-       * @default 10
-       */
-      radius_km?: number;
-      /** @default "popular" */
-      sort_by?:
-        | "popular"
-        | "rating"
-        | "reviews"
-        | "cheap"
-        | "expensive"
-        | "weel_recommended";
-      /**
-       * @min 1
-       * @default 1
-       */
-      page?: number;
-      /**
-       * @min 1
-       * @max 100
-       * @default 20
-       */
-      page_size?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsSearchListData;
-  }
-
-  /**
-   * @description Return the hotels most frequently booked by the company, ordered by `booking_count` descending. For each hotel, `total_spend` is also returned as the total price of all bookings for that hotel. Default `limit=3`, maximum 100.
-   * @tags api
-   * @name B2BHotelsTopByBookingsList
-   * @summary Top hotels by company booking count
-   * @request GET:/b2b/hotels/top-by-bookings/
-   * @secure
-   */
-  export namespace B2BHotelsTopByBookingsList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /**
-       * Number of hotels to return (1-100). Default 3.
-       * @default 3
-       */
-      limit?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsTopByBookingsListData;
-  }
-
-  /**
-   * @description Return the daily occupancy status for each active room in the selected hotel (`hotel_guid`) over the `from_date` to `to_date` range. Each row contains `room_id`, `room_name`, `date`, and `status` (`booked` or `available`). This includes both B2B bookings and bookings made through the hotel's own site, so owners and performers can see the real occupancy state and choose free dates accurately.
-   * @tags B2B / Executer
-   * @name B2BHotelsCalendarList
-   * @summary Hotel occupancy calendar
-   * @request GET:/b2b/hotels/{hotel_guid}/calendar/
-   * @secure
-   */
-  export namespace B2BHotelsCalendarList {
-    export type RequestParams = {
-      /** Hotel GUID identifier. */
-      hotelGuid: string;
-    };
-    export type RequestQuery = {
-      /**
-       * Start date for the calendar range (YYYY-MM-DD).
-       * @format date
-       */
-      from_date: string;
-      /**
-       * End date for the calendar range (YYYY-MM-DD).
-       * @format date
-       */
-      to_date: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsCalendarListData;
-  }
-
-  /**
-   * @description GET /b2b/hotels/<hotel_guid>/card/ Fetch one hotel's search-result card by GUID — used to reopen the booking flow for an already-known hotel (e.g. clicking a "popular hotel" in analytics) without a fuzzy city/name search.
-   * @tags B2B / Executer
-   * @name B2BHotelsCardList
-   * @summary Fetch a single hotel card by GUID
-   * @request GET:/b2b/hotels/{hotel_guid}/card/
-   * @secure
-   */
-  export namespace B2BHotelsCardList {
-    export type RequestParams = {
-      hotelGuid: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsCardListData;
-  }
-
-  /**
-   * @description For the selected `hotel_guid`, return the available rooms for the same `check_in`/`check_out`/`guests` values chosen in step 1. Each room's `capacity` indicates how many employees can be assigned to it, usually 1 or 2.
-   * @tags B2B / Executer
-   * @name B2BHotelsRoomsList
-   * @summary List hotel rooms (owner or performer, step 2)
-   * @request GET:/b2b/hotels/{hotel_guid}/rooms/
-   * @secure
-   */
-  export namespace B2BHotelsRoomsList {
-    export type RequestParams = {
-      hotelGuid: string;
-    };
-    export type RequestQuery = {
-      /** @format date */
-      check_in?: string;
-      /** @format date */
-      check_out?: string;
-      /**
-       * @min 1
-       * @default 1
-       */
-      guests?: number;
-      room_types?: string;
-      room_type_presets?: string;
-      rate_plans?: string;
-      meal_plans?: string;
-      /** @min 1 */
-      min_capacity?: number;
-      /** @min 1 */
-      max_capacity?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = B2BHotelsRoomsListData;
   }
 
   /**
@@ -12281,6 +7405,365 @@ export namespace B2B {
   }
 
   /**
+   * @description GET /api/b2b/workspace/access/catalogue/ — every role, module and permission this build knows about, with the labels to draw them. Read-only and the same for every workspace: it is the vocabulary, not the policy. The app renders the role editor from this rather than from its own hard-coded list, so a permission added on the server appears in the editor without an app release.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccessCatalogueList
+   * @summary Roles, modules and permissions
+   * @request GET:/b2b/workspace/access/catalogue/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccessCatalogueList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccessCatalogueListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/access/roles/ — what each role may do here.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccessRolesList
+   * @summary This workspace's role configuration
+   * @request GET:/b2b/workspace/access/roles/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccessRolesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccessRolesListData;
+  }
+
+  /**
+   * @description PUT /api/b2b/workspace/access/roles/<code>/ — change what a role may do. Roles themselves cannot be created or removed — the TZ forbids it for the MVP — so there is no POST and no DELETE here. What a role *is* stays; what it may do is this workspace's to decide.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccessRolesUpdate
+   * @summary Set a role's modules and permissions
+   * @request PUT:/b2b/workspace/access/roles/{code}/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccessRolesUpdate {
+    export type RequestParams = {
+      code: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = RoleAccess;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccessRolesUpdateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/account/device-token/ — address this phone. The account-session twin of `/me/device-token/`. Registered as soon as registration finishes, before there is any workspace to belong to, so that somebody waiting on a join request can be told when it is answered — the roster's token cannot reach them, because they are not on a roster. An empty token clears the row, which is what signing out sends.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountDeviceTokenCreate
+   * @summary Register this phone (account)
+   * @request POST:/b2b/workspace/account/device-token/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountDeviceTokenCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountDeviceTokenCreateData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/account/invites/<token>/ — what this link offers. POST /api/b2b/workspace/account/invites/<token>/ — take it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountInvitesRead
+   * @summary Preview an invite
+   * @request GET:/b2b/workspace/account/invites/{token}/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountInvitesRead {
+    export type RequestParams = {
+      token: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountInvitesReadData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/account/invites/<token>/ — what this link offers. POST /api/b2b/workspace/account/invites/<token>/ — take it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountInvitesCreate
+   * @summary Accept an invite
+   * @request POST:/b2b/workspace/account/invites/{token}/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountInvitesCreate {
+    export type RequestParams = {
+      token: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountInvitesCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/account/join-code/?code= — what this string is. One field on the app, two things it can hold, and the server decides which — not the client. The two are genuinely different offers and telling them apart by shape is exactly the kind of rule that goes stale: * a **workspace invite link** was minted for one room, with a role and a set of modules already chosen. Taking it is immediate. * a **company join code** decides nothing. It names a company and lists the rooms inside it, and every one of them still has to be asked through. A string that is neither is one answer — `404` — whichever it failed to be. Guessing at five characters must not be able to learn that a code exists but its company is closed, or that a token was real but expired.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountJoinCodeList
+   * @summary Resolve an invite link or company code
+   * @request GET:/b2b/workspace/account/join-code/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountJoinCodeList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** An invite link, an invite token, or a company code. */
+      code?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountJoinCodeListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/account/join-requests/ — what I have asked for. POST /api/b2b/workspace/account/join-requests/ — ask to be let in.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountJoinRequestsList
+   * @summary My join requests
+   * @request GET:/b2b/workspace/account/join-requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountJoinRequestsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountJoinRequestsListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/account/join-requests/ — what I have asked for. POST /api/b2b/workspace/account/join-requests/ — ask to be let in.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountJoinRequestsCreate
+   * @summary Ask to join a workspace
+   * @request POST:/b2b/workspace/account/join-requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountJoinRequestsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = JoinRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountJoinRequestsCreateData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/account/me/ — who this is, and where they work. PUT  /api/b2b/workspace/account/me/ — finish registration.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountMeList
+   * @summary The Weel account
+   * @request GET:/b2b/workspace/account/me/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountMeList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountMeListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/account/me/ — who this is, and where they work. PUT  /api/b2b/workspace/account/me/ — finish registration.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountMeUpdate
+   * @summary Set name and username
+   * @request PUT:/b2b/workspace/account/me/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountMeUpdate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = Profile;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountMeUpdateData;
+  }
+
+  /**
+   * @description Erase the person, keep the work. Required of any app that lets somebody sign up — App Store guideline 5.1.1(v) — and it has to be reachable from inside the app rather than by writing to support. It always succeeds. Owning a company cannot be handed over anywhere in this product, so refusing while somebody owns one would be refusing for good; instead the companies they solely own are closed with them, and `GET` on this endpoint is what lets the screen say which ones before anybody presses anything.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountMeDelete
+   * @summary Delete this account
+   * @request DELETE:/b2b/workspace/account/me/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountMeDelete {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountMeDeleteData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/account/me/deletion/ — what deleting would cost. Separate from the delete itself so the confirmation can be specific. "This cannot be undone" is a sentence people press through; naming the company that closes and the number of colleagues who lose their workspace is not.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountMeDeletionList
+   * @summary What deleting this account closes
+   * @request GET:/b2b/workspace/account/me/deletion/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountMeDeletionList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountMeDeletionListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/account/orgs/<org_id>/workspaces/ — every workspace under this company, for the "Workspace'lar" screen. Gated the same way `POST /account/workspaces/` gates opening one inside an org: holding any active roster row in it. An org's workspaces are already visible sideways to anyone on one of them — see `WorkspaceOrgPeopleView` — this is that same boundary applied to the list of workspaces rather than the list of people.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountOrgsWorkspacesList
+   * @summary A company's workspaces
+   * @request GET:/b2b/workspace/account/orgs/{org_id}/workspaces/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountOrgsWorkspacesList {
+    export type RequestParams = {
+      orgId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountOrgsWorkspacesListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/account/username-check/?username=xusan_design Whether a handle is free, and what else to try if it is not. Answered as the field is typed rather than only on submit. A uniqueness rule that is enforced at the end of a form is a form people fill in twice, and the handle is the last screen of registration — the worst place to send somebody back to. Reading this tells the caller whether *some* handle exists, which is exactly what the screen after it does anyway; it needs an account session, so it is not an open directory probe.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountUsernameCheckList
+   * @summary Is this username free?
+   * @request GET:/b2b/workspace/account/username-check/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountUsernameCheckList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** The handle to test, with or without its @. */
+      username?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountUsernameCheckListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/account/username-suggestion/ The TZ says the system may propose a free handle. Offering one is most of what gets somebody past this screen — a blank field with a uniqueness rule is where registrations stop.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountUsernameSuggestionList
+   * @summary A free username
+   * @request GET:/b2b/workspace/account/username-suggestion/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountUsernameSuggestionList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountUsernameSuggestionListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/account/workspaces/ — where this account works. POST /api/b2b/workspace/account/workspaces/ — open a new one.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountWorkspacesList
+   * @summary My workspaces
+   * @request GET:/b2b/workspace/account/workspaces/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountWorkspacesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountWorkspacesListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/account/workspaces/ — where this account works. POST /api/b2b/workspace/account/workspaces/ — open a new one.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountWorkspacesCreate
+   * @summary Create a workspace
+   * @request POST:/b2b/workspace/account/workspaces/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountWorkspacesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = WorkspaceCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountWorkspacesCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/account/workspaces/search/?q= — find a workspace to ask to join. The one screen an account that belongs to nothing may look outward from, so it is kept to exactly that: at least two characters, a capped number of rows, and nothing on a row that is not already on the card the app draws. Workspaces this account is already on are filtered out on the way.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountWorkspacesSearchList
+   * @summary Search workspaces
+   * @request GET:/b2b/workspace/account/workspaces/search/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountWorkspacesSearchList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Workspace name or handle, at least 2 characters. */
+      q?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountWorkspacesSearchListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/account/workspaces/<employee_id>/open/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountWorkspacesOpenCreate
+   * @summary Open a workspace session
+   * @request POST:/b2b/workspace/account/workspaces/{employee_id}/open/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountWorkspacesOpenCreate {
+    export type RequestParams = {
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountWorkspacesOpenCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/app-version/ — may this build still run? The one endpoint in the workspace API that answers before there is a
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAppVersionList
+   * @summary Whether the installed mobile build may still run
+   * @request GET:/b2b/workspace/app-version/
+   * @secure
+   */
+  export namespace B2BWorkspaceAppVersionList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      platform: "android" | "ios";
+      /** The installed version name, e.g. 1.1.0 */
+      version: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAppVersionListData;
+  }
+
+  /**
    * @description GET /api/b2b/workspace/attendance/ — today's roll call. Readable by everyone: it is on the chat home screen, and the point of it is knowing who is around. `?date=YYYY-MM-DD` reads another day.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceAttendanceList
@@ -12297,6 +7780,22 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceAttendanceListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/attendance/absence/ — "I am not coming in". The other half of the check-in button. Somebody outside the geofence cannot mark themselves present, and the alternative to letting them say why is a day that stays unmarked — which reads as nobody having looked at them rather than as an absence they declared. Needs no capability for the same reason check-in does not: it only ever writes the caller's own row. `marked_by_id` stays null, which is what tells this apart from a manager marking them absent. No coordinates are taken. The point of this endpoint is that the person is somewhere else, and recording where they were when they said so would collect a location for no purpose it serves.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAttendanceAbsenceCreate
+   * @summary Report yourself absent, with a reason
+   * @request POST:/b2b/workspace/attendance/absence/
+   * @secure
+   */
+  export namespace B2BWorkspaceAttendanceAbsenceCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = AttendanceSelfAbsence;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAttendanceAbsenceCreateData;
   }
 
   /**
@@ -12363,6 +7862,24 @@ export namespace B2B {
     export type RequestBody = AttendanceMark;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceAttendanceCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/audit/ — role changes, access changes, deletions.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAuditList
+   * @summary The workspace's audit log
+   * @request GET:/b2b/workspace/audit/
+   * @secure
+   */
+  export namespace B2BWorkspaceAuditList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAuditListData;
   }
 
   /**
@@ -12565,6 +8082,45 @@ export namespace B2B {
   }
 
   /**
+   * @description GET /api/b2b/workspace/crm/customers/ — the CRM directory. Every customer the company has ever raised a lead against, with their deal count, lifetime value and last-touched date, so the CRM list screen can render straight off one response.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCrmCustomersList
+   * @summary List CRM customers
+   * @request GET:/b2b/workspace/crm/customers/
+   * @secure
+   */
+  export namespace B2BWorkspaceCrmCustomersList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Name, company or phone. */
+      q?: string;
+      /** Faol mijozlar / Nofaol mijozlar. Omit for Barchasi. */
+      active?: "active" | "inactive";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCrmCustomersListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/crm/customers/<id>/ — one customer's CRM card. The contact card, the lifetime totals, the trailing six months of deal value for the chart, and the deal history — everything the detail screen draws, in one response.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCrmCustomersRead
+   * @summary CRM customer detail
+   * @request GET:/b2b/workspace/crm/customers/{customer_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceCrmCustomersRead {
+    export type RequestParams = {
+      customerId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCrmCustomersReadData;
+  }
+
+  /**
    * @description GET /api/b2b/workspace/customers/?q= — the company's customer directory. What step 1 of the "Yangi lead" sheet searches. Any employee may look a customer up: the point of the search is to stop the same buyer being typed in twice, and a directory only half the company can see would not. Deliberately not paged. It answers a search box the moment somebody stops typing, and twenty matches is already more than anyone reads before narrowing the query.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceCustomersList
@@ -12629,6 +8185,42 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceEmployeeOfMonthStatsListData;
+  }
+
+  /**
+   * @description GET/PUT /api/b2b/workspace/employees/<id>/access/ — one person's standing.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceEmployeesAccessList
+   * @summary What one employee may do
+   * @request GET:/b2b/workspace/employees/{employee_id}/access/
+   * @secure
+   */
+  export namespace B2BWorkspaceEmployeesAccessList {
+    export type RequestParams = {
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceEmployeesAccessListData;
+  }
+
+  /**
+   * @description GET/PUT /api/b2b/workspace/employees/<id>/access/ — one person's standing.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceEmployeesAccessUpdate
+   * @summary Set one employee's role and access
+   * @request PUT:/b2b/workspace/employees/{employee_id}/access/
+   * @secure
+   */
+  export namespace B2BWorkspaceEmployeesAccessUpdate {
+    export type RequestParams = {
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EmployeeAccess;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceEmployeesAccessUpdateData;
   }
 
   /**
@@ -12761,7 +8353,25 @@ export namespace B2B {
   }
 
   /**
-   * @description DELETE /api/b2b/workspace/files/<id>/
+   * @description PATCH / DELETE /api/b2b/workspace/files/<id>/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceFilesPartialUpdate
+   * @summary Rename a file or move it to another folder
+   * @request PATCH:/b2b/workspace/files/{file_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceFilesPartialUpdate {
+    export type RequestParams = {
+      fileId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = WorkspaceFilePatch;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceFilesPartialUpdateData;
+  }
+
+  /**
+   * @description PATCH / DELETE /api/b2b/workspace/files/<id>/
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceFilesDelete
    * @summary Delete a file
@@ -12779,24 +8389,138 @@ export namespace B2B {
   }
 
   /**
-   * @description GET /api/b2b/workspace/hotels/ — partner hotels, shaped for the phone. A thin projection of the platform hotel card: the mobile list only renders a name, a location, a rating and a starting price, and shipping the full card (policies, rate plans, legal info) over mobile data for a list of 20 would cost far more than it shows.
+   * @description GET/POST /api/b2b/workspace/folders/ — the drive's own folders. Anyone in the company may make one, the same as anyone may add a file: the drive is shared, and a folder is how somebody decided to arrange it.
    * @tags B2B / Workspace (mobile)
-   * @name B2BWorkspaceHotelsList
-   * @summary Partner hotels
-   * @request GET:/b2b/workspace/hotels/
+   * @name B2BWorkspaceFoldersList
+   * @summary List folders
+   * @request GET:/b2b/workspace/folders/
    * @secure
    */
-  export namespace B2BWorkspaceHotelsList {
+  export namespace B2BWorkspaceFoldersList {
     export type RequestParams = {};
-    export type RequestQuery = {
-      city?: string;
-      search?: string;
-      limit?: number;
-      offset?: number;
-    };
+    export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = B2BWorkspaceHotelsListData;
+    export type ResponseBody = B2BWorkspaceFoldersListData;
+  }
+
+  /**
+   * @description GET/POST /api/b2b/workspace/folders/ — the drive's own folders. Anyone in the company may make one, the same as anyone may add a file: the drive is shared, and a folder is how somebody decided to arrange it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceFoldersCreate
+   * @summary Create a folder
+   * @request POST:/b2b/workspace/folders/
+   * @secure
+   */
+  export namespace B2BWorkspaceFoldersCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = WorkspaceFolderWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceFoldersCreateData;
+  }
+
+  /**
+   * @description DELETE /api/b2b/workspace/folders/<id>/ The folder goes; the files in it go back to the drive. Deleting somebody's arrangement is not deleting the company's documents, and the two should never be the same tap.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceFoldersDelete
+   * @summary Delete a folder (its files return to the drive)
+   * @request DELETE:/b2b/workspace/folders/{folder_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceFoldersDelete {
+    export type RequestParams = {
+      folderId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceFoldersDeleteData;
+  }
+
+  /**
+   * @description GET/POST /api/b2b/workspace/invites/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInvitesList
+   * @summary Invite links
+   * @request GET:/b2b/workspace/invites/
+   * @secure
+   */
+  export namespace B2BWorkspaceInvitesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInvitesListData;
+  }
+
+  /**
+   * @description GET/POST /api/b2b/workspace/invites/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInvitesCreate
+   * @summary Create an invite link
+   * @request POST:/b2b/workspace/invites/
+   * @secure
+   */
+  export namespace B2BWorkspaceInvitesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = InviteCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInvitesCreateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/invites/<id>/revoke/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInvitesRevokeCreate
+   * @summary Revoke an invite link
+   * @request POST:/b2b/workspace/invites/{invite_id}/revoke/
+   * @secure
+   */
+  export namespace B2BWorkspaceInvitesRevokeCreate {
+    export type RequestParams = {
+      inviteId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInvitesRevokeCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/join-requests/ — who is asking to be let in.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceJoinRequestsList
+   * @summary Join requests
+   * @request GET:/b2b/workspace/join-requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceJoinRequestsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceJoinRequestsListData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/join-requests/<id>/<accept|decline>/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceJoinRequestsCreate
+   * @summary Answer a join request
+   * @request POST:/b2b/workspace/join-requests/{request_id}/{action}/
+   * @secure
+   */
+  export namespace B2BWorkspaceJoinRequestsCreate {
+    export type RequestParams = {
+      requestId: string;
+      action: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = JoinDecision;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceJoinRequestsCreateData;
   }
 
   /**
@@ -12852,6 +8576,24 @@ export namespace B2B {
   }
 
   /**
+   * @description GET /api/b2b/workspace/leads/<id>/ — the whole lead in one response. The detail screen shows the lead, its priced lines, its history and the tasks raised off it all at once, so it fetches them together: four small queries on the server beats four round trips from a phone.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsDelete
+   * @summary Delete a lead (owner or manager)
+   * @request DELETE:/b2b/workspace/leads/{lead_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsDelete {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsDeleteData;
+  }
+
+  /**
    * @description POST /api/b2b/workspace/leads/<id>/assign/ — hand the lead to somebody. Managers only, and distinct from claiming: claiming is first-come and self-service, this takes a lead off one employee and gives it to another.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceLeadsAssignCreate
@@ -12888,7 +8630,7 @@ export namespace B2B {
   }
 
   /**
-   * @description POST /api/b2b/workspace/leads/<id>/comments/ — add a note to the history. Only open to whoever may see the contact: the history names the people and the calls, and it is withheld from the rest of the board for the same reason the phone number is.
+   * @description POST /api/b2b/workspace/leads/<id>/comments/ — add a note to the history. The claimant's alone. Management reads the history — that is the point of it — but the account of the calls is written by the person who made them.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceLeadsCommentsCreate
    * @summary Comment on a lead
@@ -12979,7 +8721,7 @@ export namespace B2B {
   }
 
   /**
-   * @description POST /api/b2b/workspace/leads/<id>/stage/ — move the lead along the funnel. The owner or a manager, and never on a closed lead. Reaching ``won`` or ``lost`` completes it; that rule lives in the repository so this view does not have to know which stages are terminal.
+   * @description POST /api/b2b/workspace/leads/<id>/stage/ — move the lead along the funnel. The claimant only, and never on a closed lead. Reaching ``won`` or ``lost`` completes it; that rule lives in the repository so this view does not have to know which stages are terminal.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceLeadsStageCreate
    * @summary Change a lead's funnel stage
@@ -13334,6 +9076,38 @@ export namespace B2B {
   }
 
   /**
+   * @description PUT /api/b2b/workspace/me/profile/ — correct your own entry. Yours alone, and only the parts that are actually yours: the name people see and the address they write to. The position, the department and the role are the workspace's account of what you do here and are set by whoever runs it, so the app draws them greyed out with that said in words rather than leaving them off the screen — somebody looking for the field that fixes their job title should find the answer, not an absence. The phone is not editable here either. It is what the login is checked against, and moving it is a different act with an OTP behind it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceMeProfileUpdate
+   * @summary Edit your own profile
+   * @request PUT:/b2b/workspace/me/profile/
+   * @secure
+   */
+  export namespace B2BWorkspaceMeProfileUpdate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = OwnProfile;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMeProfileUpdateData;
+  }
+
+  /**
+   * @description PUT /api/b2b/workspace/me/username/ — pick the handle people find you by. Yours alone. A roster is imported from passports and phone numbers, and a handle is the one part of somebody's entry they choose for themselves — which is also why nothing here lets one person set another's.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceMeUsernameUpdate
+   * @summary Set your own username
+   * @request PUT:/b2b/workspace/me/username/
+   * @secure
+   */
+  export namespace B2BWorkspaceMeUsernameUpdate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = Username;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMeUsernameUpdateData;
+  }
+
+  /**
    * @description GET /api/b2b/workspace/notifications/ — the real, server-stored feed. Replaces the feed both clients used to synthesise from whatever data they happened to have loaded, which could not show anything that arrived while the app was closed.
    * @tags B2B / Mail
    * @name B2BWorkspaceNotificationsList
@@ -13366,6 +9140,75 @@ export namespace B2B {
     export type RequestBody = NotificationRead;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceNotificationsReadCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/org/people/?search= — who else is in the org. The picker on "So'rov yuborish" searches this rather than `/team/`: the whole point is to reach somebody who is *not* in this workspace. Restricted to the org, so a workspace can only ever ask people who share an owner with it — never the whole of WEEL.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceOrgPeopleList
+   * @summary Search people in the org's other workspaces
+   * @request GET:/b2b/workspace/org/people/
+   * @secure
+   */
+  export namespace B2BWorkspaceOrgPeopleList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      search?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceOrgPeopleListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/requests/ — the inbox and the sent list. POST /api/b2b/workspace/requests/ — ask somebody to come and help.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceRequestsList
+   * @summary Requests received and sent
+   * @request GET:/b2b/workspace/requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceRequestsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceRequestsListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/requests/ — the inbox and the sent list. POST /api/b2b/workspace/requests/ — ask somebody to come and help.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceRequestsCreate1
+   * @summary Ask somebody from another workspace for help
+   * @request POST:/b2b/workspace/requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceRequestsCreate1 {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = SecondmentRequestCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceRequestsCreate1Data;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/requests/<id>/<accept|decline|cancel>/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceRequestsCreate2
+   * @summary Accept, decline or cancel a request
+   * @request POST:/b2b/workspace/requests/{request_id}/{action}/
+   * @secure
+   */
+  export namespace B2BWorkspaceRequestsCreate2 {
+    export type RequestParams = {
+      requestId: string;
+      action: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = SecondmentDecline;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceRequestsCreate2Data;
   }
 
   /**
@@ -13417,17 +9260,49 @@ export namespace B2B {
   }
 
   /**
-   * @description GET  /api/b2b/workspace/tasks/ — tasks the caller may see. POST /api/b2b/workspace/tasks/ — managers only.
+   * @description GET  /api/b2b/workspace/switch/ — the workspaces this person can open. POST /api/b2b/workspace/switch/ — tokens for one of them. Signing in always lands on the workspace that hired you; this is how somebody gets to one they were lent to. A separate token per workspace rather than one token that carries a workspace header: every row in this schema references `b2b_employee(id)`, so "which workspace am I in" and "which employee am I" are the same question, and answering it once at sign-in is what keeps the other two hundred queries honest.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceSwitchList
+   * @summary Workspaces this person can open
+   * @request GET:/b2b/workspace/switch/
+   * @secure
+   */
+  export namespace B2BWorkspaceSwitchList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceSwitchListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/switch/ — the workspaces this person can open. POST /api/b2b/workspace/switch/ — tokens for one of them. Signing in always lands on the workspace that hired you; this is how somebody gets to one they were lent to. A separate token per workspace rather than one token that carries a workspace header: every row in this schema references `b2b_employee(id)`, so "which workspace am I in" and "which employee am I" are the same question, and answering it once at sign-in is what keeps the other two hundred queries honest.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceSwitchCreate
+   * @summary Get tokens for another workspace
+   * @request POST:/b2b/workspace/switch/
+   * @secure
+   */
+  export namespace B2BWorkspaceSwitchCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceSwitchCreateData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/tasks/ — the company's whole board, whatever the caller's role; the app's "Menikilar" toggle narrows it client-side. POST /api/b2b/workspace/tasks/ — managers only.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceTasksList
-   * @summary List tasks (employees see only their own)
+   * @summary List tasks (every role sees the whole company board)
    * @request GET:/b2b/workspace/tasks/
    * @secure
    */
   export namespace B2BWorkspaceTasksList {
     export type RequestParams = {};
     export type RequestQuery = {
-      status?: "todo" | "in_progress" | "review" | "done";
+      status?: "todo" | "in_progress" | "done";
       search?: string;
     };
     export type RequestBody = never;
@@ -13436,7 +9311,7 @@ export namespace B2B {
   }
 
   /**
-   * @description GET  /api/b2b/workspace/tasks/ — tasks the caller may see. POST /api/b2b/workspace/tasks/ — managers only.
+   * @description GET  /api/b2b/workspace/tasks/ — the company's whole board, whatever the caller's role; the app's "Menikilar" toggle narrows it client-side. POST /api/b2b/workspace/tasks/ — managers only.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceTasksCreate
    * @summary Create a task (owner/manager only)
@@ -13449,6 +9324,22 @@ export namespace B2B {
     export type RequestBody = TaskWrite;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceTasksCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/tasks/activity/ The company-wide feed the tasks page shows: every create/edit/status/ assign/delete across every task, newest first — including tasks since deleted, since the log outlives the row it was written about. Everyone sees everyone's actions, the same boundary ``list_tasks`` draws for the task list itself (see ``WorkspaceUser.task_scope``).
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceTasksActivityList
+   * @summary Company-wide task activity feed
+   * @request GET:/b2b/workspace/tasks/activity/
+   * @secure
+   */
+  export namespace B2BWorkspaceTasksActivityList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceTasksActivityListData;
   }
 
   /**
@@ -13524,7 +9415,7 @@ export namespace B2B {
   }
 
   /**
-   * @description POST /api/b2b/workspace/tasks/<id>/status/ The one write an employee always has: moving a task they were given from todo → in progress → review → done.
+   * @description POST /api/b2b/workspace/tasks/<id>/status/ The one write an employee always has: moving a task they were given from todo → in progress → done.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceTasksStatusCreate
    * @summary Change a task's status
@@ -13561,6 +9452,46 @@ export namespace B2B {
   }
 
   /**
+   * @description POST/DELETE /api/b2b/workspace/tasks/<id>/voice/ — the task's voice note. Its own endpoint rather than a field on the create call: a task is created as JSON and a clip is multipart, and folding the two together would mean every task write carried a file parser it does not need. The app posts the task, gets its id, and sends the recording straight after. A task carries at most one clip. Posting a second replaces the first, bytes and all — re-recording is the common case, and leaving the earlier attempt on the company's quota is not what "replace" means.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceTasksVoiceCreate
+   * @summary Attach a voice note to a task
+   * @request POST:/b2b/workspace/tasks/{task_id}/voice/
+   * @secure
+   */
+  export namespace B2BWorkspaceTasksVoiceCreate {
+    export type RequestParams = {
+      taskId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** @format binary */
+      file: File;
+      duration_ms?: number;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceTasksVoiceCreateData;
+  }
+
+  /**
+   * @description POST/DELETE /api/b2b/workspace/tasks/<id>/voice/ — the task's voice note. Its own endpoint rather than a field on the create call: a task is created as JSON and a clip is multipart, and folding the two together would mean every task write carried a file parser it does not need. The app posts the task, gets its id, and sends the recording straight after. A task carries at most one clip. Posting a second replaces the first, bytes and all — re-recording is the common case, and leaving the earlier attempt on the company's quota is not what "replace" means.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceTasksVoiceDelete
+   * @summary Remove a task's voice note
+   * @request DELETE:/b2b/workspace/tasks/{task_id}/voice/
+   * @secure
+   */
+  export namespace B2BWorkspaceTasksVoiceDelete {
+    export type RequestParams = {
+      taskId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceTasksVoiceDeleteData;
+  }
+
+  /**
    * @description GET /api/b2b/workspace/team/ — the company roster. Everyone can read it: names are needed to render assignees, chat rows and event participants. Editing the roster stays in the web dashboard.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceTeamList
@@ -13577,511 +9508,40 @@ export namespace B2B {
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceTeamListData;
   }
-}
-
-export namespace Booking {
-  /**
-   * @description Returns a paginated list of all bookings with filtering, search, and ordering support
-   * @tags Admin / Booking
-   * @name BookingAdminBookingsList
-   * @summary List all bookings for admin
-   * @request GET:/booking/admin/bookings/
-   * @secure
-   */
-  export namespace BookingAdminBookingsList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Search by booking number or client phone number */
-      search?: string;
-      /** Order by field (created_at, check_in, status). Prefix with '-' for descending */
-      ordering?: string;
-      /** A page number within the paginated result set. */
-      page?: number;
-      /** Number of results to return per page. */
-      page_size?: number;
-      /** Filter bookings by status */
-      status?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingAdminBookingsListData;
-  }
 
   /**
-   * @description Return a list of booking related to the authenticated client
-   * @tags Client / Booking
-   * @name BookingClientList
-   * @summary List client bookings
-   * @request GET:/booking/client/
+   * @description GET /api/b2b/workspace/trash/ — what has been deleted and can come back. Behind a permission of its own rather than shown to everybody: the TZ says an ordinary user does not see deleted objects at all, and a bin that anybody can read is a way to see the deal somebody removed this morning.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceTrashList
+   * @summary Deleted tasks and deals
+   * @request GET:/b2b/workspace/trash/
    * @secure
    */
-  export namespace BookingClientList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Filter bookings by status */
-      status?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingClientListData;
-  }
-
-  /**
-   * @description Creates a **PENDING booking** and places a **payment hold (UZS)**
-   * @tags Client / Booking
-   * @name BookingClientCreate
-   * @summary Create booking and payment hold
-   * @request POST:/booking/client/
-   * @secure
-   */
-  export namespace BookingClientCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = RawClientBookingCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingClientCreateData;
-  }
-
-  /**
-   * @description Returns a list of history bookings created by the authenticated client
-   * @tags Client / Booking
-   * @name BookingClientHistoryList
-   * @summary Retrieve booking history
-   * @request GET:/booking/client/history/
-   * @secure
-   */
-  export namespace BookingClientHistoryList {
+  export namespace B2BWorkspaceTrashList {
     export type RequestParams = {};
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = BookingClientHistoryListData;
+    export type ResponseBody = B2BWorkspaceTrashListData;
   }
 
   /**
-   * @description Returns detailed information about a specific booking history belonging to the authenticated client
-   * @tags Client / Booking
-   * @name BookingClientHistoryRead
-   * @summary Retrieve history booking details
-   * @request GET:/booking/client/history/{booking_id}/
+   * @description POST /api/b2b/workspace/trash/<kind>/<id>/restore/ — put one back.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceTrashRestoreCreate
+   * @summary Restore a deleted object
+   * @request POST:/b2b/workspace/trash/{kind}/{object_id}/restore/
    * @secure
    */
-  export namespace BookingClientHistoryRead {
+  export namespace B2BWorkspaceTrashRestoreCreate {
     export type RequestParams = {
-      /**
-       * Unique booking GUID
-       * @format uuid
-       */
-      bookingId: string;
+      kind: string;
+      objectId: string;
     };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = BookingClientHistoryReadData;
-  }
-
-  /**
-   * @description Client-only. Creates a pending hotel booking with payment hold, calendar slots, and notifications.
-   * @tags Hotel / Booking
-   * @name CreateHotelBooking
-   * @summary Create a hotel booking
-   * @request POST:/booking/client/hotel/
-   * @secure
-   */
-  export namespace CreateHotelBooking {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = HotelBookingCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateHotelBookingData;
-  }
-
-  /**
-   * @description Returns all hotel bookings for the authenticated client.
-   * @tags Hotel / Booking
-   * @name ListClientHotelBookings
-   * @summary List client hotel bookings
-   * @request GET:/booking/client/hotel/list/
-   * @secure
-   */
-  export namespace ListClientHotelBookings {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Filter by status. */
-      status?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListClientHotelBookingsData;
-  }
-
-  /**
-   * @description Returns detailed information about a specific hotel booking.
-   * @tags Hotel / Booking
-   * @name GetClientHotelBookingDetail
-   * @summary Get hotel booking detail
-   * @request GET:/booking/client/hotel/{booking_id}/
-   * @secure
-   */
-  export namespace GetClientHotelBookingDetail {
-    export type RequestParams = {
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetClientHotelBookingDetailData;
-  }
-
-  /**
-   * @description Client cancels their hotel booking. Dismisses payment hold and releases calendar slots.
-   * @tags Hotel / Booking
-   * @name CancelClientHotelBooking
-   * @summary Cancel a hotel booking
-   * @request POST:/booking/client/hotel/{booking_id}/cancel/
-   * @secure
-   */
-  export namespace CancelClientHotelBooking {
-    export type RequestParams = {
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = CancelClientHotelBookingData;
-  }
-
-  /**
-   * @description Retrieve information about a specific booking belonging to the authenticated client
-   * @tags Client / Booking
-   * @name BookingClientRead
-   * @summary Retrieve client booking details
-   * @request GET:/booking/client/{booking_id}/
-   * @secure
-   */
-  export namespace BookingClientRead {
-    export type RequestParams = {
-      /**
-       * Unique booking GUID
-       * @format uuid
-       */
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingClientReadData;
-  }
-
-  /**
-   * @description Allows a client to cancel their booking
-   * @tags Client / Booking
-   * @name BookingClientCancelCreate
-   * @summary Cancel booking
-   * @request POST:/booking/client/{booking_id}/cancel/
-   * @secure
-   */
-  export namespace BookingClientCancelCreate {
-    export type RequestParams = {
-      /**
-       * Unique booking GUID
-       * @format uuid
-       */
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingClientCancelCreateData;
-  }
-
-  /**
-   * @description Returns per-room availability for a hotel date range.
-   * @tags Hotel / Booking
-   * @name GetHotelCalendar
-   * @summary Get hotel room calendar
-   * @request GET:/booking/hotels/{hotel_guid}/calendar/
-   * @secure
-   */
-  export namespace GetHotelCalendar {
-    export type RequestParams = {
-      hotelGuid: string;
-    };
-    export type RequestQuery = {
-      /** @format date */
-      from_date: string;
-      /** @format date */
-      to_date: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetHotelCalendarData;
-  }
-
-  /**
-   * @description Returns available rooms for a hotel by encoded GUID. Query params: check_in, check_out, guests.
-   * @tags Hotel / Booking
-   * @name ListHotelRooms
-   * @summary List available hotel rooms
-   * @request GET:/booking/hotels/{hotel_guid}/rooms/
-   * @secure
-   */
-  export namespace ListHotelRooms {
-    export type RequestParams = {
-      hotelGuid: string;
-    };
-    export type RequestQuery = {
-      /** @format date */
-      check_in: string;
-      /** @format date */
-      check_out: string;
-      /** @default 1 */
-      guests?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListHotelRoomsData;
-  }
-
-  /**
-   * @description Returns server-side price quote for a hotel room: nights, total, hold_amount, remaining_on_arrival.
-   * @tags Hotel / Booking
-   * @name GetHotelRoomPrice
-   * @summary Get room price quote
-   * @request GET:/booking/hotels/{hotel_guid}/rooms/{room_id}/price/
-   * @secure
-   */
-  export namespace GetHotelRoomPrice {
-    export type RequestParams = {
-      hotelGuid: string;
-      roomId: number;
-    };
-    export type RequestQuery = {
-      /** @format date */
-      check_in: string;
-      /** @format date */
-      check_out: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetHotelRoomPriceData;
-  }
-
-  /**
-   * @description Return a list of booking related to the authenticated partner
-   * @tags Partner / Booking
-   * @name BookingPartnerList
-   * @summary List partner bookings
-   * @request GET:/booking/partner/
-   * @secure
-   */
-  export namespace BookingPartnerList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Filter bookings by status */
-      status?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPartnerListData;
-  }
-
-  /**
-   * @description Allows a partner to accept a booking request
-   * @tags Partner / Booking
-   * @name BookingPartnerAcceptCreate
-   * @summary Accept booking
-   * @request POST:/booking/partner/{booking_id}/accept/
-   * @secure
-   */
-  export namespace BookingPartnerAcceptCreate {
-    export type RequestParams = {
-      /**
-       * Unique booking GUID
-       * @format uuid
-       */
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPartnerAcceptCreateData;
-  }
-
-  /**
-   * @description A cancellation reason may be provided and the booking status
-   * @tags Partner / Booking
-   * @name BookingPartnerCancelCreate
-   * @summary Cancel booking
-   * @request POST:/booking/partner/{booking_id}/cancel/
-   * @secure
-   */
-  export namespace BookingPartnerCancelCreate {
-    export type RequestParams = {
-      /**
-       * Unique booking GUID
-       * @format uuid
-       */
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPartnerCancelCreateData;
-  }
-
-  /**
-   * @description Marks as confirmed booking as completed when the user arrives Charges 50% of the hold booking price
-   * @tags Partner / Booking
-   * @name BookingPartnerCompleteCreate
-   * @summary Complete booking
-   * @request POST:/booking/partner/{booking_id}/complete/
-   * @secure
-   */
-  export namespace BookingPartnerCompleteCreate {
-    export type RequestParams = {
-      /**
-       * Unique booking GUID
-       * @format uuid
-       */
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPartnerCompleteCreateData;
-  }
-
-  /**
-   * @description Marks a confirmed booking as no-show when the user does not arrive
-   * @tags Partner / Booking
-   * @name BookingPartnerNoShowCreate
-   * @summary Mark booking as no-show
-   * @request POST:/booking/partner/{booking_id}/no_show/
-   * @secure
-   */
-  export namespace BookingPartnerNoShowCreate {
-    export type RequestParams = {
-      /**
-       * Unique booking GUID
-       * @format uuid
-       */
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPartnerNoShowCreateData;
-  }
-
-  /**
-   * @description Returns the calendar for a property within the specified date range
-   * @tags Booking / Calendar
-   * @name BookingPropertiesCalendarList
-   * @summary Retrieve property calendar availability
-   * @request GET:/booking/properties/{property_id}/calendar/
-   * @secure
-   */
-  export namespace BookingPropertiesCalendarList {
-    export type RequestParams = {
-      /**
-       * Unique property GUID
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPropertiesCalendarListData;
-  }
-
-  /**
-   * @description Blocks one or more dates in the property calendar
-   * @tags Booking / Calendar
-   * @name BookingPropertiesCalendarBlockCreate
-   * @summary Block dates in property calendar
-   * @request POST:/booking/properties/{property_id}/calendar/block/
-   * @secure
-   */
-  export namespace BookingPropertiesCalendarBlockCreate {
-    export type RequestParams = {
-      /**
-       * Unique property GUID
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RawPropertyCalendarDateRange;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPropertiesCalendarBlockCreateData;
-  }
-
-  /**
-   * @description Temporarily holds one or more dates for a client during the booking process. The client has 30 minutes to complete payment.
-   * @tags Booking / Calendar
-   * @name BookingPropertiesCalendarHoldCreate
-   * @summary Temporarily hold dates for 30 minutes
-   * @request POST:/booking/properties/{property_id}/calendar/hold/
-   * @secure
-   */
-  export namespace BookingPropertiesCalendarHoldCreate {
-    export type RequestParams = {
-      /**
-       * Unique property GUID
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RawPropertyCalendarDateRange;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPropertiesCalendarHoldCreateData;
-  }
-
-  /**
-   * @description Removes blocked dates from the property calendar
-   * @tags Booking / Calendar
-   * @name BookingPropertiesCalendarUnblockCreate
-   * @summary Unblock dates in property calendar
-   * @request POST:/booking/properties/{property_id}/calendar/unblock/
-   * @secure
-   */
-  export namespace BookingPropertiesCalendarUnblockCreate {
-    export type RequestParams = {
-      /**
-       * Unique property GUID
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RawPropertyCalendarDateRange;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPropertiesCalendarUnblockCreateData;
-  }
-
-  /**
-   * @description Releases previously held dates before the 30-minute hold expires
-   * @tags Booking / Calendar
-   * @name BookingPropertiesCalendarUnholdCreate
-   * @summary Release held dates
-   * @request POST:/booking/properties/{property_id}/calendar/unhold/
-   * @secure
-   */
-  export namespace BookingPropertiesCalendarUnholdCreate {
-    export type RequestParams = {
-      /**
-       * Unique property GUID
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RawPropertyCalendarDateRange;
-    export type RequestHeaders = {};
-    export type ResponseBody = BookingPropertiesCalendarUnholdCreateData;
+    export type ResponseBody = B2BWorkspaceTrashRestoreCreateData;
   }
 }
 
@@ -14249,242 +9709,329 @@ export namespace Documents {
 
 export namespace Hotels {
   /**
-   * No description
+   * @description GET /api/hotels/ — browse the catalogue without checking availability.
    * @tags api
-   * @name HotelsSearchList
-   * @request GET:/hotels/search/
+   * @name HotelsList
+   * @request GET:/hotels/
    * @secure
    */
-  export namespace HotelsSearchList {
+  export namespace HotelsList {
     export type RequestParams = {};
-    export type RequestQuery = {
-      city?: string;
-      /** @format date */
-      check_in?: string;
-      /** @format date */
-      check_out?: string;
-      /**
-       * @min 1
-       * @default 1
-       */
-      guests?: number;
-      /** @min 1 */
-      adults?: number;
-      /** @min 0 */
-      children?: number;
-      /** @min 0 */
-      babies?: number;
-      /**
-       * @min 1
-       * @max 5
-       */
-      star_rating?: number | null;
-      weel_classification?:
-        | "standard"
-        | "essential"
-        | "comfort"
-        | "comfort_plus"
-        | "business"
-        | "premium"
-        | "signature";
-      is_recommended?: boolean | null;
-      themes?: string[];
-      /** @format decimal */
-      price_min?: string | null;
-      /** @format decimal */
-      price_max?: string | null;
-      /** @format decimal */
-      budget_max?: string | null;
-      room_types?: string;
-      room_type_presets?: string;
-      rate_plans?: string;
-      meal_plans?: string;
-      /** @min 1 */
-      min_capacity?: number;
-      /** @min 1 */
-      max_capacity?: number;
-      lat?: number | null;
-      lon?: number | null;
-      /**
-       * @min 0.1
-       * @default 10
-       */
-      radius_km?: number;
-      /** @default "popular" */
-      sort_by?:
-        | "popular"
-        | "rating"
-        | "reviews"
-        | "cheap"
-        | "expensive"
-        | "weel_recommended";
-      /**
-       * @min 1
-       * @default 1
-       */
-      page?: number;
-      /**
-       * @min 1
-       * @max 100
-       * @default 20
-       */
-      page_size?: number;
-    };
+    export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = HotelsSearchListData;
+    export type ResponseBody = HotelsListData;
   }
 
   /**
-   * No description
+   * @description Hotelios refuses a booking with error 4303 once balance plus allowed credit runs out, so this needs to be visible before a guest finds out for us.
    * @tags api
-   * @name HotelsRead
-   * @request GET:/hotels/{guid}/
+   * @name HotelsBalanceList
+   * @summary GET /api/hotels/balance/ — the credit bookings are drawn against.
+   * @request GET:/hotels/balance/
    * @secure
    */
-  export namespace HotelsRead {
+  export namespace HotelsBalanceList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBalanceListData;
+  }
+
+  /**
+   * @description POST holds the rooms; it does not send them to the hotel. That is the separate confirm step, which is what a completed payment triggers.
+   * @tags api
+   * @name HotelsBookingsList
+   * @summary GET/POST /api/hotels/bookings/ — this caller's bookings, and new holds.
+   * @request GET:/hotels/bookings/
+   * @secure
+   */
+  export namespace HotelsBookingsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsListData;
+  }
+
+  /**
+   * @description POST holds the rooms; it does not send them to the hotel. That is the separate confirm step, which is what a completed payment triggers.
+   * @tags api
+   * @name HotelsBookingsCreate
+   * @summary GET/POST /api/hotels/bookings/ — this caller's bookings, and new holds.
+   * @request POST:/hotels/bookings/
+   * @secure
+   */
+  export namespace HotelsBookingsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CreateHotelBooking;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsCreateData;
+  }
+
+  /**
+   * @description GET /api/hotels/bookings/{guid}/ — with `?refresh=1` to re-read upstream.
+   * @tags api
+   * @name HotelsBookingsRead
+   * @request GET:/hotels/bookings/{guid}/
+   * @secure
+   */
+  export namespace HotelsBookingsRead {
     export type RequestParams = {
       guid: string;
     };
     export type RequestQuery = {};
     export type RequestBody = never;
     export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsReadData;
+  }
+
+  /**
+   * @description Same operation for clients that cannot issue a DELETE.
+   * @tags api
+   * @name HotelsBookingsCancelCreate
+   * @request POST:/hotels/bookings/{guid}/cancel/
+   * @secure
+   */
+  export namespace HotelsBookingsCancelCreate {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsCancelCreateData;
+  }
+
+  /**
+   * @description Whether it costs anything is decided by the room's cancellation policy, which was recorded on the room line when the booking was made.
+   * @tags api
+   * @name HotelsBookingsCancelDelete
+   * @summary DELETE /api/hotels/bookings/{guid}/cancel/ — cancel with the provider.
+   * @request DELETE:/hotels/bookings/{guid}/cancel/
+   * @secure
+   */
+  export namespace HotelsBookingsCancelDelete {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsCancelDeleteData;
+  }
+
+  /**
+   * @description Works exactly once, and is the step that makes the reservation real.
+   * @tags api
+   * @name HotelsBookingsConfirmCreate
+   * @summary POST /api/hotels/bookings/{guid}/confirm/ — send it to the hotel.
+   * @request POST:/hotels/bookings/{guid}/confirm/
+   * @secure
+   */
+  export namespace HotelsBookingsConfirmCreate {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsConfirmCreateData;
+  }
+
+  /**
+   * @description GET /api/hotels/bookings/{guid}/events/ — the status history.
+   * @tags api
+   * @name HotelsBookingsEventsList
+   * @request GET:/hotels/bookings/{guid}/events/
+   * @secure
+   */
+  export namespace HotelsBookingsEventsList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsEventsListData;
+  }
+
+  /**
+   * @description POST /api/hotels/bookings/{guid}/refresh/.
+   * @tags api
+   * @name HotelsBookingsRefreshCreate
+   * @request POST:/hotels/bookings/{guid}/refresh/
+   * @secure
+   */
+  export namespace HotelsBookingsRefreshCreate {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsRefreshCreateData;
+  }
+
+  /**
+   * @description GET /api/hotels/bookings/{guid}/rooms/ — the priced room lines.
+   * @tags api
+   * @name HotelsBookingsRoomsList
+   * @request GET:/hotels/bookings/{guid}/rooms/
+   * @secure
+   */
+  export namespace HotelsBookingsRoomsList {
+    export type RequestParams = {
+      guid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsBookingsRoomsListData;
+  }
+
+  /**
+   * @description GET /api/hotels/cities/ — cities that actually have bookable hotels.
+   * @tags api
+   * @name HotelsCitiesList
+   * @request GET:/hotels/cities/
+   * @secure
+   */
+  export namespace HotelsCitiesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsCitiesListData;
+  }
+
+  /**
+   * @description GET /api/hotels/monthly-summary/?year=&month= — B2B only.
+   * @tags api
+   * @name HotelsMonthlySummaryList
+   * @request GET:/hotels/monthly-summary/
+   * @secure
+   */
+  export namespace HotelsMonthlySummaryList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsMonthlySummaryListData;
+  }
+
+  /**
+   * @description Mandatory before booking, and the `quote_id` it returns is only good for about an hour, so this belongs immediately before the payment screen.
+   * @tags api
+   * @name HotelsQuoteCreate
+   * @summary POST /api/hotels/quote/ — confirm price and availability, open a quote.
+   * @request POST:/hotels/quote/
+   * @secure
+   */
+  export namespace HotelsQuoteCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = Quote;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsQuoteCreateData;
+  }
+
+  /**
+   * @description Hotels in cities this company has booked before, top-rated first, minus hotels it's currently staying at. A company with no history yet gets the overall top-rated catalogue instead of an empty widget.
+   * @tags api
+   * @name HotelsRecommendationsList
+   * @summary GET /api/hotels/recommendations/?limit= — B2B only.
+   * @request GET:/hotels/recommendations/
+   * @secure
+   */
+  export namespace HotelsRecommendationsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsRecommendationsListData;
+  }
+
+  /**
+   * @description GET /api/hotels/reference/{name}/ — a synced lookup list.
+   * @tags api
+   * @name HotelsReferenceRead
+   * @request GET:/hotels/reference/{name}/
+   * @secure
+   */
+  export namespace HotelsReferenceRead {
+    export type RequestParams = {
+      name: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsReferenceReadData;
+  }
+
+  /**
+   * @description The result carries only hotel ids and room options, so the hotel cards are joined in from our synced copy: that is the whole point of the sync, and it saves the apps a second round trip per result.
+   * @tags api
+   * @name HotelsSearchCreate
+   * @summary POST /api/hotels/search/ — live availability and prices.
+   * @request POST:/hotels/search/
+   * @secure
+   */
+  export namespace HotelsSearchCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = HotelSearch;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsSearchCreateData;
+  }
+
+  /**
+   * @description GET /api/hotels/sync-status/ — how the inventory imports are going.
+   * @tags api
+   * @name HotelsSyncStatusList
+   * @request GET:/hotels/sync-status/
+   * @secure
+   */
+  export namespace HotelsSyncStatusList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsSyncStatusListData;
+  }
+
+  /**
+   * @description GET /api/hotels/top-by-bookings/?limit= — B2B only.
+   * @tags api
+   * @name HotelsTopByBookingsList
+   * @request GET:/hotels/top-by-bookings/
+   * @secure
+   */
+  export namespace HotelsTopByBookingsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsTopByBookingsListData;
+  }
+
+  /**
+   * @description GET /api/hotels/{hotel_id}/ — the hotel card, with its room types.
+   * @tags api
+   * @name HotelsRead
+   * @request GET:/hotels/{hotel_id}/
+   * @secure
+   */
+  export namespace HotelsRead {
+    export type RequestParams = {
+      hotelId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
     export type ResponseBody = HotelsReadData;
-  }
-
-  /**
-   * @description Return the daily occupancy status for each room in the selected hotel (`guid`) over the `from_date` to `to_date` range. The result contains one row per room × date pair: `room_id`, `room_name`, `date` (YYYY-MM-DD), and `status` (`booked` or `available`).
-   * @tags api
-   * @name HotelsCalendarList
-   * @summary Hotel occupancy calendar
-   * @request GET:/hotels/{guid}/calendar/
-   * @secure
-   */
-  export namespace HotelsCalendarList {
-    export type RequestParams = {
-      /** Property GUID (pms_property.guid). */
-      guid: string;
-    };
-    export type RequestQuery = {
-      /**
-       * Start date for the calendar range (YYYY-MM-DD).
-       * @format date
-       */
-      from_date: string;
-      /**
-       * End date for the calendar range (YYYY-MM-DD).
-       * @format date
-       */
-      to_date: string;
-      /** Comma-separated room type names. */
-      room_types?: string;
-      /** Comma-separated room type presets. */
-      room_type_presets?: string;
-      /**
-       * Return a dense matrix summary grouped by date.
-       * @default false
-       */
-      include_summary?: boolean;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = HotelsCalendarListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name HotelsReviewsList
-   * @request GET:/hotels/{guid}/reviews/
-   * @secure
-   */
-  export namespace HotelsReviewsList {
-    export type RequestParams = {
-      /** Property GUID (pms_property.guid). */
-      guid: string;
-    };
-    export type RequestQuery = {
-      /** @default 10 */
-      limit?: number;
-      /** @default 0 */
-      offset?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = HotelsReviewsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name HotelsRoomsList
-   * @request GET:/hotels/{guid}/rooms/
-   * @secure
-   */
-  export namespace HotelsRoomsList {
-    export type RequestParams = {
-      /** Property GUID (pms_property.guid). */
-      guid: string;
-    };
-    export type RequestQuery = {
-      /** @format date */
-      check_in?: string;
-      /** @format date */
-      check_out?: string;
-      /**
-       * @min 1
-       * @default 1
-       */
-      guests?: number;
-      room_types?: string;
-      room_type_presets?: string;
-      rate_plans?: string;
-      meal_plans?: string;
-      /** @min 1 */
-      min_capacity?: number;
-      /** @min 1 */
-      max_capacity?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = HotelsRoomsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name HotelsRoomsPriceList
-   * @request GET:/hotels/{guid}/rooms/{room_id}/price/
-   * @secure
-   */
-  export namespace HotelsRoomsPriceList {
-    export type RequestParams = {
-      /** Property GUID (pms_property.guid). */
-      guid: string;
-      roomId: string;
-    };
-    export type RequestQuery = {
-      /** @format date */
-      check_in?: string;
-      /** @format date */
-      check_out?: string;
-      /**
-       * @min 1
-       * @default 1
-       */
-      guests?: number;
-      room_types?: string;
-      room_type_presets?: string;
-      rate_plans?: string;
-      meal_plans?: string;
-      /** @min 1 */
-      min_capacity?: number;
-      /** @min 1 */
-      max_capacity?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = HotelsRoomsPriceListData;
   }
 }
 
@@ -14674,3603 +10221,7 @@ export namespace Payment {
   }
 }
 
-export namespace Platform {
-  /**
-   * No description
-   * @tags api
-   * @name PlatformLoginCreate
-   * @request POST:/platform/login/
-   * @secure
-   */
-  export namespace PlatformLoginCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Phone number */
-      phone_number: string;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformLoginCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformLoginVerifyCreate
-   * @request POST:/platform/login/verify/
-   * @secure
-   */
-  export namespace PlatformLoginVerifyCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Phone number */
-      phone_number: string;
-      /** OTP code */
-      otp_code: string;
-      /** Optional: select which organization to log into */
-      organization_id?: number;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformLoginVerifyCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformMeList
-   * @request GET:/platform/me/
-   * @secure
-   */
-  export namespace PlatformMeList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformMeListData;
-  }
-
-  /**
-   * No description
-   * @tags platform
-   * @name PlatformMePartialUpdate
-   * @request PATCH:/platform/me/
-   * @secure
-   */
-  export namespace PlatformMePartialUpdate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = PlatformUserUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformMePartialUpdateData;
-  }
-
-  /**
-   * @description Soft deactivate the authenticated PMS platform account. Requires OTP verification. Organizations where the user is the last active member will also be deactivated.
-   * @tags platform
-   * @name PlatformMeDelete
-   * @summary Deactivate own platform account
-   * @request DELETE:/platform/me/
-   * @secure
-   */
-  export namespace PlatformMeDelete {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** OTP code for deletion */
-      otp_code: string;
-      /** Refresh token to blacklist */
-      refresh?: string;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformMeDeleteData;
-  }
-
-  /**
-   * @description Sends an OTP to the authenticated platform user's phone to confirm account deletion.
-   * @tags platform
-   * @name PlatformMeDeleteRequestCreate
-   * @summary Send OTP for platform account deletion
-   * @request POST:/platform/me/delete/request/
-   * @secure
-   */
-  export namespace PlatformMeDeleteRequestCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformMeDeleteRequestCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformOrganizationList
-   * @request GET:/platform/organization/
-   * @secure
-   */
-  export namespace PlatformOrganizationList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformOrganizationListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformOrganizationCreate
-   * @request POST:/platform/organization/
-   * @secure
-   */
-  export namespace PlatformOrganizationCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = AuthenticatedOrgCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformOrganizationCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformOrganizationPartialUpdate
-   * @request PATCH:/platform/organization/
-   * @secure
-   */
-  export namespace PlatformOrganizationPartialUpdate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = OrganizationUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformOrganizationPartialUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformOrganizationMembersList
-   * @request GET:/platform/organization/members/
-   * @secure
-   */
-  export namespace PlatformOrganizationMembersList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformOrganizationMembersListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformOrganizationMembersCreate
-   * @request POST:/platform/organization/members/
-   * @secure
-   */
-  export namespace PlatformOrganizationMembersCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = AddMember;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformOrganizationMembersCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformOrganizationMembersPartialUpdate
-   * @request PATCH:/platform/organization/members/{member_id}/
-   * @secure
-   */
-  export namespace PlatformOrganizationMembersPartialUpdate {
-    export type RequestParams = {
-      memberId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = UpdateMemberRole;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformOrganizationMembersPartialUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformOrganizationMembersDelete
-   * @request DELETE:/platform/organization/members/{member_id}/
-   * @secure
-   */
-  export namespace PlatformOrganizationMembersDelete {
-    export type RequestParams = {
-      memberId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformOrganizationMembersDeleteData;
-  }
-
-  /**
-   * @description Start PMS registration. This only creates the personal account; the organization is created afterwards via POST /platform/organization/.
-   * @tags api
-   * @name PlatformRegisterCreate
-   * @request POST:/platform/register/
-   * @secure
-   */
-  export namespace PlatformRegisterCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Phone number */
-      phone_number: string;
-      /** First name */
-      first_name?: string;
-      /** Last name */
-      last_name?: string;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformRegisterCreateData;
-  }
-
-  /**
-   * @description Finish PMS registration. Creates the personal account only and returns tokens that are not scoped to any organization yet: `organization` is null until the client calls POST /platform/organization/.
-   * @tags api
-   * @name PlatformRegisterVerifyCreate
-   * @request POST:/platform/register/verify/
-   * @secure
-   */
-  export namespace PlatformRegisterVerifyCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Phone number */
-      phone_number: string;
-      /** OTP code */
-      otp_code: string;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformRegisterVerifyCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformSwitchOrganizationCreate
-   * @request POST:/platform/switch-organization/
-   * @secure
-   */
-  export namespace PlatformSwitchOrganizationCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = PmsSwitchOrg;
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformSwitchOrganizationCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PlatformTokenRefreshCreate
-   * @request POST:/platform/token/refresh/
-   * @secure
-   */
-  export namespace PlatformTokenRefreshCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Refresh token */
-      refresh: string;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PlatformTokenRefreshCreateData;
-  }
-}
-
-export namespace Pms {
-  /**
-   * No description
-   * @tags api
-   * @name PmsGuestsList
-   * @request GET:/pms/guests/
-   * @secure
-   */
-  export namespace PmsGuestsList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsGuestsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsGuestsCreate
-   * @request POST:/pms/guests/
-   * @secure
-   */
-  export namespace PmsGuestsCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = Guest;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsGuestsCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsGuestsRead
-   * @request GET:/pms/guests/{guest_id}/
-   * @secure
-   */
-  export namespace PmsGuestsRead {
-    export type RequestParams = {
-      guestId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsGuestsReadData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsGuestsPartialUpdate
-   * @request PATCH:/pms/guests/{guest_id}/
-   * @secure
-   */
-  export namespace PmsGuestsPartialUpdate {
-    export type RequestParams = {
-      guestId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = Guest;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsGuestsPartialUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesList
-   * @request GET:/pms/properties/
-   * @secure
-   */
-  export namespace PmsPropertiesList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesListData;
-  }
-
-  /**
-   * @description Create a new property
-   * @tags api
-   * @name PmsPropertiesCreate
-   * @request POST:/pms/properties/
-   * @secure
-   */
-  export namespace PmsPropertiesCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = Property;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRead
-   * @request GET:/pms/properties/{property_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesRead {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesReadData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesPartialUpdate
-   * @request PATCH:/pms/properties/{property_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesPartialUpdate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = Property;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesPartialUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesDelete
-   * @request DELETE:/pms/properties/{property_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesDelete {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesDeleteData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesAnalyticsList
-   * @request GET:/pms/properties/{property_id}/analytics/
-   * @secure
-   */
-  export namespace PmsPropertiesAnalyticsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {
-      /**
-       * Start date
-       * @format date
-       */
-      date_from: string;
-      /**
-       * End date
-       * @format date
-       */
-      date_to: string;
-      /** Chart metric */
-      metric?: "check_ins" | "revenue" | "bookings" | "occupancy";
-      /** Room category filter */
-      category?: string;
-      /** Floor filter */
-      floor?: string;
-      /** Room number search */
-      search?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesAnalyticsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesAnalyticsExportList
-   * @request GET:/pms/properties/{property_id}/analytics/export/
-   * @secure
-   */
-  export namespace PmsPropertiesAnalyticsExportList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {
-      /**
-       * Start date
-       * @format date
-       */
-      date_from: string;
-      /**
-       * End date
-       * @format date
-       */
-      date_to: string;
-      /** Chart metric */
-      metric?: "check_ins" | "revenue" | "bookings" | "occupancy";
-      /** Room category filter */
-      category?: string;
-      /** Floor filter */
-      floor?: string;
-      /** Room number search */
-      search?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesAnalyticsExportListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingComConnectionList
-   * @request GET:/pms/properties/{property_id}/booking-com/connection/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingComConnectionList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingComConnectionListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingComConnectionUpdate
-   * @request PUT:/pms/properties/{property_id}/booking-com/connection/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingComConnectionUpdate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = BookingComConnection;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingComConnectionUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingComConnectionDelete
-   * @request DELETE:/pms/properties/{property_id}/booking-com/connection/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingComConnectionDelete {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingComConnectionDeleteData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingComMappingsList
-   * @request GET:/pms/properties/{property_id}/booking-com/mappings/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingComMappingsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingComMappingsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingComMappingsUpdate
-   * @request PUT:/pms/properties/{property_id}/booking-com/mappings/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingComMappingsUpdate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = BookingComRoomMapping[];
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingComMappingsUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingComStatusList
-   * @request GET:/pms/properties/{property_id}/booking-com/status/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingComStatusList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingComStatusListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingComSyncCreate
-   * @request POST:/pms/properties/{property_id}/booking-com/sync/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingComSyncCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = BookingComManualSync;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingComSyncCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsList
-   * @request GET:/pms/properties/{property_id}/bookings/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsCreate
-   * @request POST:/pms/properties/{property_id}/bookings/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = Booking;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsRead
-   * @request GET:/pms/properties/{property_id}/bookings/{booking_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsRead {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsReadData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsPartialUpdate
-   * @request PATCH:/pms/properties/{property_id}/bookings/{booking_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsPartialUpdate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = Booking;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsPartialUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsAcceptCreate
-   * @request POST:/pms/properties/{property_id}/bookings/{booking_id}/accept/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsAcceptCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsAcceptCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsCancelCreate
-   * @request POST:/pms/properties/{property_id}/bookings/{booking_id}/cancel/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsCancelCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsCancelCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsCheckInCreate
-   * @request POST:/pms/properties/{property_id}/bookings/{booking_id}/check-in/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsCheckInCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsCheckInCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsCheckOutCreate
-   * @request POST:/pms/properties/{property_id}/bookings/{booking_id}/check-out/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsCheckOutCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsCheckOutCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsHistoryList
-   * @request GET:/pms/properties/{property_id}/bookings/{booking_id}/history/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsHistoryList {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsHistoryListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsMealPlanCreate
-   * @request POST:/pms/properties/{property_id}/bookings/{booking_id}/meal-plan/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsMealPlanCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = MealPlanChange;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsMealPlanCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesBookingsMoveCreate
-   * @request POST:/pms/properties/{property_id}/bookings/{booking_id}/move/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsMoveCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = MoveBooking;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsMoveCreateData;
-  }
-
-  /**
-   * @description GET  — read voucher_number for a booking. POST — regenerate / set voucher_number (only when booking is confirmed).
-   * @tags api
-   * @name PmsPropertiesBookingsVoucherList
-   * @request GET:/pms/properties/{property_id}/bookings/{booking_id}/voucher/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsVoucherList {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsVoucherListData;
-  }
-
-  /**
-   * @description GET  — read voucher_number for a booking. POST — regenerate / set voucher_number (only when booking is confirmed).
-   * @tags api
-   * @name PmsPropertiesBookingsVoucherCreate
-   * @request POST:/pms/properties/{property_id}/bookings/{booking_id}/voucher/
-   * @secure
-   */
-  export namespace PmsPropertiesBookingsVoucherCreate {
-    export type RequestParams = {
-      propertyId: string;
-      bookingId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Optional custom voucher number. Auto-generated if omitted. */
-      voucher_number?: string;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesBookingsVoucherCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesCalendarList
-   * @request GET:/pms/properties/{property_id}/calendar/
-   * @secure
-   */
-  export namespace PmsPropertiesCalendarList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesCalendarListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesCalendarBlockCreate
-   * @request POST:/pms/properties/{property_id}/calendar/block/
-   * @secure
-   */
-  export namespace PmsPropertiesCalendarBlockCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RoomIds;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesCalendarBlockCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesCalendarHoldCreate
-   * @request POST:/pms/properties/{property_id}/calendar/hold/
-   * @secure
-   */
-  export namespace PmsPropertiesCalendarHoldCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RoomIds;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesCalendarHoldCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesCalendarUnblockCreate
-   * @request POST:/pms/properties/{property_id}/calendar/unblock/
-   * @secure
-   */
-  export namespace PmsPropertiesCalendarUnblockCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RoomIds;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesCalendarUnblockCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesCalendarUnholdCreate
-   * @request POST:/pms/properties/{property_id}/calendar/unhold/
-   * @secure
-   */
-  export namespace PmsPropertiesCalendarUnholdCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RoomIds;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesCalendarUnholdCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesImagesCreate
-   * @request POST:/pms/properties/{property_id}/images/
-   * @secure
-   */
-  export namespace PmsPropertiesImagesCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** @format binary */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesImagesCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesImagesDelete
-   * @request DELETE:/pms/properties/{property_id}/images/{image_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesImagesDelete {
-    export type RequestParams = {
-      propertyId: string;
-      imageId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesImagesDeleteData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesReviewsList
-   * @request GET:/pms/properties/{property_id}/reviews/
-   * @secure
-   */
-  export namespace PmsPropertiesReviewsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesReviewsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesReviewsCreate
-   * @request POST:/pms/properties/{property_id}/reviews/
-   * @secure
-   */
-  export namespace PmsPropertiesReviewsCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = Review;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesReviewsCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesReviewsComplainCreate
-   * @request POST:/pms/properties/{property_id}/reviews/{review_id}/complain/
-   * @secure
-   */
-  export namespace PmsPropertiesReviewsComplainCreate {
-    export type RequestParams = {
-      propertyId: string;
-      reviewId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = ReviewComplain;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesReviewsComplainCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesReviewsRespondCreate
-   * @request POST:/pms/properties/{property_id}/reviews/{review_id}/respond/
-   * @secure
-   */
-  export namespace PmsPropertiesReviewsRespondCreate {
-    export type RequestParams = {
-      propertyId: string;
-      reviewId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = ReviewRespond;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesReviewsRespondCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomTypesList
-   * @request GET:/pms/properties/{property_id}/room-types/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomTypesList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomTypesListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomTypesCreate
-   * @request POST:/pms/properties/{property_id}/room-types/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomTypesCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RoomType;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomTypesCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomTypesRead
-   * @request GET:/pms/properties/{property_id}/room-types/{room_type_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomTypesRead {
-    export type RequestParams = {
-      propertyId: string;
-      roomTypeId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomTypesReadData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomTypesPartialUpdate
-   * @request PATCH:/pms/properties/{property_id}/room-types/{room_type_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomTypesPartialUpdate {
-    export type RequestParams = {
-      propertyId: string;
-      roomTypeId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RoomType;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomTypesPartialUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomTypesDelete
-   * @request DELETE:/pms/properties/{property_id}/room-types/{room_type_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomTypesDelete {
-    export type RequestParams = {
-      propertyId: string;
-      roomTypeId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomTypesDeleteData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomsList
-   * @request GET:/pms/properties/{property_id}/rooms/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomsList {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomsListData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomsCreate
-   * @request POST:/pms/properties/{property_id}/rooms/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomsCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = Room;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomsCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomsMassUpdateCreate
-   * @request POST:/pms/properties/{property_id}/rooms/mass-update/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomsMassUpdateCreate {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RoomMassUpdateItem[];
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomsMassUpdateCreateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomsRead
-   * @request GET:/pms/properties/{property_id}/rooms/{room_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomsRead {
-    export type RequestParams = {
-      propertyId: string;
-      roomId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomsReadData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomsPartialUpdate
-   * @request PATCH:/pms/properties/{property_id}/rooms/{room_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomsPartialUpdate {
-    export type RequestParams = {
-      propertyId: string;
-      roomId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = Room;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomsPartialUpdateData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomsDelete
-   * @request DELETE:/pms/properties/{property_id}/rooms/{room_id}/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomsDelete {
-    export type RequestParams = {
-      propertyId: string;
-      roomId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomsDeleteData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PmsPropertiesRoomsImagesCreate
-   * @request POST:/pms/properties/{property_id}/rooms/{room_id}/images/
-   * @secure
-   */
-  export namespace PmsPropertiesRoomsImagesCreate {
-    export type RequestParams = {
-      propertyId: string;
-      roomId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** @format binary */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PmsPropertiesRoomsImagesCreateData;
-  }
-}
-
 export namespace Property {
-  /**
-   * @description Returns all prefectures, optionally filtered by district_id or district_guid. Results are cached for 10 minutes.
-   * @tags Property / Meta
-   * @name ListPrefectures
-   * @summary List prefectures
-   * @request GET:/property/
-   * @secure
-   */
-  export namespace ListPrefectures {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Filter by district database id. */
-      district_id?: number;
-      /**
-       * Filter by district GUID.
-       * @format uuid
-       */
-      district_guid?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPrefecturesData;
-  }
-
-  /**
-   * @description Returns every apartment, cottage, and hotel in the database, including unverified and archived. Supports the same filters as public list (search, region, price, sort, limit, etc.).
-   * @tags Admin / Property
-   * @name PropertyAdminAllList
-   * @summary List all properties (admin)
-   * @request GET:/property/admin/all/
-   * @secure
-   */
-  export namespace PropertyAdminAllList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-      /** Optional. Omit to return apartments, cottages, and hotels together. */
-      property_type?:
-        | "apartment"
-        | "cottage"
-        | "hotel"
-        | "apartments"
-        | "cottages"
-        | "hotels";
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminAllListData;
-  }
-
-  /**
-   * @description Admin-only apartment creation endpoint.
-   * @tags Admin / Property
-   * @name PropertyAdminApartmentsCreate
-   * @summary Create apartment (admin)
-   * @request POST:/property/admin/apartments/
-   * @secure
-   */
-  export namespace PropertyAdminApartmentsCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = ApartmentAdminUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminApartmentsCreateData;
-  }
-
-  /**
-   * @description Returns the full admin view of an apartment by its guid.
-   * @tags Admin / Property
-   * @name PropertyAdminApartmentsRead
-   * @summary Retrieve apartment (admin)
-   * @request GET:/property/admin/apartments/{apartment_id}/
-   * @secure
-   */
-  export namespace PropertyAdminApartmentsRead {
-    export type RequestParams = {
-      apartmentId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminApartmentsReadData;
-  }
-
-  /**
-   * @description Admin-only full update for every writable field on the apartment table,
-   * @tags Admin / Property
-   * @name PropertyAdminApartmentsPartialUpdate
-   * @summary Patch apartment (Admin)
-   * @request PATCH:/property/admin/apartments/{apartment_id}/
-   * @secure
-   */
-  export namespace PropertyAdminApartmentsPartialUpdate {
-    export type RequestParams = {
-      apartmentId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = ApartmentAdminUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminApartmentsPartialUpdateData;
-  }
-
-  /**
-   * @description Admin-only. Uploads image file(s) and appends them to the property's gallery.
-   * @tags Admin / Property
-   * @name AdminCreatePropertyImageApartments
-   * @summary Upload property image(s) (admin)
-   * @request POST:/property/admin/apartments/{property_id}/images/
-   * @secure
-   */
-  export namespace AdminCreatePropertyImageApartments {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Image file to upload (JPEG/PNG/WebP). */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminCreatePropertyImageApartmentsData;
-  }
-
-  /**
-   * @description Admin-only. Removes a specific image from the property's gallery.
-   * @tags Admin / Property
-   * @name AdminDeletePropertyImageApartments
-   * @summary Delete a specific property image (admin)
-   * @request DELETE:/property/admin/apartments/{property_id}/images/{image_id}/
-   * @secure
-   */
-  export namespace AdminDeletePropertyImageApartments {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-      /** Image URL or stored path of the image to delete. */
-      imageId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = any;
-  }
-
-  /**
-   * @description Admin-only cottage creation endpoint.
-   * @tags Admin / Property
-   * @name PropertyAdminCottagesCreate
-   * @summary Create cottage (admin)
-   * @request POST:/property/admin/cottages/
-   * @secure
-   */
-  export namespace PropertyAdminCottagesCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = CottageAdminUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminCottagesCreateData;
-  }
-
-  /**
-   * @description Returns the full admin view of a cottage by its guid.
-   * @tags Admin / Property
-   * @name PropertyAdminCottagesRead
-   * @summary Retrieve cottage (admin)
-   * @request GET:/property/admin/cottages/{cottage_id}/
-   * @secure
-   */
-  export namespace PropertyAdminCottagesRead {
-    export type RequestParams = {
-      cottageId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminCottagesReadData;
-  }
-
-  /**
-   * @description Admin-only partial update for every writable field on the cottage table, including verification/archival/recommendation flags and owner reassignment. Unlike the partner endpoint, this does NOT auto-reset verification on save.
-   * @tags Admin / Property
-   * @name PropertyAdminCottagesPartialUpdate
-   * @summary Patch cottage (admin)
-   * @request PATCH:/property/admin/cottages/{cottage_id}/
-   * @secure
-   */
-  export namespace PropertyAdminCottagesPartialUpdate {
-    export type RequestParams = {
-      cottageId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = CottageAdminUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminCottagesPartialUpdateData;
-  }
-
-  /**
-   * @description Admin-only hard delete of a cottage by its guid.
-   * @tags Admin / Property
-   * @name DeleteAdminCottage
-   * @summary Delete cottage (admin)
-   * @request DELETE:/property/admin/cottages/{cottage_id}/
-   * @secure
-   */
-  export namespace DeleteAdminCottage {
-    export type RequestParams = {
-      cottageId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = any;
-  }
-
-  /**
-   * @description Admin-only. Uploads image file(s) and appends them to the property's gallery.
-   * @tags Admin / Property
-   * @name AdminCreatePropertyImageCottages
-   * @summary Upload property image(s) (admin)
-   * @request POST:/property/admin/cottages/{property_id}/images/
-   * @secure
-   */
-  export namespace AdminCreatePropertyImageCottages {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Image file to upload (JPEG/PNG/WebP). */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminCreatePropertyImageCottagesData;
-  }
-
-  /**
-   * @description Admin-only. Removes a specific image from the property's gallery.
-   * @tags Admin / Property
-   * @name AdminDeletePropertyImageCottages
-   * @summary Delete a specific property image (admin)
-   * @request DELETE:/property/admin/cottages/{property_id}/images/{image_id}/
-   * @secure
-   */
-  export namespace AdminDeletePropertyImageCottages {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-      /** Image URL or stored path of the image to delete. */
-      imageId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = any;
-  }
-
-  /**
-   * @description Returns districts, optionally filtered by region_id or region guid.
-   * @tags Admin / Property
-   * @name PropertyAdminDistrictsList
-   * @summary List districts (admin)
-   * @request GET:/property/admin/districts/
-   * @secure
-   */
-  export namespace PropertyAdminDistrictsList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Optional region id (integer) or region guid. */
-      region_id?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminDistrictsListData;
-  }
-
-  /**
-   * @description Returns PMS tenant organizations available for hotel administration.
-   * @tags Admin / Property
-   * @name PropertyAdminHotelOrganizationsList
-   * @summary List hotel organizations (admin)
-   * @request GET:/property/admin/hotel-organizations/
-   * @secure
-   */
-  export namespace PropertyAdminHotelOrganizationsList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminHotelOrganizationsListData;
-  }
-
-  /**
-   * @description Admin-only list of hotels across all tenant schemas.
-   * @tags Admin / Property
-   * @name PropertyAdminHotelsList
-   * @summary List hotels (admin)
-   * @request GET:/property/admin/hotels/
-   * @secure
-   */
-  export namespace PropertyAdminHotelsList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      search?: string;
-      organization_id?: number;
-      tenant_schema?: string;
-      is_active?: boolean;
-      is_verified?: boolean;
-      /** @format date */
-      created_from?: string;
-      /** @format date */
-      created_to?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminHotelsListData;
-  }
-
-  /**
-   * @description Admin-only hotel creation endpoint targeting a PMS tenant schema.
-   * @tags Admin / Property
-   * @name PropertyAdminHotelsCreate
-   * @summary Create hotel (admin)
-   * @request POST:/property/admin/hotels/
-   * @secure
-   */
-  export namespace PropertyAdminHotelsCreate {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = HotelAdminUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminHotelsCreateData;
-  }
-
-  /**
-   * @description Returns the full admin view of a hotel by its tenant-aware guid.
-   * @tags Admin / Property
-   * @name PropertyAdminHotelsRead
-   * @summary Retrieve hotel (admin)
-   * @request GET:/property/admin/hotels/{hotel_id}/
-   * @secure
-   */
-  export namespace PropertyAdminHotelsRead {
-    export type RequestParams = {
-      hotelId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminHotelsReadData;
-  }
-
-  /**
-   * @description Admin-only partial update for hotel records stored in PMS tenant schemas.
-   * @tags Admin / Property
-   * @name PropertyAdminHotelsPartialUpdate
-   * @summary Patch hotel (admin)
-   * @request PATCH:/property/admin/hotels/{hotel_id}/
-   * @secure
-   */
-  export namespace PropertyAdminHotelsPartialUpdate {
-    export type RequestParams = {
-      hotelId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = HotelAdminUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminHotelsPartialUpdateData;
-  }
-
-  /**
-   * @description Admin-only soft delete for hotel records in PMS tenant schemas.
-   * @tags Admin / Property
-   * @name PropertyAdminHotelsDelete
-   * @summary Delete hotel (admin)
-   * @request DELETE:/property/admin/hotels/{hotel_id}/
-   * @secure
-   */
-  export namespace PropertyAdminHotelsDelete {
-    export type RequestParams = {
-      hotelId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminHotelsDeleteData;
-  }
-
-  /**
-   * @description Admin-only. Uploads image file(s) and appends them to the hotel's gallery.
-   * @tags Admin / Property
-   * @name AdminCreateHotelImage
-   * @summary Upload hotel image(s) (admin)
-   * @request POST:/property/admin/hotels/{property_id}/images/
-   * @secure
-   */
-  export namespace AdminCreateHotelImage {
-    export type RequestParams = {
-      /** Tenant-aware hotel guid. */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Image file to upload (JPEG/PNG/WebP). */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminCreateHotelImageData;
-  }
-
-  /**
-   * @description Admin-only. Removes a specific image from the hotel's gallery.
-   * @tags Admin / Property
-   * @name AdminDeleteHotelImage
-   * @summary Delete a specific hotel image (admin)
-   * @request DELETE:/property/admin/hotels/{property_id}/images/{image_id}/
-   * @secure
-   */
-  export namespace AdminDeleteHotelImage {
-    export type RequestParams = {
-      /** Tenant-aware hotel guid. */
-      propertyId: string;
-      /** Image URL or stored path of the image to delete. */
-      imageId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminDeleteHotelImageData;
-  }
-
-  /**
-   * @description Returns prefectures, optionally filtered by district_id or district_guid.
-   * @tags Admin / Property
-   * @name PropertyAdminPrefecturesList
-   * @summary List prefectures (admin)
-   * @request GET:/property/admin/prefectures/
-   * @secure
-   */
-  export namespace PropertyAdminPrefecturesList {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Optional district id filter. */
-      district_id?: number;
-      /** Optional district guid filter. */
-      district_guid?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminPrefecturesListData;
-  }
-
-  /**
-   * @description Returns all regions without caching (admin access).
-   * @tags Admin / Property
-   * @name PropertyAdminRegionsList
-   * @summary List regions (admin)
-   * @request GET:/property/admin/regions/
-   * @secure
-   */
-  export namespace PropertyAdminRegionsList {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyAdminRegionsListData;
-  }
-
-  /**
-   * @description Returns all property types with titles in all languages, kind, and current icon URL.
-   * @tags Admin / Property
-   * @name AdminListPropertyTypes
-   * @summary List property types (admin)
-   * @request GET:/property/admin/types/
-   * @secure
-   */
-  export namespace AdminListPropertyTypes {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminListPropertyTypesData;
-  }
-
-  /**
-   * @description Admin-only. Uploads an SVG or PNG icon for the specified property type.
-   * @tags Admin / Property
-   * @name AdminUploadPropertyTypeIcon
-   * @summary Upload icon for a property type
-   * @request POST:/property/admin/types/{type_guid}/icon/
-   * @secure
-   */
-  export namespace AdminUploadPropertyTypeIcon {
-    export type RequestParams = {
-      /**
-       * Property type GUID.
-       * @format uuid
-       */
-      typeGuid: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Icon image file (SVG or PNG). */
-      icon: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = AdminUploadPropertyTypeIconData;
-  }
-
-  /**
-   * @description Returns verified public apartments. Without `limit` and `page`, all matching rows are returned; with either query param, results are paginated (default page size 20, max `limit` 100). Supports search, filtering, and sorting. `X-Testing-Mode: true` returns only testing apartments; otherwise testing apartments are excluded.
-   * @tags Property / Public
-   * @name ListApartments
-   * @summary List apartments
-   * @request GET:/property/apartments/
-   * @secure
-   */
-  export namespace ListApartments {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
-      "X-Testing-Mode"?: boolean;
-    };
-    export type ResponseBody = ListApartmentsData;
-  }
-
-  /**
-   * @description Partner-only. Creates a new apartment listing. The property is created with verification_status=waiting.
-   * @tags Property / Partner
-   * @name CreateApartment
-   * @summary Create an apartment
-   * @request POST:/property/apartments/
-   * @secure
-   */
-  export namespace CreateApartment {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = ApartmentCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateApartmentData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PropertyApartmentsRead
-   * @request GET:/property/apartments/{property_id}/
-   * @secure
-   */
-  export namespace PropertyApartmentsRead {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyApartmentsReadData;
-  }
-
-  /**
-   * @description Partner-only full update for an apartment or cottage. Mutating fields resets verification status to waiting.
-   * @tags Property / Partner
-   * @name FullUpdateProperty
-   * @summary Fully update a property
-   * @request PATCH:/property/apartments/{property_id}/
-   * @secure
-   */
-  export namespace FullUpdateProperty {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = ApartmentUpdate;
-    export type RequestHeaders = {};
-    export type ResponseBody = FullUpdatePropertyData;
-  }
-
-  /**
-   * @description Partner-only hard delete of an apartment or cottage.
-   * @tags Property / Partner
-   * @name DeletePropertyApartments
-   * @summary Delete a property
-   * @request DELETE:/property/apartments/{property_id}/
-   * @secure
-   */
-  export namespace DeletePropertyApartments {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = any;
-  }
-
-  /**
-   * @description Partner-only. Uploads image file(s) and appends them to the property's gallery. If the property is not yet verified, the images are marked as pending approval.
-   * @tags Property / Partner
-   * @name CreatePropertyImageApartments
-   * @summary Upload property image(s)
-   * @request POST:/property/apartments/{property_id}/images/
-   * @secure
-   */
-  export namespace CreatePropertyImageApartments {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Image file to upload (JPEG/PNG/WebP). */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = CreatePropertyImageApartmentsData;
-  }
-
-  /**
-   * @description Partner-only. Replaces a specific image in the property's gallery. If the property is not yet verified, the image is marked as pending approval.
-   * @tags Property / Partner
-   * @name UpdatePropertyImageApartments
-   * @summary Update a specific property image
-   * @request PATCH:/property/apartments/{property_id}/images/{image_url}/
-   * @secure
-   */
-  export namespace UpdatePropertyImageApartments {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-      /** Image URL or stored path of the image to replace. */
-      imageUrl: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** New image file to upload (JPEG/PNG/WebP). */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = UpdatePropertyImageApartmentsData;
-  }
-
-  /**
-   * @description Partner-only. Removes a specific image from the property's gallery.
-   * @tags Property / Partner
-   * @name DeletePropertyImageApartments
-   * @summary Delete a specific property image
-   * @request DELETE:/property/apartments/{property_id}/images/{image_url}/
-   * @secure
-   */
-  export namespace DeletePropertyImageApartments {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-      /** Image URL or stored path of the image to delete. */
-      imageUrl: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = any;
-  }
-
-  /**
-   * @description Partner-only. Returns all reviews for a property, including hidden ones.
-   * @tags Property / Partner
-   * @name ListPartnerPropertyReviewsApartments
-   * @summary List all reviews for a property (partner)
-   * @request GET:/property/apartments/{property_id}/partner/reviews/
-   * @secure
-   */
-  export namespace ListPartnerPropertyReviewsApartments {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPartnerPropertyReviewsApartmentsData;
-  }
-
-  /**
-   * @description Returns public reviews for a property. No authentication required.
-   * @tags Property / Reviews
-   * @name ListPropertyReviewsApartments
-   * @summary List property reviews
-   * @request GET:/property/apartments/{property_id}/reviews/
-   * @secure
-   */
-  export namespace ListPropertyReviewsApartments {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPropertyReviewsApartmentsData;
-  }
-
-  /**
-   * @description Client-only. Creates a review for a property the client has an eligible completed or accepted booking for.
-   * @tags Property / Reviews
-   * @name CreatePropertyReviewApartments
-   * @summary Create a property review
-   * @request POST:/property/apartments/{property_id}/reviews/
-   * @secure
-   */
-  export namespace CreatePropertyReviewApartments {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RawPropertyReviewCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreatePropertyReviewApartmentsData;
-  }
-
-  /**
-   * @description Returns an empty list. Categories are not yet implemented.
-   * @tags Property / Meta
-   * @name ListCategories
-   * @summary List categories
-   * @request GET:/property/categories/
-   * @secure
-   */
-  export namespace ListCategories {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListCategoriesData;
-  }
-
-  /**
-   * @description Returns an empty list. Category-based recommendations are not yet implemented.
-   * @tags Property / Meta
-   * @name ListCategoryPropertyRecommendations
-   * @summary List property recommendations by category
-   * @request GET:/property/categories/{category_id}/properties/
-   * @secure
-   */
-  export namespace ListCategoryPropertyRecommendations {
-    export type RequestParams = {
-      categoryId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListCategoryPropertyRecommendationsData;
-  }
-
-  /**
-   * @description Returns an empty list. Category-based latest properties are not yet implemented.
-   * @tags Property / Meta
-   * @name ListCategoryLatestProperties
-   * @summary List latest properties by category
-   * @request GET:/property/categories/{category_id}/properties/latest/
-   * @secure
-   */
-  export namespace ListCategoryLatestProperties {
-    export type RequestParams = {
-      categoryId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListCategoryLatestPropertiesData;
-  }
-
-  /**
-   * @description Returns verified public cottages. Without `limit` and `page`, all matching rows are returned; with either query param, results are paginated (default page size 20, max `limit` 100). Supports search, filtering, and sorting. `X-Testing-Mode: true` returns only testing cottages; otherwise testing cottages are excluded.
-   * @tags Property / Public
-   * @name ListCottages
-   * @summary List cottages
-   * @request GET:/property/cottages/
-   * @secure
-   */
-  export namespace ListCottages {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
-      "X-Testing-Mode"?: boolean;
-    };
-    export type ResponseBody = ListCottagesData;
-  }
-
-  /**
-   * @description Partner-only. Creates a new cottage listing. The property is created with verification_status=waiting.
-   * @tags Property / Partner
-   * @name CreateCottage
-   * @summary Create a cottage
-   * @request POST:/property/cottages/
-   * @secure
-   */
-  export namespace CreateCottage {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = {
-      title: string;
-      /** @default "UZS" */
-      currency?: "USD" | "UZS";
-      /** @default false */
-      weekend_only_sunday_inclusive?: boolean;
-      /**
-       * Per-person price (both months unless you vary via legacy `price` list only).
-       * @format double
-       */
-      price_per_person?: number | null;
-      /**
-       * Working-day rate.
-       * @format double
-       */
-      price_on_working_days?: number | null;
-      /**
-       * Weekend rate.
-       * @format double
-       */
-      price_on_weekends?: number | null;
-      /**
-       * First pricing month: interval start (YYYY-MM-DD). Use with month_to, next_month_from, next_month_to.
-       * @format date
-       */
-      month_from?: string | null;
-      /**
-       * First pricing month: interval end (YYYY-MM-DD). Should be the last day of that month.
-       * @format date
-       */
-      month_to?: string | null;
-      /**
-       * Second pricing month: interval start.
-       * @format date
-       */
-      next_month_from?: string | null;
-      /**
-       * Second pricing month: interval end.
-       * @format date
-       */
-      next_month_to?: string | null;
-      latitude?: string | null;
-      longitude?: string | null;
-      country?: string | null;
-      city?: string | null;
-      region_id?: string | null;
-      district_id?: string | null;
-      /** @format uuid */
-      prefecture_id?: string | null;
-      description_en?: string | null;
-      description_ru?: string | null;
-      description_uz?: string | null;
-      /** @format time */
-      check_in?: string | null;
-      /** @format time */
-      check_out?: string | null;
-      /** @default false */
-      is_allowed_alcohol?: boolean;
-      /** @default false */
-      is_allowed_corporate?: boolean;
-      /** @default false */
-      is_allowed_pets?: boolean;
-      /** @default false */
-      is_quiet_hours?: boolean;
-      /** Service UUIDs (same as legacy `property_services`). */
-      services?: string[];
-      guests?: number | null;
-      rooms?: number | null;
-      beds?: number | null;
-      bathrooms?: number | null;
-      /** Image paths or URLs; a single string is also accepted by the API. */
-      img?: string[] | null;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateCottageData;
-  }
-
-  /**
-   * @description Same as `PropertyRetrieveUpdateDestroyView` but Swagger documents cottage PATCH body (flat, like create).
-   * @tags api
-   * @name PropertyCottagesRead
-   * @request GET:/property/cottages/{property_id}/
-   * @secure
-   */
-  export namespace PropertyCottagesRead {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyCottagesReadData;
-  }
-
-  /**
-   * @description Partner-only partial update for a cottage. Request body matches POST /api/property/cottages/ (flat `price_*`, month range fields, location, descriptions, services, rooms); all fields optional.
-   * @tags Property / Partner
-   * @name PartialUpdateCottage
-   * @summary Partially update a cottage
-   * @request PATCH:/property/cottages/{property_id}/
-   * @secure
-   */
-  export namespace PartialUpdateCottage {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      title?: string;
-      /** @default "UZS" */
-      currency?: "USD" | "UZS";
-      /** @default false */
-      weekend_only_sunday_inclusive?: boolean;
-      /**
-       * Per-person price (both months unless you vary via legacy `price` list only).
-       * @format double
-       */
-      price_per_person?: number | null;
-      /**
-       * Working-day rate.
-       * @format double
-       */
-      price_on_working_days?: number | null;
-      /**
-       * Weekend rate.
-       * @format double
-       */
-      price_on_weekends?: number | null;
-      /**
-       * First pricing month: interval start (YYYY-MM-DD). Use with month_to, next_month_from, next_month_to.
-       * @format date
-       */
-      month_from?: string | null;
-      /**
-       * First pricing month: interval end (YYYY-MM-DD). Should be the last day of that month.
-       * @format date
-       */
-      month_to?: string | null;
-      /**
-       * Second pricing month: interval start.
-       * @format date
-       */
-      next_month_from?: string | null;
-      /**
-       * Second pricing month: interval end.
-       * @format date
-       */
-      next_month_to?: string | null;
-      latitude?: string | null;
-      longitude?: string | null;
-      country?: string | null;
-      city?: string | null;
-      region_id?: string | null;
-      district_id?: string | null;
-      /** @format uuid */
-      prefecture_id?: string | null;
-      description_en?: string | null;
-      description_ru?: string | null;
-      description_uz?: string | null;
-      /** @format time */
-      check_in?: string | null;
-      /** @format time */
-      check_out?: string | null;
-      /** @default false */
-      is_allowed_alcohol?: boolean;
-      /** @default false */
-      is_allowed_corporate?: boolean;
-      /** @default false */
-      is_allowed_pets?: boolean;
-      /** @default false */
-      is_quiet_hours?: boolean;
-      /** Service UUIDs (same as legacy `property_services`). */
-      services?: string[];
-      guests?: number | null;
-      rooms?: number | null;
-      beds?: number | null;
-      bathrooms?: number | null;
-      /** Image paths or URLs; a single string is also accepted by the API. */
-      img?: string[] | null;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = PartialUpdateCottageData;
-  }
-
-  /**
-   * @description Partner-only hard delete of an apartment or cottage.
-   * @tags Property / Partner
-   * @name DeletePropertyCottages
-   * @summary Delete a property
-   * @request DELETE:/property/cottages/{property_id}/
-   * @secure
-   */
-  export namespace DeletePropertyCottages {
-    export type RequestParams = {
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = any;
-  }
-
-  /**
-   * @description Partner-only. Uploads image file(s) and appends them to the property's gallery. If the property is not yet verified, the images are marked as pending approval.
-   * @tags Property / Partner
-   * @name CreatePropertyImageCottages
-   * @summary Upload property image(s)
-   * @request POST:/property/cottages/{property_id}/images/
-   * @secure
-   */
-  export namespace CreatePropertyImageCottages {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** Image file to upload (JPEG/PNG/WebP). */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = CreatePropertyImageCottagesData;
-  }
-
-  /**
-   * @description Partner-only. Replaces a specific image in the property's gallery. If the property is not yet verified, the image is marked as pending approval.
-   * @tags Property / Partner
-   * @name UpdatePropertyImageCottages
-   * @summary Update a specific property image
-   * @request PATCH:/property/cottages/{property_id}/images/{image_url}/
-   * @secure
-   */
-  export namespace UpdatePropertyImageCottages {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-      /** Image URL or stored path of the image to replace. */
-      imageUrl: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      /** New image file to upload (JPEG/PNG/WebP). */
-      image: File;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = UpdatePropertyImageCottagesData;
-  }
-
-  /**
-   * @description Partner-only. Removes a specific image from the property's gallery.
-   * @tags Property / Partner
-   * @name DeletePropertyImageCottages
-   * @summary Delete a specific property image
-   * @request DELETE:/property/cottages/{property_id}/images/{image_url}/
-   * @secure
-   */
-  export namespace DeletePropertyImageCottages {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-      /** Image URL or stored path of the image to delete. */
-      imageUrl: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = any;
-  }
-
-  /**
-   * @description Partner-only. Returns all reviews for a property, including hidden ones.
-   * @tags Property / Partner
-   * @name ListPartnerPropertyReviewsCottages
-   * @summary List all reviews for a property (partner)
-   * @request GET:/property/cottages/{property_id}/partner/reviews/
-   * @secure
-   */
-  export namespace ListPartnerPropertyReviewsCottages {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPartnerPropertyReviewsCottagesData;
-  }
-
-  /**
-   * @description Returns public reviews for a property. No authentication required.
-   * @tags Property / Reviews
-   * @name ListPropertyReviewsCottages
-   * @summary List property reviews
-   * @request GET:/property/cottages/{property_id}/reviews/
-   * @secure
-   */
-  export namespace ListPropertyReviewsCottages {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPropertyReviewsCottagesData;
-  }
-
-  /**
-   * @description Client-only. Creates a review for a property the client has an eligible completed or accepted booking for.
-   * @tags Property / Reviews
-   * @name CreatePropertyReviewCottages
-   * @summary Create a property review
-   * @request POST:/property/cottages/{property_id}/reviews/
-   * @secure
-   */
-  export namespace CreatePropertyReviewCottages {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = RawPropertyReviewCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreatePropertyReviewCottagesData;
-  }
-
-  /**
-   * @description Powers the `Где?` sheet. Returns `nearby` places ordered by distance when `lat`/`lon` are supplied, and `recommended` destinations (regions and districts with the most listings) otherwise. `search` filters both lists by name.
-   * @tags Property / Public
-   * @name ListSearchDestinations
-   * @summary Search destinations
-   * @request GET:/property/destinations/
-   * @secure
-   */
-  export namespace ListSearchDestinations {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      search?: string;
-      /** @format float */
-      lat?: number;
-      /** @format float */
-      lon?: number;
-      limit?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListSearchDestinationsData;
-  }
-
-  /**
-   * @description Returns all districts, optionally filtered by region_id or region GUID. Results are cached for 10 minutes.
-   * @tags Property / Meta
-   * @name ListDistricts
-   * @summary List districts
-   * @request GET:/property/districts/
-   * @secure
-   */
-  export namespace ListDistricts {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Filter by region database id or region GUID. */
-      region_id?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListDistrictsData;
-  }
-
-  /**
-   * @description Returns the amenity list grouped by category, the selectable property types and the min/max bounds for the budget slider and the room steppers. Pass any active filters to scope the price bounds to the current result set.
-   * @tags Property / Public
-   * @name GetPropertyFilterMeta
-   * @summary Filter sheet metadata
-   * @request GET:/property/filters/
-   * @secure
-   */
-  export namespace GetPropertyFilterMeta {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-      /** Comma-separated amenity GUIDs (Удобства). Repeatable. */
-      services?: string;
-      /** `all` (default) requires every selected amenity, `any` requires at least one. */
-      services_match?: "all" | "any";
-      /** Minimum bedrooms (Спальни). */
-      bedrooms?: number;
-      /** Minimum beds (Кровати). */
-      beds?: number;
-      /** Minimum bathrooms (Ванные комнаты). */
-      bathrooms?: number;
-      /** Minimum guest capacity (Кто). */
-      guests?: number;
-      allowed_pets?: boolean;
-      allowed_alcohol?: boolean;
-      /** Minimum hotel star rating. */
-      min_stars?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetPropertyFilterMetaData;
-  }
-
-  /**
-   * @description Returns the nightly-price distribution for the current filter selection as equal-width buckets, so the filter sheet can draw the bar chart above the budget slider. `min_price`/`max_price` are ignored when building the buckets so the chart keeps its full shape while the handles move.
-   * @tags Property / Public
-   * @name GetPropertyPriceHistogram
-   * @summary Budget slider histogram
-   * @request GET:/property/filters/price-histogram/
-   * @secure
-   */
-  export namespace GetPropertyPriceHistogram {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-      /** Comma-separated amenity GUIDs (Удобства). Repeatable. */
-      services?: string;
-      /** `all` (default) requires every selected amenity, `any` requires at least one. */
-      services_match?: "all" | "any";
-      /** Minimum bedrooms (Спальни). */
-      bedrooms?: number;
-      /** Minimum beds (Кровати). */
-      beds?: number;
-      /** Minimum bathrooms (Ванные комнаты). */
-      bathrooms?: number;
-      /** Minimum guest capacity (Кто). */
-      guests?: number;
-      allowed_pets?: boolean;
-      allowed_alcohol?: boolean;
-      /** Minimum hotel star rating. */
-      min_stars?: number;
-      /** Number of histogram bars. Default 30, max 60. */
-      buckets?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetPropertyPriceHistogramData;
-  }
-
-  /**
-   * @description Returns active public hotels with pricing, rating, and amenity previews. Without `limit` and `page`, all matching rows are returned; with either query param, results are paginated. `X-Testing-Mode: true` returns only testing hotels; otherwise testing hotels are excluded.
-   * @tags Property / Public
-   * @name ListHotels
-   * @summary List hotels
-   * @request GET:/property/hotels/
-   * @secure
-   */
-  export namespace ListHotels {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
-      "X-Testing-Mode"?: boolean;
-    };
-    export type ResponseBody = ListHotelsData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PropertyHotelsRead
-   * @request GET:/property/hotels/{hotel_guid}/
-   * @secure
-   */
-  export namespace PropertyHotelsRead {
-    export type RequestParams = {
-      hotelGuid: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyHotelsReadData;
-  }
-
-  /**
-   * @description Returns public reviews for a hotel by encoded GUID.
-   * @tags Property / Reviews
-   * @name ListHotelReviews
-   * @summary List hotel reviews
-   * @request GET:/property/hotels/{hotel_guid}/reviews/
-   * @secure
-   */
-  export namespace ListHotelReviews {
-    export type RequestParams = {
-      /** Encoded hotel GUID. */
-      hotelGuid: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListHotelReviewsData;
-  }
-
-  /**
-   * @description Client-only. Creates a review for a hotel after an eligible completed booking.
-   * @tags Property / Reviews
-   * @name CreateHotelReview
-   * @summary Create a hotel review
-   * @request POST:/property/hotels/{hotel_guid}/reviews/
-   * @secure
-   */
-  export namespace CreateHotelReview {
-    export type RequestParams = {
-      /** Encoded hotel GUID. */
-      hotelGuid: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = {
-      rating?: number;
-      comment?: string;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = CreateHotelReviewData;
-  }
-
-  /**
-   * @description Returns the full hierarchical location tree: regions → districts → prefectures. Results are cached for 10 minutes.
-   * @tags Property / Meta
-   * @name ListLocations
-   * @summary List location tree
-   * @request GET:/property/location/
-   * @secure
-   */
-  export namespace ListLocations {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /**
-       * Preferred language for localized titles. Defaults to Uzbek.
-       * @default "uz"
-       */
-      "Accept-Language"?: "en" | "ru" | "uz";
-    };
-    export type ResponseBody = ListLocationsData;
-  }
-
-  /**
-   * @description Returns lightweight map markers for the current viewport. Below `cluster_max_zoom` nearby properties are merged into clusters; above it every property is returned as a pin carrying its nightly price. Tap handling should fetch the card via `/property/map/cards/`. Accepts every filter supported by `/property/properties/`.
-   * @tags Property / Public
-   * @name ListPropertyMapPins
-   * @summary Map pins and clusters
-   * @request GET:/property/map/
-   * @secure
-   */
-  export namespace ListPropertyMapPins {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-      /**
-       * South-west corner latitude of the visible map viewport.
-       * @format float
-       */
-      sw_lat?: number;
-      /**
-       * South-west corner longitude of the visible map viewport.
-       * @format float
-       */
-      sw_lon?: number;
-      /**
-       * North-east corner latitude of the visible map viewport.
-       * @format float
-       */
-      ne_lat?: number;
-      /**
-       * North-east corner longitude of the visible map viewport.
-       * @format float
-       */
-      ne_lon?: number;
-      /** Viewport as `sw_lat,sw_lon,ne_lat,ne_lon`. Alternative to the four corner params. */
-      bbox?: string;
-      /** Current map zoom level (0–20). Results are clustered below `cluster_max_zoom` (default 14) and returned as individual pins above it. */
-      zoom?: number;
-      /** Zoom level from which clustering is disabled. Default 14. */
-      cluster_max_zoom?: number;
-      /** Comma-separated property kinds: `apartment,cottage,hotel`. Repeatable. */
-      property_types?: string;
-      /** Comma-separated amenity GUIDs (Удобства). Repeatable. */
-      services?: string;
-      /** `all` (default) requires every selected amenity, `any` requires at least one. */
-      services_match?: "all" | "any";
-      /** Minimum bedrooms (Спальни). */
-      bedrooms?: number;
-      /** Minimum beds (Кровати). */
-      beds?: number;
-      /** Minimum bathrooms (Ванные комнаты). */
-      bathrooms?: number;
-      /** Minimum guest capacity (Кто). */
-      guests?: number;
-      allowed_pets?: boolean;
-      allowed_alcohol?: boolean;
-      /** Minimum hotel star rating. */
-      min_stars?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
-      "X-Testing-Mode"?: boolean;
-    };
-    export type ResponseBody = ListPropertyMapPinsData;
-  }
-
-  /**
-   * @description Returns the card payload (image, title, rating, nightly price, district line and review count) for up to 20 properties. Used when a map price pin is tapped. Unknown GUIDs are skipped silently.
-   * @tags Property / Public
-   * @name ListPropertyMapCards
-   * @summary Property cards by GUID
-   * @request GET:/property/map/cards/
-   * @secure
-   */
-  export namespace ListPropertyMapCards {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Comma-separated property GUIDs (max 20). Repeatable. */
-      guids: string;
-      /**
-       * Reference date used to pick the seasonal price. Defaults to today.
-       * @format date
-       */
-      from_date?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPropertyMapCardsData;
-  }
-
-  /**
-   * @description Admin or Partner. Returns every property owned by the requested owner (or the authenticated owner). Admins can pass owner_id to query another owner's listings.
-   * @tags Property / Partner
-   * @name ListAllPartnerProperties
-   * @summary List all properties for an owner
-   * @request GET:/property/partner/all/
-   * @secure
-   */
-  export namespace ListAllPartnerProperties {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-      /** Admin only: target owner user id. Partners ignore this and always use the JWT subject. */
-      owner_id?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListAllPartnerPropertiesData;
-  }
-
-  /**
-   * @description Partner-only. Returns the authenticated partner's own apartments, including unverified and archived. Supports the same filters as public list.
-   * @tags Property / Partner
-   * @name ListPartnerApartments
-   * @summary List partner apartments
-   * @request GET:/property/partner/apartments/
-   * @secure
-   */
-  export namespace ListPartnerApartments {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPartnerApartmentsData;
-  }
-
-  /**
-   * @description Partner-only. Returns the authenticated partner's own cottages, including unverified and archived. Supports the same filters as public list.
-   * @tags Property / Partner
-   * @name ListPartnerCottages
-   * @summary List partner cottages
-   * @request GET:/property/partner/cottages/
-   * @secure
-   */
-  export namespace ListPartnerCottages {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPartnerCottagesData;
-  }
-
-  /**
-   * @description Partner-only. Returns the authenticated partner's own apartments and cottages, including unverified and archived. Supports the same filters as public list.
-   * @tags Property / Partner
-   * @name ListPartnerProperties
-   * @summary List partner properties
-   * @request GET:/property/partner/properties/
-   * @secure
-   */
-  export namespace ListPartnerProperties {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-      /** Filter by property kind. Omit to return both. */
-      property_type?: "apartment" | "cottage";
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPartnerPropertiesData;
-  }
-
-  /**
-   * @description Partner-only. Returns booking statistics, cancellation metrics, and income breakdown for a specific property over a given time range.
-   * @tags Property / Partner
-   * @name GetPropertyAnalytics
-   * @summary Get property analytics
-   * @request GET:/property/partner/properties/{property_id}/analytics/
-   * @secure
-   */
-  export namespace GetPropertyAnalytics {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {
-      /**
-       * Time range for analytics.
-       * @default "month"
-       */
-      range?: "week" | "month" | "quarter" | "year";
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = GetPropertyAnalyticsData;
-  }
-
-  /**
-   * @description Returns all prefectures, optionally filtered by district_id or district_guid. Results are cached for 10 minutes.
-   * @tags Property / Meta
-   * @name ListPrefecturesPrefectures
-   * @summary List prefectures
-   * @request GET:/property/prefectures/
-   * @secure
-   */
-  export namespace ListPrefecturesPrefectures {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Filter by district database id. */
-      district_id?: number;
-      /**
-       * Filter by district GUID.
-       * @format uuid
-       */
-      district_guid?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListPrefecturesPrefecturesData;
-  }
-
-  /**
-   * @description Returns verified public apartments, cottages, and hotels. Use `property_type` or `kind` to filter to one property kind. `X-Testing-Mode: true` returns only testing properties; otherwise testing properties are excluded.
-   * @tags Property / Public
-   * @name ListProperties
-   * @summary List properties
-   * @request GET:/property/properties/
-   * @secure
-   */
-  export namespace ListProperties {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
-      "X-Testing-Mode"?: boolean;
-    };
-    export type ResponseBody = ListPropertiesData;
-  }
-
-  /**
-   * @description Partner-only compatibility endpoint. Creates an apartment by default, or a cottage when the URL forces cottage mode.
-   * @tags Property / Partner
-   * @name CreateProperty
-   * @summary Create a property
-   * @request POST:/property/properties/
-   * @secure
-   */
-  export namespace CreateProperty {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = ApartmentCreate;
-    export type RequestHeaders = {};
-    export type ResponseBody = CreatePropertyData;
-  }
-
-  /**
-   * @description Client-only. Returns the authenticated client's favorited properties (apartments and cottages). Supports the same filters as public list.
-   * @tags Property / Client
-   * @name ListSavedProperties
-   * @summary List saved (favorite) properties
-   * @request GET:/property/properties/favorites/
-   * @secure
-   */
-  export namespace ListSavedProperties {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListSavedPropertiesData;
-  }
-
-  /**
-   * @description Accepts a property URL or link and returns the matching property GUID if found.
-   * @tags Property / Public
-   * @name FilterPropertyByLink
-   * @summary Filter property by link
-   * @request POST:/property/properties/filter-by-link/
-   * @secure
-   */
-  export namespace FilterPropertyByLink {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = {
-      url?: string;
-      link?: string;
-    };
-    export type RequestHeaders = {};
-    export type ResponseBody = FilterPropertyByLinkData;
-  }
-
-  /**
-   * @description Returns featured, best-reviewed, or most-booked properties. Supports filtering by kind (apartment, cottage, or both). Results are cached for 60 seconds.
-   * @tags Property / Public
-   * @name ListRecommendations
-   * @summary List recommended properties
-   * @request GET:/property/recommendations/
-   * @secure
-   */
-  export namespace ListRecommendations {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-      kind?: "property" | "apartment" | "cottage";
-      type?: "featured" | "best-by-reviews" | "most-booked";
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
-      "X-Testing-Mode"?: boolean;
-    };
-    export type ResponseBody = ListRecommendationsData;
-  }
-
   /**
    * @description Returns KNN-based personalized property recommendations for the authenticated client. Uses pgvector cosine similarity on client and property embeddings built from booking history, reviews, and preferences.
    * @tags Property / Recommendations
@@ -18295,325 +10246,6 @@ export namespace Property {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = GetPersonalizedRecommendationsData;
-  }
-
-  /**
-   * @description Returns all regions with titles and image URLs. Results are cached for 10 minutes.
-   * @tags Property / Meta
-   * @name ListRegions
-   * @summary List regions
-   * @request GET:/property/regions/
-   * @secure
-   */
-  export namespace ListRegions {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ListRegionsData;
-  }
-
-  /**
-   * @description Returns apartments and cottages filtered by a specific region. Supports the same query filters as the public list. `X-Testing-Mode: true` returns only testing properties; otherwise testing properties are excluded.
-   * @tags Property / Public
-   * @name ListPropertiesByRegion
-   * @summary List properties by region
-   * @request GET:/property/regions/{region_id}/properties/
-   * @secure
-   */
-  export namespace ListPropertiesByRegion {
-    export type RequestParams = {
-      regionId: string;
-    };
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
-      "X-Testing-Mode"?: boolean;
-    };
-    export type ResponseBody = ListPropertiesByRegionData;
-  }
-
-  /**
-   * @description Mixed apartment / cottage / hotel search returning the compact card payload used on the search results screen: image, title, rating, `от X / 1 чел · ночь`, district line and review count. Accepts the full filter set plus `property_types` multi-select.
-   * @tags Property / Public
-   * @name SearchProperties
-   * @summary Search properties (card list)
-   * @request GET:/property/search/
-   * @secure
-   */
-  export namespace SearchProperties {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
-      search?: string;
-      /**
-       * Latitude for geographic radius search. Requires `lon` to be set.
-       * @format float
-       */
-      lat?: number;
-      /**
-       * Longitude for geographic radius search. Requires `lat` to be set.
-       * @format float
-       */
-      lon?: number;
-      /**
-       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
-       * @format float
-       */
-      radius?: number;
-      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
-      location_id?: string;
-      region_id?: number;
-      district_id?: number;
-      /** @format uuid */
-      prefecture_id?: string;
-      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
-      property_type?: "apartment" | "cottage" | "hotel";
-      corporate?: boolean;
-      min_price?: number;
-      max_price?: number;
-      currency?: string;
-      sort?:
-        | "price_high"
-        | "price_low"
-        | "rating_high"
-        | "rating_low"
-        | "reviews_high"
-        | "reviews_low"
-        | "title_asc"
-        | "title_desc"
-        | "corporate_yes"
-        | "corporate_no";
-      ordering?: string;
-      /** @format date */
-      from_date?: string;
-      limit?: number;
-      page?: number;
-      /**
-       * South-west corner latitude of the visible map viewport.
-       * @format float
-       */
-      sw_lat?: number;
-      /**
-       * South-west corner longitude of the visible map viewport.
-       * @format float
-       */
-      sw_lon?: number;
-      /**
-       * North-east corner latitude of the visible map viewport.
-       * @format float
-       */
-      ne_lat?: number;
-      /**
-       * North-east corner longitude of the visible map viewport.
-       * @format float
-       */
-      ne_lon?: number;
-      /** Viewport as `sw_lat,sw_lon,ne_lat,ne_lon`. Alternative to the four corner params. */
-      bbox?: string;
-      /** Current map zoom level (0–20). Results are clustered below `cluster_max_zoom` (default 14) and returned as individual pins above it. */
-      zoom?: number;
-      /** Zoom level from which clustering is disabled. Default 14. */
-      cluster_max_zoom?: number;
-      /** Comma-separated property kinds: `apartment,cottage,hotel`. Repeatable. */
-      property_types?: string;
-      /** Comma-separated amenity GUIDs (Удобства). Repeatable. */
-      services?: string;
-      /** `all` (default) requires every selected amenity, `any` requires at least one. */
-      services_match?: "all" | "any";
-      /** Minimum bedrooms (Спальни). */
-      bedrooms?: number;
-      /** Minimum beds (Кровати). */
-      beds?: number;
-      /** Minimum bathrooms (Ванные комнаты). */
-      bathrooms?: number;
-      /** Minimum guest capacity (Кто). */
-      guests?: number;
-      allowed_pets?: boolean;
-      allowed_alcohol?: boolean;
-      /** Minimum hotel star rating. */
-      min_stars?: number;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
-      "X-Testing-Mode"?: boolean;
-    };
-    export type ResponseBody = SearchPropertiesData;
-  }
-
-  /**
-   * @description Returns all available property services (amenities) with localized titles and icon URLs. Results are cached for 10 minutes.
-   * @tags Property / Meta
-   * @name ListPropertyServices
-   * @summary List property services
-   * @request GET:/property/services/
-   * @secure
-   */
-  export namespace ListPropertyServices {
-    export type RequestParams = {};
-    export type RequestQuery = {
-      /** Restrict the list to services that apply to this property type (e.g. hotel, room). */
-      property_type?: string;
-    };
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /**
-       * Preferred language for localized titles. Defaults to Uzbek.
-       * @default "uz"
-       */
-      "Accept-Language"?: "en" | "ru" | "uz";
-    };
-    export type ResponseBody = ListPropertyServicesData;
-  }
-
-  /**
-   * @description Returns the public property types with localized titles, icon URLs, and `kind` field. Results are cached for 10 minutes.
-   * @tags Property / Meta
-   * @name ListPropertyTypes
-   * @summary List property types
-   * @request GET:/property/types/
-   * @secure
-   */
-  export namespace ListPropertyTypes {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {
-      /**
-       * Preferred language for localized titles. Defaults to Uzbek.
-       * @default "uz"
-       */
-      "Accept-Language"?: "en" | "ru" | "uz";
-    };
-    export type ResponseBody = ListPropertyTypesData;
-  }
-
-  /**
-   * @description Client-only. Adds/removes a hotel from favorites by encoded GUID.
-   * @tags Property / Client
-   * @name ToggleHotelFavorite
-   * @summary Toggle hotel favorite
-   * @request POST:/property/{hotel_guid}/favorite/
-   * @secure
-   */
-  export namespace ToggleHotelFavorite {
-    export type RequestParams = {
-      /** Encoded hotel GUID. */
-      hotelGuid: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = ToggleHotelFavoriteData;
-  }
-
-  /**
-   * No description
-   * @tags api
-   * @name PropertyFavoriteDelete
-   * @request DELETE:/property/{hotel_guid}/favorite/
-   * @secure
-   */
-  export namespace PropertyFavoriteDelete {
-    export type RequestParams = {
-      hotelGuid: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = PropertyFavoriteDeleteData;
-  }
-
-  /**
-   * @description Client-only. Adds the property to favorites if not present, or removes it if already favorited. Returns the new is_favorite state.
-   * @tags Property / Client
-   * @name TogglePropertyFavorite
-   * @summary Toggle property favorite
-   * @request POST:/property/{property_id}/favorite/
-   * @secure
-   */
-  export namespace TogglePropertyFavorite {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = TogglePropertyFavoriteData;
-  }
-
-  /**
-   * @description Client-only. Removes a property from the authenticated client's favorites.
-   * @tags Property / Client
-   * @name RemovePropertyFavorite
-   * @summary Remove property from favorites
-   * @request DELETE:/property/{property_id}/favorite/
-   * @secure
-   */
-  export namespace RemovePropertyFavorite {
-    export type RequestParams = {
-      /**
-       * Property GUID.
-       * @format uuid
-       */
-      propertyId: string;
-    };
-    export type RequestQuery = {};
-    export type RequestBody = never;
-    export type RequestHeaders = {};
-    export type ResponseBody = RemovePropertyFavoriteData;
   }
 }
 

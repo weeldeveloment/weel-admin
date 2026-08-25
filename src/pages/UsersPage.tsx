@@ -8,7 +8,7 @@ import { MessageSquare, Search, ChevronLeft, ChevronRight, Users } from 'lucide-
 import { useNavigate } from 'react-router-dom'
 import api from '@/lib/api'
 import { useTranslation } from 'react-i18next'
-import { AdminClient, AdminPartner, AdminPmsUser, PaginatedResponse } from '@/types'
+import { AdminClient, AdminPartner, PaginatedResponse } from '@/types'
 import { formatUzbekPhoneNumber, getPhoneHref } from '@/lib/phone'
 import ErrorAlert from '@/components/ErrorAlert'
 
@@ -55,7 +55,6 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [clientsPage, setClientsPage] = useState(1)
   const [partnersPage, setPartnersPage] = useState(1)
-  const [pmsPage, setPmsPage] = useState(1)
   const ITEMS_PER_PAGE = 10
 
   const clientsQuery = useQuery({
@@ -68,21 +67,14 @@ export default function UsersPage() {
     queryFn: () => fetchUserPage<AdminPartner>('/admin-auth/users/partners/', partnersPage, searchQuery),
   })
 
-  const pmsQuery = useQuery({
-    queryKey: ['adminUsers', 'pms', pmsPage, searchQuery],
-    queryFn: () => fetchUserPage<AdminPmsUser>('/admin-auth/users/pms/', pmsPage, searchQuery),
-  })
-
-  const loading = clientsQuery.isLoading || partnersQuery.isLoading || pmsQuery.isLoading
+  const loading = clientsQuery.isLoading || partnersQuery.isLoading
   const error =
     getApiErrorMessage(clientsQuery.error) ??
-    getApiErrorMessage(partnersQuery.error) ??
-    getApiErrorMessage(pmsQuery.error)
+    getApiErrorMessage(partnersQuery.error)
 
   useEffect(() => {
     setClientsPage(1)
     setPartnersPage(1)
-    setPmsPage(1)
   }, [searchQuery])
 
   const UserTable = ({ 
@@ -92,9 +84,9 @@ export default function UsersPage() {
     page, 
     onPageChange 
   }: { 
-    users: AdminClient[] | AdminPartner[] | AdminPmsUser[]
+    users: AdminClient[] | AdminPartner[]
     totalUsers: number
-    type: 'client' | 'partner' | 'pms'
+    type: 'client' | 'partner'
     page: number
     onPageChange: (page: number) => void
   }) => {
@@ -148,7 +140,7 @@ export default function UsersPage() {
                                 <p className="font-semibold text-foreground text-sm truncate">
                                   {user.first_name}
                                 </p>
-                                <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : type === 'partner' ? t('users.type.partner') : t('users.type.pms')}</p>
+                                <p className="text-xs text-muted-foreground">{type === 'client' ? t('users.type.client') : t('users.type.partner')}</p>
                               </div>
                             </div>
                           </td>
@@ -290,7 +282,6 @@ export default function UsersPage() {
           onRetry={() => {
             void clientsQuery.refetch()
             void partnersQuery.refetch()
-            void pmsQuery.refetch()
           }}
         />
       )}
@@ -323,13 +314,6 @@ export default function UsersPage() {
             <Users className="h-4 w-4 mr-2" />
             {t('users.tabs.partners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{partnersQuery.data?.count ?? 0}</span>
           </TabsTrigger>
-          <TabsTrigger
-            value="pms"
-            className="rounded-md data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground shrink-0"
-          >
-            <Users className="h-4 w-4 mr-2" />
-            {t('users.tabs.hotelOwners')} <span className="ml-2 bg-accent text-accent-foreground px-2 py-0.5 rounded text-xs font-semibold">{pmsQuery.data?.count ?? 0}</span>
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="clients">
@@ -349,16 +333,6 @@ export default function UsersPage() {
             type="partner" 
             page={partnersPage}
             onPageChange={setPartnersPage}
-          />
-        </TabsContent>
-
-        <TabsContent value="pms">
-          <UserTable 
-            users={pmsQuery.data?.results ?? []}
-            totalUsers={pmsQuery.data?.count ?? 0}
-            type="pms" 
-            page={pmsPage}
-            onPageChange={setPmsPage}
           />
         </TabsContent>
       </Tabs>

@@ -16,7 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Users, MessageSquare, LogOut, Home, Building2, BookOpen, Newspaper, Image, MountainSnow, Paintbrush, Briefcase, LifeBuoy } from 'lucide-react'
+import { Users, MessageSquare, LogOut, Home, BookOpen, Newspaper, Image, MountainSnow, Briefcase, LifeBuoy } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeToggle } from './ThemeToggle'
@@ -30,14 +30,12 @@ export default function Layout() {
     { icon: Home, label: t('nav.bookings'), path: '/bookings' },
     { icon: Users, label: t('nav.users'), path: '/users' },
     { icon: Briefcase, label: t('nav.b2b'), path: '/b2b' },
-    { icon: Building2, label: t('nav.properties'), path: '/properties' },
     { icon: MountainSnow, label: t('nav.activities'), path: '/activities' },
     { icon: BookOpen, label: t('nav.stories'), path: '/stories' },
     { icon: Newspaper, label: t('nav.news'), path: '/news' },
     { icon: Image, label: t('nav.banners'), path: '/banners' },
     { icon: MessageSquare, label: t('nav.chat'), path: '/chat' },
     { icon: LifeBuoy, label: t('nav.b2bSupport'), path: '/b2b-support' },
-    { icon: Paintbrush, label: t('nav.propertyTypeIcons'), path: '/property-type-icons' },
   ]
 
   return (

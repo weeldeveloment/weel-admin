@@ -141,15 +141,6 @@ export interface AdminPartner {
   is_verified?: boolean
 }
 
-export interface AdminPmsUser {
-  id: string | number
-  first_name?: string
-  last_name?: string
-  full_name?: string
-  phone_number?: string
-  created_at?: string
-}
-
 /** One row of the B2B support inbox — a person waiting, and for how long. */
 export interface B2BSupportThread {
   employee_id: number

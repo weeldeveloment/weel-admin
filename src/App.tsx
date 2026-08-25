@@ -11,16 +11,11 @@ const ChatPage = lazy(() => import('./pages/ChatPage'))
 const B2BSupportPage = lazy(() => import('./pages/B2BSupportPage'))
 const BookingsPage = lazy(() => import('./pages/BookingsPage'))
 const Partner = lazy(() => import('./pages/Partner'))
-const PropertiesPage = lazy(() => import('./pages/PropertiesPage'))
 const ActivitiesPage = lazy(() => import('./pages/ActivitiesPage'))
 const ActivityCalendarPage = lazy(() => import('./pages/ActivityCalendarPage'))
-const CottageDetailsUpdate = lazy(() => import('./pages/CottageDetailsUpdate'))
-const ApartmentDetailsUpdate = lazy(() => import('./pages/ApartmentDetailsUpdate'))
-const HotelDetailsUpdate = lazy(() => import('./pages/HotelDetailsUpdate'))
 const StoriesModerationPage = lazy(() => import('./pages/StoriesModerationPage'))
 const NewsManagementPage = lazy(() => import('./pages/NewsManagementPage'))
 const BannerManagementPage = lazy(() => import('./pages/BannerManagementPage'))
-const PropertyTypeIconsPage = lazy(() => import('./pages/PropertyTypeIconsPage'))
 
 function LoadingScreen() {
   const { t } = useTranslation()
@@ -67,17 +62,11 @@ function App() {
           <Route path="chat/:partnerId" element={<ChatPage />} />
           <Route path="b2b-support" element={<B2BSupportPage />} />
           <Route path="partner/:partnerId" element={<Partner />} />
-          <Route path="properties" element={<PropertiesPage />} />
-          <Route path="properties/cottages/:propertyId" element={<CottageDetailsUpdate />} />
-          <Route path="properties/apartments/:propertyId" element={<ApartmentDetailsUpdate />} />
-          <Route path="properties/hotels/:propertyId" element={<HotelDetailsUpdate />} />
-          <Route path="properties/:propertyType/:propertyId" element={<Navigate to="/properties" replace />} />
           <Route path="activities" element={<ActivitiesPage />} />
           <Route path="activities/:guid/calendar" element={<ActivityCalendarPage />} />
           <Route path="stories" element={<StoriesModerationPage />} />
           <Route path="news" element={<NewsManagementPage />} />
           <Route path="banners" element={<BannerManagementPage />} />
-          <Route path="property-type-icons" element={<PropertyTypeIconsPage />} />
         </Route>
       </Routes>
     </Suspense>

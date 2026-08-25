@@ -1,5 +1,11 @@
 import api from './api'
-import type { AdminAuth, ListAllPartnerPropertiesData, PartnerProfile } from '@/types/weel-openapi'
+import type { AdminAuth, PartnerProfile } from '@/types/weel-openapi'
+
+// `/property/partner/all/` belonged to the old self-hosted property stack, which
+// generated `ListAllPartnerPropertiesData`. That backend app is gone (inventory is
+// now supplied externally via Hotelios/Bookhara), so the type no longer exists —
+// this loose shape replaces it without changing fetchPartnerProperties' behavior.
+type ListAllPartnerPropertiesData = Record<string, unknown>[]
 
 type AdminPartnersResponse = AdminAuth.AdminAuthUsersPartnersList.ResponseBody
 
@@ -184,12 +190,12 @@ const extractPrice = (price: PartnerPropertyPayload['price']): string | null => 
 }
 
 const normalizeProperty = (value: PartnerPropertyPayload, type?: string): PartnerProperty | null => {
-  const guid = value.guid
+  const guid = asString(value.guid)
   if (!guid) return null
 
   return {
     guid,
-    title: value.title || 'Unnamed Property',
+    title: asString(value.title) || 'Unnamed Property',
     price: extractPrice(value.price),
     currency: value.currency ?? null,
     property_type: extractPropertyType(value.property_type),
