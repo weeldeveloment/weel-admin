@@ -79,6 +79,16 @@ export interface B2BUser {
   created_at: string;
 }
 
+export interface OwnershipRequestDecision {
+  /** Action */
+  action: "approve" | "reject";
+  /**
+   * Note
+   * @default ""
+   */
+  note?: string;
+}
+
 export interface SupportThread {
   /** Employee id */
   employee_id: number;
@@ -374,19 +384,21 @@ export interface Passenger {
   /**
    * First name
    * @minLength 1
-   * @maxLength 120
+   * @maxLength 25
+   * @pattern ^[A-Za-z][A-Za-z \-']*$
    */
   first_name: string;
   /**
    * Last name
    * @minLength 1
-   * @maxLength 120
+   * @maxLength 25
+   * @pattern ^[A-Za-z][A-Za-z \-']*$
    */
   last_name: string;
   /**
    * Middle name
    * @minLength 1
-   * @maxLength 120
+   * @maxLength 25
    */
   middle_name?: string | null;
   /** Age */
@@ -449,11 +461,8 @@ export interface B2BCreateBooking {
    * @pattern ^\+\d{9,15}$
    */
   payer_tel: string;
-  /**
-   * Order note
-   * @maxLength 64
-   */
-  order_note?: string;
+  /** Order note */
+  order_note?: "specialbuyercontacts";
   passengers: Passenger[];
   additional_services?: string[];
   /** Trip id */
@@ -760,7 +769,7 @@ export interface B2BEmployee {
    * Role
    * @default "employee"
    */
-  role?: "owner" | "performer" | "lider" | "employee";
+  role?: "owner" | "performer" | "lider" | "employee" | "guest";
   /** Is active */
   is_active: boolean;
   /**
@@ -1617,6 +1626,14 @@ export interface Profile {
   username: string;
 }
 
+export interface WorkspaceRefresh {
+  /**
+   * Refresh
+   * @minLength 1
+   */
+  refresh: string;
+}
+
 export interface WorkspaceCreate {
   /**
    * Name
@@ -1648,6 +1665,28 @@ export interface WorkspaceCreate {
   tax_id?: string;
 }
 
+export interface Generate {
+  /** Period */
+  period: "day" | "week" | "month" | "year";
+}
+
+export interface Discuss {
+  /**
+   * Question
+   * @maxLength 4000
+   */
+  question?: string;
+}
+
+export interface AiSend {
+  /**
+   * Text
+   * @minLength 1
+   * @maxLength 100000
+   */
+  text: string;
+}
+
 export interface AttendanceEntry {
   /** Employee id */
   employee_id: number;
@@ -1661,6 +1700,11 @@ export interface AttendanceEntry {
    * @minLength 1
    */
   position?: string | null;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
   /**
    * Department name
    * @minLength 1
@@ -1676,6 +1720,11 @@ export interface AttendanceEntry {
    * @format date-time
    */
   checked_in_at?: string | null;
+  /**
+   * Checked out at
+   * @format date-time
+   */
+  checked_out_at?: string | null;
   /**
    * Reason
    * @minLength 1
@@ -1707,6 +1756,16 @@ export interface AttendanceDay {
    * @minLength 1
    */
   my_reason?: string | null;
+  /**
+   * My checked in at
+   * @format date-time
+   */
+  my_checked_in_at?: string | null;
+  /**
+   * My checked out at
+   * @format date-time
+   */
+  my_checked_out_at?: string | null;
   entries: AttendanceEntry[];
 }
 
@@ -1725,6 +1784,13 @@ export interface AttendanceSelfAbsence {
 }
 
 export interface AttendanceCheckIn {
+  /** Latitude */
+  latitude?: number | null;
+  /** Longitude */
+  longitude?: number | null;
+}
+
+export interface AttendanceCheckOut {
   /** Latitude */
   latitude?: number | null;
   /** Longitude */
@@ -1801,12 +1867,95 @@ export interface WorkspaceLoginVerify {
   otp: string;
 }
 
-export interface WorkspaceRefresh {
+export interface CallCreate {
   /**
-   * Refresh
+   * Type
+   * @default "video"
+   */
+  type?: "audio" | "video";
+  /**
+   * Source module
+   * @default "chat"
+   */
+  source_module?: "chat" | "crm" | "sales";
+  /** Thread id */
+  thread_id?: number | null;
+  /** Target employee id */
+  target_employee_id?: number | null;
+  /** Lead id */
+  lead_id?: number | null;
+  /** Customer id */
+  customer_id?: number | null;
+}
+
+export interface Call {
+  /** Id */
+  id: number;
+  /**
+   * Room name
    * @minLength 1
    */
-  refresh: string;
+  room_name: string;
+  /**
+   * Type
+   * @minLength 1
+   */
+  type: string;
+  /**
+   * Source module
+   * @minLength 1
+   */
+  source_module: string;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status: string;
+  /** Thread id */
+  thread_id?: number | null;
+  /** Lead id */
+  lead_id?: number | null;
+  /** Customer id */
+  customer_id?: number | null;
+  /**
+   * Started at
+   * @format date-time
+   */
+  started_at: string;
+  /**
+   * Answered at
+   * @format date-time
+   */
+  answered_at?: string | null;
+  /**
+   * Ended at
+   * @format date-time
+   */
+  ended_at?: string | null;
+  /** Duration seconds */
+  duration_seconds?: number | null;
+  /**
+   * Server url
+   * @minLength 1
+   */
+  server_url: string;
+  /** Ring timeout seconds */
+  ring_timeout_seconds: number;
+  /**
+   * Token
+   * @minLength 1
+   */
+  token?: string | null;
+  /**
+   * Token expires at
+   * @format date-time
+   */
+  token_expires_at?: string | null;
+  /**
+   * Guest link
+   * @minLength 1
+   */
+  guest_link?: string | null;
 }
 
 export type WorkspaceChatMessage = {
@@ -1825,16 +1974,43 @@ export type WorkspaceChatMessage = {
    * @format date-time
    */
   created_at: string;
+  /**
+   * Edited at
+   * @format date-time
+   */
+  edited_at?: string | null;
+  /** Forwarded from id */
+  forwarded_from_id?: number | null;
+  /**
+   * Forwarded from name
+   * @minLength 1
+   */
+  forwarded_from_name?: string | null;
+  /**
+   * Pinned at
+   * @format date-time
+   */
+  pinned_at?: string | null;
 };
 
 export interface ChatThread {
   /** Id */
   id: number;
   /**
+   * Kind
+   * @minLength 1
+   */
+  kind?: string;
+  /**
    * Group name
    * @minLength 1
    */
   group_name?: string | null;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
   participant_ids: number[];
   /** Unread */
   unread: number;
@@ -1859,6 +2035,152 @@ export interface ThreadFlags {
   is_pinned?: boolean;
   /** Is muted */
   is_muted?: boolean;
+}
+
+export interface ChatGroupMember {
+  /** Id */
+  id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Username
+   * @minLength 1
+   */
+  username?: string | null;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /**
+   * Role
+   * @minLength 1
+   */
+  role: string;
+  /**
+   * Department name
+   * @minLength 1
+   */
+  department_name?: string | null;
+  /**
+   * Department color
+   * @minLength 1
+   */
+  department_color?: string | null;
+  /**
+   * Phone
+   * @minLength 1
+   */
+  phone?: string | null;
+  /**
+   * Email
+   * @minLength 1
+   */
+  email?: string | null;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status?: string;
+  /**
+   * Is guest
+   * @default false
+   */
+  is_guest?: boolean;
+  /**
+   * Is online
+   * @default false
+   */
+  is_online?: boolean;
+  /**
+   * Last seen at
+   * @minLength 1
+   */
+  last_seen_at?: string | null;
+  /**
+   * Member role
+   * @minLength 1
+   */
+  member_role: string;
+}
+
+export interface ChatGroup {
+  /** Id */
+  id: number;
+  /**
+   * Group name
+   * @minLength 1
+   */
+  group_name?: string | null;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /** Created by */
+  created_by?: number | null;
+  /**
+   * Created at
+   * @minLength 1
+   */
+  created_at?: string | null;
+  /** Member count */
+  member_count: number;
+  /**
+   * My role
+   * @minLength 1
+   */
+  my_role: string;
+  /** Can manage */
+  can_manage: boolean;
+  members: ChatGroupMember[];
+}
+
+export interface ThreadMembers {
+  member_ids: number[];
+}
+
+export interface ThreadMemberRole {
+  /** Role */
+  role: "admin" | "member";
+}
+
+export interface MessageEdit {
+  /**
+   * Text
+   * @minLength 1
+   * @maxLength 4000
+   */
+  text: string;
+}
+
+export interface MessageReaction {
+  /**
+   * Emoji
+   * @minLength 1
+   * @maxLength 16
+   */
+  emoji: string;
+}
+
+export interface OwnershipRequest {
+  /** Kind */
+  kind: "transfer" | "close";
+  /** Target employee id */
+  target_employee_id?: number | null;
+  /**
+   * Reason
+   * @default ""
+   */
+  reason?: string;
 }
 
 export interface CrmCustomer {
@@ -1933,9 +2255,20 @@ export interface CrmDeal {
     | "negotiation"
     | "contract"
     | "won"
-    | "lost";
+    | "lost"
+    | "archived";
   /** Status */
   status: "new" | "in_progress" | "completed";
+  /** Kind */
+  kind?: "lead" | "quick_sale";
+  /** Payment method */
+  payment_method?:
+    | "cash"
+    | "card"
+    | "transfer"
+    | "installment"
+    | "other"
+    | null;
   /**
    * Created at
    * @format date-time
@@ -2040,7 +2373,50 @@ export interface CustomerList {
   results: Customer[];
 }
 
+export interface WorkspaceDeleteRequest {
+  /**
+   * Reason
+   * @default ""
+   */
+  reason?: string;
+}
+
 export interface EmployeeOfMonth {
+  /** Employee id */
+  employee_id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /**
+   * Position
+   * @minLength 1
+   */
+  position?: string | null;
+  /**
+   * Department name
+   * @minLength 1
+   */
+  department_name?: string | null;
+  /** Year */
+  year: number;
+  /** Month */
+  month: number;
+  /**
+   * Selected at
+   * @format date-time
+   */
+  selected_at: string;
+}
+
+export interface EmployeeOfMonthList {
+  results: EmployeeOfMonth[];
   /** Employee id */
   employee_id: number;
   /**
@@ -2065,8 +2441,9 @@ export interface EmployeeOfMonth {
 }
 
 export interface EmployeeOfMonthSelect {
+  employee_ids?: number[];
   /** Employee id */
-  employee_id: number;
+  employee_id?: number;
 }
 
 export interface EmployeeMonthlyStat {
@@ -2117,6 +2494,27 @@ export interface EmployeeAccess {
   role?: "owner" | "admin" | "manager" | "employee" | "guest";
   modules?: string[] | null;
   permissions?: string[] | null;
+}
+
+export interface EmployeeRemove {
+  /**
+   * Scope
+   * @default "workspace"
+   */
+  scope?: "workspace" | "company";
+}
+
+export interface EmployeeStats {
+  /** Employee id */
+  employee_id: number;
+  /** Tasks done */
+  tasks_done: number;
+  /** Tasks in progress */
+  tasks_in_progress: number;
+  /** Tasks todo */
+  tasks_todo: number;
+  /** Tasks overdue */
+  tasks_overdue: number;
 }
 
 export interface CalendarEvent {
@@ -2309,6 +2707,1816 @@ export interface WorkspaceFolderWrite {
   name: string;
 }
 
+export type MetaSetup = {
+  /** Uses own app */
+  uses_own_app: boolean;
+  /**
+   * App id
+   * @minLength 1
+   */
+  app_id?: string | null;
+  /**
+   * Redirect uri
+   * @minLength 1
+   */
+  redirect_uri: string;
+  /**
+   * Webhook url
+   * @minLength 1
+   */
+  webhook_url: string;
+  /**
+   * Verify token
+   * @minLength 1
+   */
+  verify_token?: string | null;
+};
+
+export interface IntegrationPage {
+  /** Id */
+  id: number;
+  /**
+   * Page id
+   * @minLength 1
+   */
+  page_id: string;
+  /**
+   * Page name
+   * @minLength 1
+   */
+  page_name: string;
+  /** Is active */
+  is_active: boolean;
+  /** Subscribed */
+  subscribed: boolean;
+  /** Lead count */
+  lead_count: number;
+  /**
+   * Last lead at
+   * @format date-time
+   */
+  last_lead_at?: string | null;
+  /**
+   * Last error
+   * @minLength 1
+   */
+  last_error?: string | null;
+}
+
+export interface Integration {
+  /**
+   * Provider
+   * @minLength 1
+   */
+  provider: string;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Status
+   * @minLength 1
+   */
+  status: string;
+  /** Connected */
+  connected: boolean;
+  /**
+   * Available
+   * Whether the server is configured for this provider at all.
+   */
+  available: boolean;
+  /**
+   * Account name
+   * @minLength 1
+   */
+  account_name?: string | null;
+  /**
+   * Connected at
+   * @format date-time
+   */
+  connected_at?: string | null;
+  /**
+   * Connected by
+   * @minLength 1
+   */
+  connected_by?: string | null;
+  /**
+   * Last sync at
+   * @format date-time
+   */
+  last_sync_at?: string | null;
+  /**
+   * Last error
+   * @minLength 1
+   */
+  last_error?: string | null;
+  /** Lead count */
+  lead_count: number;
+  /**
+   * Token expires at
+   * @format date-time
+   */
+  token_expires_at?: string | null;
+  setup: MetaSetup;
+  pages: IntegrationPage[];
+  /** Ai */
+  ai?: string;
+}
+
+export interface IntegrationList {
+  results: Integration[];
+  /** Can manage */
+  can_manage: boolean;
+}
+
+export interface MetaApp {
+  /**
+   * App id
+   * @minLength 1
+   * @maxLength 64
+   */
+  app_id: string;
+  /**
+   * App secret
+   * @minLength 1
+   * @maxLength 200
+   */
+  app_secret: string;
+  /**
+   * Verify token
+   * @maxLength 120
+   */
+  verify_token?: string;
+}
+
+export interface MetaConnect {
+  /**
+   * Authorize url
+   * @minLength 1
+   */
+  authorize_url: string;
+  /**
+   * State
+   * @minLength 1
+   */
+  state: string;
+  /** Expires in */
+  expires_in: number;
+}
+
+export interface PageToggle {
+  /** Is active */
+  is_active: boolean;
+}
+
+export interface AiConnect {
+  /**
+   * Api key
+   * @minLength 1
+   * @maxLength 400
+   */
+  api_key: string;
+}
+
+export interface AiModel {
+  /**
+   * Model
+   * @minLength 1
+   * @maxLength 120
+   */
+  model: string;
+}
+
+export interface AiConversation {
+  /** Id */
+  id: number;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  /** Project id */
+  project_id?: number | null;
+  /**
+   * Project name
+   * @minLength 1
+   */
+  project_name?: string | null;
+  /**
+   * Model
+   * @minLength 1
+   */
+  model?: string | null;
+  /**
+   * Source
+   * @minLength 1
+   */
+  source: string;
+  /** Message count */
+  message_count: number;
+  /**
+   * Last message at
+   * @format date-time
+   */
+  last_message_at?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at?: string | null;
+}
+
+export interface AiConversationList {
+  results: AiConversation[];
+  /** Count */
+  count: number;
+}
+
+export interface AiNewConversation {
+  /**
+   * Title
+   * @maxLength 300
+   */
+  title?: string;
+  /** Project id */
+  project_id?: number | null;
+}
+
+export interface AiMessage {
+  /** Id */
+  id: number;
+  /**
+   * Role
+   * @minLength 1
+   */
+  role: string;
+  /**
+   * Text
+   * @minLength 1
+   */
+  text: string;
+  /**
+   * Sent at
+   * @format date-time
+   */
+  sent_at?: string | null;
+}
+
+export interface AiConversationDetail {
+  /** Id */
+  id: number;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  /** Project id */
+  project_id?: number | null;
+  /**
+   * Project name
+   * @minLength 1
+   */
+  project_name?: string | null;
+  /**
+   * Model
+   * @minLength 1
+   */
+  model?: string | null;
+  /**
+   * Source
+   * @minLength 1
+   */
+  source: string;
+  /** Message count */
+  message_count: number;
+  /**
+   * Last message at
+   * @format date-time
+   */
+  last_message_at?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at?: string | null;
+  messages: AiMessage[];
+}
+
+export interface AiImportResult {
+  /** Projects */
+  projects: number;
+  /** Chats created */
+  chats_created: number;
+  /** Chats updated */
+  chats_updated: number;
+  /** Messages */
+  messages: number;
+  integration: Integration;
+}
+
+export interface AiProject {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Description
+   * @minLength 1
+   */
+  description?: string | null;
+  /**
+   * Instructions
+   * @minLength 1
+   */
+  instructions?: string | null;
+  /** Chat count */
+  chat_count: number;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at?: string | null;
+}
+
+export interface AiProjectList {
+  results: AiProject[];
+}
+
+export interface Category {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /** Parent id */
+  parent_id?: number | null;
+  /** Position */
+  position: number;
+  /** Product count */
+  product_count?: number;
+}
+
+export interface CategoryWrite {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 200
+   */
+  name: string;
+  /** Parent id */
+  parent_id?: number | null;
+}
+
+export interface CategoryPatch {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 200
+   */
+  name?: string;
+  /** Parent id */
+  parent_id?: number | null;
+  /** Position */
+  position?: number;
+}
+
+export interface DocumentItem {
+  /** Id */
+  id: number;
+  /** Product id */
+  product_id: number;
+  /**
+   * Product name
+   * @minLength 1
+   */
+  product_name?: string;
+  /**
+   * Product kind
+   * @minLength 1
+   */
+  product_kind?: string;
+  /**
+   * Sku
+   * @minLength 1
+   */
+  sku?: string | null;
+  /**
+   * Unit
+   * @minLength 1
+   */
+  unit?: string;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
+  /**
+   * System quantity
+   * @format decimal
+   */
+  system_quantity?: string | null;
+  /**
+   * Counted quantity
+   * @format decimal
+   */
+  counted_quantity?: string | null;
+  /**
+   * Difference
+   * @format decimal
+   */
+  difference?: string;
+  /**
+   * Unit cost
+   * @format decimal
+   */
+  unit_cost?: string | null;
+  /**
+   * Old price
+   * @format decimal
+   */
+  old_price?: string | null;
+  /**
+   * New price
+   * @format decimal
+   */
+  new_price?: string | null;
+  /**
+   * Old wholesale
+   * @format decimal
+   */
+  old_wholesale?: string | null;
+  /**
+   * New wholesale
+   * @format decimal
+   */
+  new_wholesale?: string | null;
+  /** Lead item id */
+  lead_item_id?: number | null;
+}
+
+export interface InventoryDocument {
+  /** Id */
+  id: number;
+  /** Kind */
+  kind:
+    | "receipt"
+    | "transfer"
+    | "inventory"
+    | "write_off"
+    | "revaluation"
+    | "sale"
+    | "return";
+  /**
+   * Kind label
+   * @minLength 1
+   */
+  kind_label?: string;
+  /**
+   * Number
+   * @minLength 1
+   */
+  number?: string | null;
+  /** Status */
+  status: "draft" | "sent" | "pending" | "confirmed" | "cancelled";
+  /** Warehouse id */
+  warehouse_id?: number | null;
+  /**
+   * Warehouse name
+   * @minLength 1
+   */
+  warehouse_name?: string | null;
+  /** To warehouse id */
+  to_warehouse_id?: number | null;
+  /**
+   * To warehouse name
+   * @minLength 1
+   */
+  to_warehouse_name?: string | null;
+  /** Supplier id */
+  supplier_id?: number | null;
+  /**
+   * Supplier name
+   * @minLength 1
+   */
+  supplier_name?: string | null;
+  /** Customer id */
+  customer_id?: number | null;
+  /**
+   * Customer name
+   * @minLength 1
+   */
+  customer_name?: string | null;
+  /** Lead id */
+  lead_id?: number | null;
+  /**
+   * Currency
+   * @minLength 1
+   */
+  currency: string;
+  /**
+   * Extra costs
+   * @format decimal
+   */
+  extra_costs: string;
+  /**
+   * Reason
+   * @minLength 1
+   */
+  reason?: string | null;
+  /**
+   * Note
+   * @minLength 1
+   */
+  note?: string | null;
+  /**
+   * Doc date
+   * @format date
+   */
+  doc_date?: string | null;
+  /**
+   * External number
+   * @minLength 1
+   */
+  external_number?: string | null;
+  /** File id */
+  file_id?: number | null;
+  /** Reversal of */
+  reversal_of?: number | null;
+  /**
+   * Reversal of number
+   * @minLength 1
+   */
+  reversal_of_number?: string | null;
+  /**
+   * Cancel reason
+   * @minLength 1
+   */
+  cancel_reason?: string | null;
+  /** Author id */
+  author_id?: number | null;
+  /**
+   * Author name
+   * @minLength 1
+   */
+  author_name?: string | null;
+  /**
+   * Confirmed by name
+   * @minLength 1
+   */
+  confirmed_by_name?: string | null;
+  /**
+   * Confirmed at
+   * @format date-time
+   */
+  confirmed_at?: string | null;
+  /**
+   * Sent at
+   * @format date-time
+   */
+  sent_at?: string | null;
+  /**
+   * Received at
+   * @format date-time
+   */
+  received_at?: string | null;
+  /**
+   * Cancelled at
+   * @format date-time
+   */
+  cancelled_at?: string | null;
+  /**
+   * Cancelled by name
+   * @minLength 1
+   */
+  cancelled_by_name?: string | null;
+  /** Line count */
+  line_count: number;
+  /**
+   * Total
+   * @format decimal
+   */
+  total?: string | null;
+  /**
+   * Quantity total
+   * @format decimal
+   */
+  quantity_total: string;
+  items?: DocumentItem[];
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface DocumentList {
+  results: InventoryDocument[];
+}
+
+export interface DocumentItemWrite {
+  /** Product id */
+  product_id: number;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity?: string | null;
+  /**
+   * Counted quantity
+   * @format decimal
+   */
+  counted_quantity?: string | null;
+  /**
+   * Unit cost
+   * @format decimal
+   */
+  unit_cost?: string | null;
+  /**
+   * New price
+   * @format decimal
+   */
+  new_price?: string | null;
+  /**
+   * New wholesale
+   * @format decimal
+   */
+  new_wholesale?: string | null;
+}
+
+export interface DocumentWrite {
+  /** Kind */
+  kind:
+    | "receipt"
+    | "transfer"
+    | "inventory"
+    | "write_off"
+    | "revaluation"
+    | "sale"
+    | "return";
+  /** Warehouse id */
+  warehouse_id?: number | null;
+  /** To warehouse id */
+  to_warehouse_id?: number | null;
+  /** Supplier id */
+  supplier_id?: number | null;
+  /** Customer id */
+  customer_id?: number | null;
+  /** Lead id */
+  lead_id?: number | null;
+  /**
+   * Currency
+   * @maxLength 3
+   */
+  currency?: string;
+  /**
+   * Extra costs
+   * @format decimal
+   */
+  extra_costs?: string;
+  /**
+   * Reason
+   * @maxLength 30
+   */
+  reason?: string | null;
+  /**
+   * Note
+   * @maxLength 2000
+   */
+  note?: string | null;
+  /**
+   * Doc date
+   * @format date
+   */
+  doc_date?: string | null;
+  /**
+   * External number
+   * @maxLength 100
+   */
+  external_number?: string | null;
+  /** File id */
+  file_id?: number | null;
+  /**
+   * Idempotency key
+   * @maxLength 80
+   */
+  idempotency_key?: string | null;
+  items: DocumentItemWrite[];
+  /**
+   * Confirm
+   * @default false
+   */
+  confirm?: boolean;
+}
+
+export interface DocumentPatch {
+  /** Kind */
+  kind?:
+    | "receipt"
+    | "transfer"
+    | "inventory"
+    | "write_off"
+    | "revaluation"
+    | "sale"
+    | "return";
+  /** Warehouse id */
+  warehouse_id?: number | null;
+  /** To warehouse id */
+  to_warehouse_id?: number | null;
+  /** Supplier id */
+  supplier_id?: number | null;
+  /** Customer id */
+  customer_id?: number | null;
+  /** Lead id */
+  lead_id?: number | null;
+  /**
+   * Currency
+   * @maxLength 3
+   */
+  currency?: string;
+  /**
+   * Extra costs
+   * @format decimal
+   */
+  extra_costs?: string;
+  /**
+   * Reason
+   * @maxLength 30
+   */
+  reason?: string | null;
+  /**
+   * Note
+   * @maxLength 2000
+   */
+  note?: string | null;
+  /**
+   * Doc date
+   * @format date
+   */
+  doc_date?: string | null;
+  /**
+   * External number
+   * @maxLength 100
+   */
+  external_number?: string | null;
+  /** File id */
+  file_id?: number | null;
+  /**
+   * Idempotency key
+   * @maxLength 80
+   */
+  idempotency_key?: string | null;
+  items?: DocumentItemWrite[];
+  /**
+   * Confirm
+   * @default false
+   */
+  confirm?: boolean;
+}
+
+export interface Cancel {
+  /**
+   * Reason
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason: string;
+}
+
+export interface StockChange {
+  /** Product id */
+  product_id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Unit
+   * @minLength 1
+   */
+  unit?: string | null;
+  /** Warehouse id */
+  warehouse_id: number;
+  /**
+   * Warehouse name
+   * @minLength 1
+   */
+  warehouse_name?: string | null;
+  /**
+   * Before
+   * @format decimal
+   */
+  before: string;
+  /**
+   * After
+   * @format decimal
+   */
+  after: string;
+  /**
+   * Change
+   * @format decimal
+   */
+  change: string;
+}
+
+export interface ImportRow {
+  /** Line */
+  line?: number | null;
+  /**
+   * Action
+   * @minLength 1
+   */
+  action: string;
+  /** Name */
+  name: string;
+  /**
+   * Kind
+   * @minLength 1
+   */
+  kind?: string | null;
+  /** Sku */
+  sku?: string | null;
+  /** Barcode */
+  barcode?: string | null;
+  /** Category */
+  category?: string | null;
+  /** Brand */
+  brand?: string | null;
+  /** Supplier */
+  supplier?: string | null;
+  /** Unit */
+  unit?: string | null;
+  /** Description */
+  description?: string | null;
+  /** Warehouse */
+  warehouse?: string | null;
+  /**
+   * Purchase price
+   * @format decimal
+   */
+  purchase_price?: string | null;
+  /**
+   * Sale price
+   * @format decimal
+   */
+  sale_price?: string | null;
+  /**
+   * Wholesale price
+   * @format decimal
+   */
+  wholesale_price?: string | null;
+  /**
+   * Min stock
+   * @format decimal
+   */
+  min_stock?: string | null;
+  /**
+   * Initial quantity
+   * @format decimal
+   */
+  initial_quantity?: string | null;
+}
+
+export interface ImportCommit {
+  rows: ImportRow[];
+  /**
+   * Update existing
+   * @default true
+   */
+  update_existing?: boolean;
+  update_fields?: string[];
+}
+
+export interface Movement {
+  /** Id */
+  id: number;
+  /** Kind */
+  kind: "receipt" | "sale" | "write_off" | "transfer" | "adjustment" | "return";
+  /** Product id */
+  product_id: number;
+  /**
+   * Product name
+   * @minLength 1
+   */
+  product_name?: string;
+  /**
+   * Sku
+   * @minLength 1
+   */
+  sku?: string | null;
+  /**
+   * Unit
+   * @minLength 1
+   */
+  unit?: string;
+  /** Warehouse id */
+  warehouse_id: number;
+  /**
+   * Warehouse name
+   * @minLength 1
+   */
+  warehouse_name?: string;
+  /** To warehouse id */
+  to_warehouse_id?: number | null;
+  /**
+   * To warehouse name
+   * @minLength 1
+   */
+  to_warehouse_name?: string | null;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
+  /**
+   * Unit cost
+   * @format decimal
+   */
+  unit_cost: string;
+  /**
+   * Cost price
+   * @format decimal
+   */
+  cost_price?: string | null;
+  /**
+   * Currency
+   * @minLength 1
+   */
+  currency?: string;
+  /**
+   * Note
+   * @minLength 1
+   */
+  note?: string | null;
+  /** Lead id */
+  lead_id?: number | null;
+  /** Document id */
+  document_id?: number | null;
+  /**
+   * Document number
+   * @minLength 1
+   */
+  document_number?: string | null;
+  /**
+   * Document kind
+   * @minLength 1
+   */
+  document_kind?: string | null;
+  /**
+   * Document reason
+   * @minLength 1
+   */
+  document_reason?: string | null;
+  /** Reversal of */
+  reversal_of?: number | null;
+  /**
+   * Supplier name
+   * @minLength 1
+   */
+  supplier_name?: string | null;
+  /**
+   * Customer name
+   * @minLength 1
+   */
+  customer_name?: string | null;
+  /** Author id */
+  author_id?: number | null;
+  /**
+   * Author name
+   * @minLength 1
+   */
+  author_name?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface MovementList {
+  results: Movement[];
+}
+
+export interface MovementWrite {
+  /** Kind */
+  kind: "receipt" | "sale" | "write_off" | "transfer" | "adjustment" | "return";
+  /** Product id */
+  product_id: number;
+  /** Warehouse id */
+  warehouse_id?: number | null;
+  /** To warehouse id */
+  to_warehouse_id?: number | null;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
+  /**
+   * Unit cost
+   * @format decimal
+   */
+  unit_cost?: string | null;
+  /** Reason */
+  reason?: "defect" | "loss" | "damage" | "internal_use" | "other" | null;
+  /** Supplier id */
+  supplier_id?: number | null;
+  /**
+   * Note
+   * @maxLength 1000
+   */
+  note?: string | null;
+  /**
+   * Idempotency key
+   * @maxLength 80
+   */
+  idempotency_key?: string | null;
+}
+
+export interface StockLine {
+  /** Warehouse id */
+  warehouse_id: number;
+  /**
+   * Warehouse name
+   * @minLength 1
+   */
+  warehouse_name: string;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
+}
+
+export interface Component {
+  /** Component id */
+  component_id: number;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name?: string;
+  /**
+   * Sku
+   * @minLength 1
+   */
+  sku?: string | null;
+  /**
+   * Unit
+   * @minLength 1
+   */
+  unit?: string;
+}
+
+export interface Product {
+  /** Id */
+  id: number;
+  /** Kind */
+  kind: "product" | "service" | "bundle";
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /** Category id */
+  category_id?: number | null;
+  /**
+   * Category name
+   * @minLength 1
+   */
+  category_name?: string | null;
+  /** Supplier id */
+  supplier_id?: number | null;
+  /**
+   * Supplier name
+   * @minLength 1
+   */
+  supplier_name?: string | null;
+  /**
+   * Brand
+   * @minLength 1
+   */
+  brand?: string | null;
+  /**
+   * Sku
+   * @minLength 1
+   */
+  sku?: string | null;
+  /**
+   * Barcode
+   * @minLength 1
+   */
+  barcode?: string | null;
+  /**
+   * Unit
+   * @minLength 1
+   */
+  unit: string;
+  /**
+   * Purchase price
+   * @format decimal
+   */
+  purchase_price?: string | null;
+  /**
+   * Sale price
+   * @format decimal
+   */
+  sale_price: string;
+  /**
+   * Wholesale price
+   * @format decimal
+   */
+  wholesale_price?: string;
+  /**
+   * Markup percent
+   * @format decimal
+   */
+  markup_percent?: string | null;
+  /** Allow free price */
+  allow_free_price?: boolean;
+  /**
+   * Min stock
+   * @format decimal
+   */
+  min_stock: string;
+  /**
+   * Description
+   * @minLength 1
+   */
+  description?: string | null;
+  /** Attributes */
+  attributes?: Record<string, string | null>;
+  /** Parent id */
+  parent_id?: number | null;
+  /**
+   * Parent name
+   * @minLength 1
+   */
+  parent_name?: string | null;
+  /**
+   * Variant label
+   * @minLength 1
+   */
+  variant_label?: string | null;
+  /** Variant count */
+  variant_count?: number;
+  /**
+   * Photo url
+   * @minLength 1
+   */
+  photo_url?: string | null;
+  /**
+   * Currency
+   * @minLength 1
+   */
+  currency?: string;
+  /** Is active */
+  is_active: boolean;
+  /**
+   * Stock total
+   * @format decimal
+   */
+  stock_total: string;
+  /**
+   * Reserved
+   * @format decimal
+   */
+  reserved: string;
+  /**
+   * Available
+   * @format decimal
+   */
+  available: string;
+  /**
+   * Stock value
+   * @format decimal
+   */
+  stock_value?: string | null;
+  /** Is low */
+  is_low: boolean;
+  /** Is out */
+  is_out: boolean;
+  /**
+   * Stock status
+   * @minLength 1
+   */
+  stock_status: string;
+  stocks: StockLine[];
+  components?: Component[];
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Updated at
+   * @format date-time
+   */
+  updated_at: string;
+}
+
+export interface ProductList {
+  results: Product[];
+  brands?: string[];
+}
+
+export interface ComponentWrite {
+  /** Component id */
+  component_id: number;
+  /**
+   * Quantity
+   * @format decimal
+   */
+  quantity: string;
+}
+
+export interface ProductWrite {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 300
+   */
+  name: string;
+  /** Kind */
+  kind?: "product" | "service" | "bundle";
+  /** Category id */
+  category_id?: number | null;
+  /** Supplier id */
+  supplier_id?: number | null;
+  /**
+   * Brand
+   * @maxLength 200
+   */
+  brand?: string | null;
+  /**
+   * Sku
+   * @maxLength 100
+   */
+  sku?: string | null;
+  /**
+   * Barcode
+   * @maxLength 100
+   */
+  barcode?: string | null;
+  /** Generate sku */
+  generate_sku?: boolean;
+  /** Generate barcode */
+  generate_barcode?: boolean;
+  /**
+   * Unit
+   * @maxLength 30
+   */
+  unit?: string;
+  /**
+   * Purchase price
+   * @format decimal
+   */
+  purchase_price?: string;
+  /**
+   * Sale price
+   * @format decimal
+   */
+  sale_price?: string | null;
+  /**
+   * Markup percent
+   * @format decimal
+   */
+  markup_percent?: string | null;
+  /**
+   * Wholesale price
+   * @format decimal
+   */
+  wholesale_price?: string;
+  /** Allow free price */
+  allow_free_price?: boolean;
+  /**
+   * Min stock
+   * @format decimal
+   */
+  min_stock?: string;
+  /** Description */
+  description?: string | null;
+  /** Attributes */
+  attributes?: Record<string, string | null>;
+  /** Parent id */
+  parent_id?: number | null;
+  /**
+   * Variant label
+   * @maxLength 200
+   */
+  variant_label?: string | null;
+  /**
+   * Currency
+   * @maxLength 3
+   */
+  currency?: string;
+  components?: ComponentWrite[];
+  /**
+   * Initial quantity
+   * @format decimal
+   */
+  initial_quantity?: string | null;
+  /** Initial warehouse id */
+  initial_warehouse_id?: number | null;
+}
+
+export interface ProductPatch {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 300
+   */
+  name?: string;
+  /** Kind */
+  kind?: "product" | "service" | "bundle";
+  /** Category id */
+  category_id?: number | null;
+  /** Supplier id */
+  supplier_id?: number | null;
+  /**
+   * Brand
+   * @maxLength 200
+   */
+  brand?: string | null;
+  /**
+   * Sku
+   * @maxLength 100
+   */
+  sku?: string | null;
+  /**
+   * Barcode
+   * @maxLength 100
+   */
+  barcode?: string | null;
+  /** Generate sku */
+  generate_sku?: boolean;
+  /** Generate barcode */
+  generate_barcode?: boolean;
+  /**
+   * Unit
+   * @maxLength 30
+   */
+  unit?: string;
+  /**
+   * Purchase price
+   * @format decimal
+   */
+  purchase_price?: string;
+  /**
+   * Sale price
+   * @format decimal
+   */
+  sale_price?: string | null;
+  /**
+   * Markup percent
+   * @format decimal
+   */
+  markup_percent?: string | null;
+  /**
+   * Wholesale price
+   * @format decimal
+   */
+  wholesale_price?: string;
+  /** Allow free price */
+  allow_free_price?: boolean;
+  /**
+   * Min stock
+   * @format decimal
+   */
+  min_stock?: string;
+  /** Description */
+  description?: string | null;
+  /** Attributes */
+  attributes?: Record<string, string | null>;
+  /** Parent id */
+  parent_id?: number | null;
+  /**
+   * Variant label
+   * @maxLength 200
+   */
+  variant_label?: string | null;
+  /**
+   * Currency
+   * @maxLength 3
+   */
+  currency?: string;
+  components?: ComponentWrite[];
+  /**
+   * Initial quantity
+   * @format decimal
+   */
+  initial_quantity?: string | null;
+  /** Initial warehouse id */
+  initial_warehouse_id?: number | null;
+  /** Is active */
+  is_active?: boolean;
+}
+
+export interface PriceHistory {
+  /** Id */
+  id: number;
+  /**
+   * Field
+   * @minLength 1
+   */
+  field: string;
+  /**
+   * Old price
+   * @format decimal
+   */
+  old_price?: string | null;
+  /**
+   * New price
+   * @format decimal
+   */
+  new_price?: string | null;
+  /** Author id */
+  author_id?: number | null;
+  /**
+   * Author name
+   * @minLength 1
+   */
+  author_name?: string | null;
+  /** Document id */
+  document_id?: number | null;
+  /**
+   * Document number
+   * @minLength 1
+   */
+  document_number?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface Settings {
+  /** Allow backorder */
+  allow_backorder: boolean;
+  /**
+   * Base currency
+   * @minLength 1
+   */
+  base_currency: string;
+  /**
+   * Sku prefix
+   * @minLength 1
+   */
+  sku_prefix: string;
+  /**
+   * Write off alert
+   * @format decimal
+   */
+  write_off_alert: string;
+}
+
+export interface SettingsWrite {
+  /** Allow backorder */
+  allow_backorder?: boolean;
+  /**
+   * Base currency
+   * @minLength 1
+   * @maxLength 3
+   */
+  base_currency?: string;
+  /**
+   * Sku prefix
+   * @maxLength 10
+   */
+  sku_prefix?: string;
+  /**
+   * Write off alert
+   * @format decimal
+   */
+  write_off_alert?: string;
+}
+
+export interface DailyPoint {
+  /**
+   * Day
+   * @format date
+   */
+  day: string;
+  /**
+   * Revenue
+   * @format decimal
+   */
+  revenue: string;
+  /**
+   * Purchases
+   * @format decimal
+   */
+  purchases: string;
+}
+
+export interface TopProduct {
+  /** Product id */
+  product_id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Unit
+   * @minLength 1
+   */
+  unit: string;
+  /**
+   * Sold qty
+   * @format decimal
+   */
+  sold_qty: string;
+  /**
+   * Revenue
+   * @format decimal
+   */
+  revenue: string;
+  /**
+   * Profit
+   * @format decimal
+   */
+  profit?: string | null;
+}
+
+export interface InventorySummary {
+  /**
+   * Date from
+   * @format date-time
+   */
+  date_from: string;
+  /**
+   * Date to
+   * @format date-time
+   */
+  date_to: string;
+  /** Product count */
+  product_count: number;
+  /**
+   * Quantity total
+   * @format decimal
+   */
+  quantity_total: string;
+  /**
+   * Stock value
+   * @format decimal
+   */
+  stock_value?: string | null;
+  /**
+   * Retail value
+   * @format decimal
+   */
+  retail_value: string;
+  /** Low stock count */
+  low_stock_count: number;
+  /** Out of stock count */
+  out_of_stock_count: number;
+  /** Sale count */
+  sale_count: number;
+  /**
+   * Sold qty
+   * @format decimal
+   */
+  sold_qty: string;
+  /**
+   * Revenue
+   * @format decimal
+   */
+  revenue: string;
+  /**
+   * Cogs
+   * @format decimal
+   */
+  cogs?: string | null;
+  /**
+   * Profit
+   * @format decimal
+   */
+  profit?: string | null;
+  /**
+   * Received qty
+   * @format decimal
+   */
+  received_qty: string;
+  /**
+   * Purchases
+   * @format decimal
+   */
+  purchases?: string | null;
+  /**
+   * Written off qty
+   * @format decimal
+   */
+  written_off_qty: string;
+  /**
+   * Write offs
+   * @format decimal
+   */
+  write_offs?: string | null;
+  /**
+   * Returned qty
+   * @format decimal
+   */
+  returned_qty: string;
+  /**
+   * Adjusted qty
+   * @format decimal
+   */
+  adjusted_qty: string;
+  /** Adjustment count */
+  adjustment_count: number;
+  /**
+   * Turnover ratio
+   * @format decimal
+   */
+  turnover_ratio?: string | null;
+  daily: DailyPoint[];
+  top_products: TopProduct[];
+}
+
+export interface Supplier {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Kind
+   * @minLength 1
+   */
+  kind: string;
+  /**
+   * Phone
+   * @minLength 1
+   */
+  phone?: string | null;
+  /**
+   * Email
+   * @minLength 1
+   */
+  email?: string | null;
+  /**
+   * Requisites
+   * @minLength 1
+   */
+  requisites?: string | null;
+  /**
+   * Note
+   * @minLength 1
+   */
+  note?: string | null;
+  /** Is active */
+  is_active: boolean;
+  /** Receipt count */
+  receipt_count?: number;
+  /**
+   * Purchases
+   * @format decimal
+   */
+  purchases?: string | null;
+  /** Product count */
+  product_count?: number;
+  /**
+   * Last receipt at
+   * @format date-time
+   */
+  last_receipt_at?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface SupplierWrite {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 300
+   */
+  name: string;
+  /** Kind */
+  kind?: "company" | "person";
+  /**
+   * Phone
+   * @maxLength 40
+   */
+  phone?: string | null;
+  /**
+   * Email
+   * @maxLength 254
+   */
+  email?: string | null;
+  /** Requisites */
+  requisites?: string | null;
+  /** Note */
+  note?: string | null;
+}
+
+export interface SupplierPatch {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 300
+   */
+  name?: string;
+  /** Kind */
+  kind?: "company" | "person";
+  /**
+   * Phone
+   * @maxLength 40
+   */
+  phone?: string | null;
+  /**
+   * Email
+   * @maxLength 254
+   */
+  email?: string | null;
+  /** Requisites */
+  requisites?: string | null;
+  /** Note */
+  note?: string | null;
+  /** Is active */
+  is_active?: boolean;
+}
+
+export interface Warehouse {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Address
+   * @minLength 1
+   */
+  address?: string | null;
+  /** Is default */
+  is_default: boolean;
+  /** Is active */
+  is_active: boolean;
+  /** Product count */
+  product_count?: number;
+  /**
+   * Quantity total
+   * @format decimal
+   */
+  quantity_total?: string;
+  /**
+   * Stock value
+   * @format decimal
+   */
+  stock_value?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface WarehouseWrite {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 200
+   */
+  name: string;
+  /** Address */
+  address?: string | null;
+  /** Is default */
+  is_default?: boolean;
+}
+
+export interface WarehousePatch {
+  /**
+   * Name
+   * @minLength 1
+   * @maxLength 200
+   */
+  name?: string;
+  /** Address */
+  address?: string | null;
+  /** Is default */
+  is_default?: boolean;
+  /** Is active */
+  is_active?: boolean;
+}
+
 export interface InviteCreate {
   /** Role */
   role: "owner" | "admin" | "manager" | "employee" | "guest";
@@ -2396,9 +4604,20 @@ export interface Lead {
     | "negotiation"
     | "contract"
     | "won"
-    | "lost";
+    | "lost"
+    | "archived";
   /** Source */
-  source: "website" | "call" | "referral" | "exhibition" | "manual";
+  source: "website" | "call" | "referral" | "exhibition" | "manual" | "meta";
+  /** Kind */
+  kind?: "lead" | "quick_sale";
+  /** Payment method */
+  payment_method?:
+    | "cash"
+    | "card"
+    | "transfer"
+    | "installment"
+    | "other"
+    | null;
   /** Author id */
   author_id: number;
   /** Claimed by id */
@@ -2413,6 +4632,11 @@ export interface Lead {
    * @format date-time
    */
   completed_at?: string | null;
+  /**
+   * Due date
+   * @format date-time
+   */
+  due_date?: string | null;
   /** Lost reason */
   lost_reason?:
     | "price"
@@ -2428,8 +4652,22 @@ export interface Lead {
    * @minLength 1
    */
   lost_note?: string | null;
+  /** Quality */
+  quality?: "good" | "bad" | null;
   /** Customer id */
   customer_id?: number | null;
+  /**
+   * External id
+   * @minLength 1
+   */
+  external_id?: string | null;
+  /**
+   * External form name
+   * @minLength 1
+   */
+  external_form_name?: string | null;
+  /** External data */
+  external_data?: object | null;
   /**
    * Created at
    * @format date-time
@@ -2476,6 +4714,15 @@ export interface LeadItemWrite {
    * @format decimal
    */
   amount?: string;
+  /** Product id */
+  product_id?: number | null;
+  /**
+   * Qty
+   * @format decimal
+   */
+  qty?: string | null;
+  /** Warehouse id */
+  warehouse_id?: number | null;
 }
 
 export interface LeadWrite {
@@ -2539,6 +4786,29 @@ export interface LeadWrite {
   /** Source */
   source?: "website" | "call" | "referral" | "exhibition" | "manual";
   items?: LeadItemWrite[];
+  /**
+   * Due date
+   * @format date-time
+   */
+  due_date?: string | null;
+  /**
+   * Kind
+   * @default "lead"
+   */
+  kind?: "lead" | "quick_sale";
+  /** Payment method */
+  payment_method?:
+    | "cash"
+    | "card"
+    | "transfer"
+    | "installment"
+    | "other"
+    | null;
+  /**
+   * Idempotency key
+   * @maxLength 80
+   */
+  idempotency_key?: string | null;
 }
 
 export interface LeadItem {
@@ -2558,13 +4828,52 @@ export interface LeadItem {
   amount: string;
   /** Position */
   position: number;
+  /** Product id */
+  product_id?: number | null;
+  /**
+   * Qty
+   * @format decimal
+   */
+  qty?: string;
+  /** Warehouse id */
+  warehouse_id?: number | null;
 }
+
+export type LeadActivityAttachment = {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /** Size */
+  size: number;
+  /**
+   * Content type
+   * @minLength 1
+   */
+  content_type?: string | null;
+  /**
+   * Url
+   * @minLength 1
+   */
+  url: string;
+};
 
 export interface LeadActivity {
   /** Id */
   id: number;
   /** Kind */
-  kind: "created" | "claimed" | "assigned" | "stage" | "comment" | "completed";
+  kind:
+    | "created"
+    | "claimed"
+    | "assigned"
+    | "stage"
+    | "comment"
+    | "completed"
+    | "due_date"
+    | "quality";
   /** Text */
   text: string;
   /** Author id */
@@ -2584,6 +4893,7 @@ export interface LeadActivity {
    * @format date-time
    */
   created_at: string;
+  attachment?: LeadActivityAttachment;
 }
 
 export interface Subtask {
@@ -2613,6 +4923,28 @@ export interface TaskComment {
    * @format date-time
    */
   created_at: string;
+}
+
+export interface TaskFile {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /** Size */
+  size: number;
+  /**
+   * Content type
+   * @minLength 1
+   */
+  content_type?: string | null;
+  /**
+   * Url
+   * @minLength 1
+   */
+  url: string;
 }
 
 export interface Task {
@@ -2655,6 +4987,7 @@ export interface Task {
   assignee_ids: number[];
   subtasks: Subtask[];
   comments: TaskComment[];
+  files?: TaskFile[];
   /** Can edit */
   can_edit: boolean;
   /** Can delete */
@@ -2724,9 +5057,20 @@ export interface LeadDetail {
     | "negotiation"
     | "contract"
     | "won"
-    | "lost";
+    | "lost"
+    | "archived";
   /** Source */
-  source: "website" | "call" | "referral" | "exhibition" | "manual";
+  source: "website" | "call" | "referral" | "exhibition" | "manual" | "meta";
+  /** Kind */
+  kind?: "lead" | "quick_sale";
+  /** Payment method */
+  payment_method?:
+    | "cash"
+    | "card"
+    | "transfer"
+    | "installment"
+    | "other"
+    | null;
   /** Author id */
   author_id: number;
   /** Claimed by id */
@@ -2741,6 +5085,11 @@ export interface LeadDetail {
    * @format date-time
    */
   completed_at?: string | null;
+  /**
+   * Due date
+   * @format date-time
+   */
+  due_date?: string | null;
   /** Lost reason */
   lost_reason?:
     | "price"
@@ -2756,8 +5105,22 @@ export interface LeadDetail {
    * @minLength 1
    */
   lost_note?: string | null;
+  /** Quality */
+  quality?: "good" | "bad" | null;
   /** Customer id */
   customer_id?: number | null;
+  /**
+   * External id
+   * @minLength 1
+   */
+  external_id?: string | null;
+  /**
+   * External form name
+   * @minLength 1
+   */
+  external_form_name?: string | null;
+  /** External data */
+  external_data?: object | null;
   /**
    * Created at
    * @format date-time
@@ -2800,31 +5163,17 @@ export interface LeadCommentWrite {
   text: string;
 }
 
-export interface LeadStageWrite {
-  /** Stage */
-  stage:
-    | "new"
-    | "interested"
-    | "proposal"
-    | "negotiation"
-    | "contract"
-    | "won"
-    | "lost";
-  /** Lost reason */
-  lost_reason?:
-    | "price"
-    | "competitor"
-    | "no_budget"
-    | "no_response"
-    | "not_needed"
-    | "postponed"
-    | "other"
-    | null;
+export interface LeadDueDateWrite {
   /**
-   * Note
-   * @maxLength 2000
+   * Due date
+   * @format date-time
    */
-  note?: string | null;
+  due_date?: string | null;
+}
+
+export interface LeadQualityWrite {
+  /** Quality */
+  quality?: "good" | "bad" | null;
 }
 
 export interface TaskWrite {
@@ -3262,6 +5611,103 @@ export interface Username {
   username: string;
 }
 
+export type NoteVoice = {
+  /** Id */
+  id: number;
+  /**
+   * Name
+   * @minLength 1
+   */
+  name: string;
+  /** Size */
+  size: number;
+  /**
+   * Content type
+   * @minLength 1
+   */
+  content_type?: string | null;
+  /** Duration ms */
+  duration_ms?: number | null;
+  /**
+   * Url
+   * @minLength 1
+   */
+  url: string;
+};
+
+export interface Note {
+  /** Id */
+  id: number;
+  /** Kind */
+  kind: "text" | "voice";
+  /** Title */
+  title: string;
+  /** Body */
+  body: string;
+  /** Color */
+  color: "green" | "violet" | "blue" | "orange" | "pink" | "red";
+  /** Is pinned */
+  is_pinned: boolean;
+  /** Is shared */
+  is_shared: boolean;
+  /** Author id */
+  author_id: number;
+  voice?: NoteVoice;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Updated at
+   * @format date-time
+   */
+  updated_at: string;
+  /** Can edit */
+  can_edit: boolean;
+}
+
+export interface NoteWrite {
+  /**
+   * Title
+   * @default ""
+   */
+  title?: string;
+  /**
+   * Body
+   * @default ""
+   */
+  body?: string;
+  /**
+   * Kind
+   * @default "text"
+   */
+  kind?: "text" | "voice";
+  /**
+   * Color
+   * @default "green"
+   */
+  color?: "green" | "violet" | "blue" | "orange" | "pink" | "red";
+  /**
+   * Is shared
+   * @default false
+   */
+  is_shared?: boolean;
+}
+
+export interface NotePatch {
+  /** Title */
+  title?: string;
+  /** Body */
+  body?: string;
+  /** Color */
+  color?: "green" | "violet" | "blue" | "orange" | "pink" | "red";
+  /** Is pinned */
+  is_pinned?: boolean;
+  /** Is shared */
+  is_shared?: boolean;
+}
+
 export interface B2BNotification {
   /** Id */
   id: number;
@@ -3333,6 +5779,259 @@ export interface OrgPerson {
    * @minLength 1
    */
   company_name?: string | null;
+}
+
+export interface ReportPeriod {
+  /**
+   * Period
+   * @minLength 1
+   */
+  period: string;
+  /**
+   * Start
+   * @format date-time
+   */
+  start: string;
+  /**
+   * End
+   * @format date-time
+   */
+  end: string;
+  /**
+   * Bucket
+   * @minLength 1
+   */
+  bucket: string;
+}
+
+export interface SalesStagePoint {
+  /**
+   * Stage
+   * @minLength 1
+   */
+  stage: string;
+  /** Count */
+  count: number;
+  /**
+   * Amount
+   * @minLength 1
+   */
+  amount: string;
+}
+
+export interface SalesSourcePoint {
+  /**
+   * Source
+   * @minLength 1
+   */
+  source: string;
+  /** Count */
+  count: number;
+  /** Won count */
+  won_count: number;
+  /**
+   * Won amount
+   * @minLength 1
+   */
+  won_amount: string;
+}
+
+export interface LostReasonPoint {
+  /**
+   * Reason
+   * @minLength 1
+   */
+  reason: string;
+  /** Count */
+  count: number;
+}
+
+export interface SalesTrendPoint {
+  /**
+   * Date
+   * @format date-time
+   */
+  date: string;
+  /** Created count */
+  created_count: number;
+  /** Won count */
+  won_count: number;
+  /**
+   * Won amount
+   * @minLength 1
+   */
+  won_amount: string;
+}
+
+export interface SalesLeader {
+  /** Employee id */
+  employee_id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /** Won count */
+  won_count: number;
+  /**
+   * Won amount
+   * @minLength 1
+   */
+  won_amount: string;
+}
+
+export type SalesReport = {
+  /** Created count */
+  created_count: number;
+  /** Won count */
+  won_count: number;
+  /** Lost count */
+  lost_count: number;
+  /** Open count */
+  open_count: number;
+  /**
+   * Won amount
+   * @minLength 1
+   */
+  won_amount: string;
+  /**
+   * Open amount
+   * @minLength 1
+   */
+  open_amount: string;
+  /** Conversion rate */
+  conversion_rate: number;
+  /**
+   * Average deal
+   * @minLength 1
+   */
+  average_deal: string;
+  by_stage: SalesStagePoint[];
+  by_source: SalesSourcePoint[];
+  lost_reasons: LostReasonPoint[];
+  trend: SalesTrendPoint[];
+  leaders: SalesLeader[];
+} | null;
+
+export interface TaskPriorityPoint {
+  /**
+   * Priority
+   * @minLength 1
+   */
+  priority: string;
+  /** Count */
+  count: number;
+}
+
+export interface TaskTrendPoint {
+  /**
+   * Date
+   * @format date-time
+   */
+  date: string;
+  /** Created count */
+  created_count: number;
+  /** Completed count */
+  completed_count: number;
+}
+
+export interface TaskLeader {
+  /** Employee id */
+  employee_id: number;
+  /**
+   * Full name
+   * @minLength 1
+   */
+  full_name: string;
+  /**
+   * Photo
+   * @minLength 1
+   */
+  photo?: string | null;
+  /** Completed count */
+  completed_count: number;
+  /** On time rate */
+  on_time_rate: number;
+}
+
+export type TaskReport = {
+  /** Created count */
+  created_count: number;
+  /** Completed count */
+  completed_count: number;
+  /** Open count */
+  open_count: number;
+  /** Todo count */
+  todo_count: number;
+  /** In progress count */
+  in_progress_count: number;
+  /** Overdue count */
+  overdue_count: number;
+  /** Due today count */
+  due_today_count: number;
+  /** On time rate */
+  on_time_rate: number;
+  by_priority: TaskPriorityPoint[];
+  trend: TaskTrendPoint[];
+  leaders: TaskLeader[];
+} | null;
+
+export interface EventTypePoint {
+  /**
+   * Event type
+   * @minLength 1
+   */
+  event_type: string;
+  /** Count */
+  count: number;
+}
+
+export interface EventWeekdayPoint {
+  /** Weekday */
+  weekday: number;
+  /** Count */
+  count: number;
+}
+
+export interface EventTrendPoint {
+  /**
+   * Date
+   * @format date-time
+   */
+  date: string;
+  /** Count */
+  count: number;
+}
+
+export type CalendarReport = {
+  /** Total count */
+  total_count: number;
+  /** All day count */
+  all_day_count: number;
+  /** Upcoming count */
+  upcoming_count: number;
+  /** Hours */
+  hours: number;
+  by_type: EventTypePoint[];
+  by_weekday: EventWeekdayPoint[];
+  trend: EventTrendPoint[];
+} | null;
+
+export interface WorkspaceReport {
+  period: ReportPeriod;
+  /**
+   * Scope
+   * @minLength 1
+   */
+  scope: string;
+  sales: SalesReport;
+  tasks: TaskReport;
+  calendar: CalendarReport;
 }
 
 export interface SecondmentRequest {
@@ -3582,6 +6281,16 @@ export interface TeamMember {
    * @default false
    */
   is_guest?: boolean;
+  /**
+   * Is online
+   * @default false
+   */
+  is_online?: boolean;
+  /**
+   * Last seen at
+   * @minLength 1
+   */
+  last_seen_at?: string | null;
 }
 
 export interface ChatMessage {
@@ -3981,6 +6690,7 @@ export interface BookingRoom {
    * Currency
    * @minLength 1
    * @maxLength 8
+   * @default "uzs"
    */
   currency?: string;
   guests: Guest[];
@@ -4216,6 +6926,1507 @@ export interface PartnerDevice {
   device_type: "ios" | "android";
 }
 
+export type PrefectureDistrictList = {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+};
+
+export interface PrefectureList {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  district: PrefectureDistrictList;
+}
+
+export interface ApartmentAdminUpdate {
+  /**
+   * Title
+   * @minLength 1
+   */
+  title?: string;
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string;
+  /** Currency */
+  currency?: "USD" | "UZS";
+  /**
+   * Latitude
+   * @format decimal
+   */
+  latitude?: string | null;
+  /**
+   * Longitude
+   * @format decimal
+   */
+  longitude?: string | null;
+  /** City */
+  city?: string | null;
+  /** Country */
+  country?: string | null;
+  /** Region id */
+  region_id?: number | null;
+  /** District id */
+  district_id?: number | null;
+  /**
+   * Prefecture id
+   * @format uuid
+   */
+  prefecture_id?: string | null;
+  services?: string[];
+  img?: string[];
+  /**
+   * Description ru
+   * @minLength 1
+   */
+  description_ru?: string;
+  /**
+   * Description uz
+   * @minLength 1
+   */
+  description_uz?: string;
+  /**
+   * Description en
+   * @minLength 1
+   */
+  description_en?: string;
+  /** Check in */
+  check_in?: string;
+  /** Check out */
+  check_out?: string;
+  /** Is allowed alcohol */
+  is_allowed_alcohol?: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate?: boolean;
+  /** Is allowed pets */
+  is_allowed_pets?: boolean;
+  /** Is quiet hours */
+  is_quiet_hours?: boolean;
+  /** Apartment number */
+  apartment_number?: string;
+  /** Home number */
+  home_number?: string;
+  /** Entrance number */
+  entrance_number?: string;
+  /** Floor number */
+  floor_number?: string;
+  /** Pass code */
+  pass_code?: string;
+  /** Guests */
+  guests?: number;
+  /** Rooms */
+  rooms?: number;
+  /** Beds */
+  beds?: number;
+  /** Bathrooms */
+  bathrooms?: number;
+  /** Is verified */
+  is_verified?: boolean;
+  /**
+   * Verified at
+   * @format date-time
+   */
+  verified_at?: string | null;
+  /** Verification status */
+  verification_status?: string;
+  /** Is archived */
+  is_archived?: boolean;
+  /** Is recommended */
+  is_recommended?: boolean;
+  /** Is testing */
+  is_testing?: boolean;
+  /** Partner user id */
+  partner_user_id?: number | null;
+  /** Verified by user id */
+  verified_by_user_id?: number | null;
+  /**
+   * Comment count
+   * @min 0
+   */
+  comment_count?: number;
+  /** Legacy property id */
+  legacy_property_id?: number | null;
+}
+
+export type ApartmentPropertyLocationRegionOutput = {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export type ApartmentPropertyLocationDistrictOutput = {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export type ApartmentPropertyLocationPrefectureOutput = {
+  /** Id */
+  id?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export interface ApartmentPropertyLocationOutput {
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  region: ApartmentPropertyLocationRegionOutput;
+  district: ApartmentPropertyLocationDistrictOutput;
+  prefecture: ApartmentPropertyLocationPrefectureOutput;
+}
+
+export interface ApartmentAdminPropertyDetail {
+  /**
+   * Description ru
+   * @minLength 1
+   */
+  description_ru?: string | null;
+  /**
+   * Description uz
+   * @minLength 1
+   */
+  description_uz?: string | null;
+  /**
+   * Description en
+   * @minLength 1
+   */
+  description_en?: string | null;
+  /**
+   * Apartment number
+   * @minLength 1
+   */
+  apartment_number?: string | null;
+  /**
+   * Home number
+   * @minLength 1
+   */
+  home_number?: string | null;
+  /**
+   * Entrance number
+   * @minLength 1
+   */
+  entrance_number?: string | null;
+  /**
+   * Floor number
+   * @minLength 1
+   */
+  floor_number?: string | null;
+  /**
+   * Pass code
+   * @minLength 1
+   */
+  pass_code?: string | null;
+}
+
+export type ApartmentPartnerUser = {
+  /** Id */
+  id: number;
+  /** Role */
+  role?: string | null;
+  /** First name */
+  first_name?: string | null;
+  /** Last name */
+  last_name?: string | null;
+  /** Phone number */
+  phone_number?: string | null;
+  /** Email */
+  email?: string | null;
+  /** Username */
+  username?: string | null;
+  /** Avatar */
+  avatar?: string | null;
+  /** Is active */
+  is_active: boolean;
+  /** Is verified */
+  is_verified: boolean;
+};
+
+export interface ApartmentAdminList {
+  /** Id */
+  id?: number;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  img: string[];
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string | null;
+  /** Currency */
+  currency?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  property_location?: ApartmentPropertyLocationOutput;
+  services: (string | null)[];
+  /** Region id */
+  region_id?: number | null;
+  /** District id */
+  district_id?: number | null;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Property room */
+  property_room?: Record<string, string | null>;
+  /** Apartment number */
+  apartment_number?: string | null;
+  /** Home number */
+  home_number?: string | null;
+  /** Entrance number */
+  entrance_number?: string | null;
+  /** Floor number */
+  floor_number?: string | null;
+  /** Pass code */
+  pass_code?: string | null;
+  /** Average rating */
+  average_rating?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Property type id
+   * @format uuid
+   */
+  property_type_id: string;
+  /** Property type */
+  property_type: Record<string, string | null>;
+  /** Verification status */
+  verification_status?: string | null;
+  /** Is recommended */
+  is_recommended?: boolean | null;
+  /** Is verified */
+  is_verified?: boolean;
+  /** Is archived */
+  is_archived?: boolean;
+  /** Is testing */
+  is_testing?: boolean;
+  property_detail?: ApartmentAdminPropertyDetail;
+  partner_user?: ApartmentPartnerUser;
+}
+
+export interface CottageMonthlyPriceItem {
+  /**
+   * Month from
+   * @format date
+   */
+  month_from?: string | null;
+  /**
+   * Month to
+   * @format date
+   */
+  month_to?: string | null;
+  /**
+   * Price per person
+   * @format decimal
+   */
+  price_per_person?: string | null;
+  /**
+   * Price on working days
+   * @format decimal
+   */
+  price_on_working_days?: string | null;
+  /**
+   * Price on weekends
+   * @format decimal
+   */
+  price_on_weekends?: string | null;
+}
+
+export type CottagePartnerUserUpdate = {
+  /** Id */
+  id?: number | null;
+  /** Role */
+  role?: string | null;
+  /** First name */
+  first_name?: string | null;
+  /** Last name */
+  last_name?: string | null;
+  /** Phone number */
+  phone_number?: string | null;
+  /** Email */
+  email?: string | null;
+  /** Username */
+  username?: string | null;
+  /** Avatar */
+  avatar?: string | null;
+  /** Is active */
+  is_active?: boolean;
+  /** Is verified */
+  is_verified?: boolean;
+};
+
+export interface CottageAdminUpdate {
+  /** Title */
+  title?: string;
+  /** Currency */
+  currency?: "USD" | "UZS";
+  /**
+   * Weekend only sunday inclusive
+   * @default false
+   */
+  weekend_only_sunday_inclusive?: boolean;
+  /**
+   * Price per person
+   * @format decimal
+   */
+  price_per_person?: string | null;
+  /**
+   * Price on working days
+   * @format decimal
+   */
+  price_on_working_days?: string | null;
+  /**
+   * Price on weekends
+   * @format decimal
+   */
+  price_on_weekends?: string | null;
+  /**
+   * Month from
+   * @format date
+   */
+  month_from?: string | null;
+  /**
+   * Month to
+   * @format date
+   */
+  month_to?: string | null;
+  /**
+   * Next month from
+   * @format date
+   */
+  next_month_from?: string | null;
+  /**
+   * Next month to
+   * @format date
+   */
+  next_month_to?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  /** Region id */
+  region_id?: string | null;
+  /** District id */
+  district_id?: string | null;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Description en */
+  description_en?: string | null;
+  /** Description ru */
+  description_ru?: string | null;
+  /** Description uz */
+  description_uz?: string | null;
+  /** Check in */
+  check_in?: string | null;
+  /** Check out */
+  check_out?: string | null;
+  /** Is allowed alcohol */
+  is_allowed_alcohol?: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate?: boolean;
+  /** Is allowed pets */
+  is_allowed_pets?: boolean;
+  /** Is quiet hours */
+  is_quiet_hours?: boolean;
+  services?: (string | null)[];
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  img?: string[];
+  price?: CottageMonthlyPriceItem[];
+  /** Is verified */
+  is_verified?: boolean;
+  /**
+   * Verified at
+   * @format date-time
+   */
+  verified_at?: string | null;
+  /** Verification status */
+  verification_status?: string | null;
+  /** Is archived */
+  is_archived?: boolean;
+  /** Is recommended */
+  is_recommended?: boolean;
+  /** Is testing */
+  is_testing?: boolean;
+  partner_user?: CottagePartnerUserUpdate;
+  /** Verified by user id */
+  verified_by_user_id?: number | null;
+  /**
+   * Comment count
+   * @min 0
+   */
+  comment_count?: number;
+  /** Legacy property id */
+  legacy_property_id?: number | null;
+}
+
+export type CottagePropertyLocationRegionOutput = {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export type CottagePropertyLocationDistrictOutput = {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export type CottagePropertyLocationPrefectureOutput = {
+  /** Id */
+  id?: string | null;
+  /** Name */
+  name?: string | null;
+};
+
+export interface CottagePropertyLocationOutput {
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  region: CottagePropertyLocationRegionOutput;
+  district: CottagePropertyLocationDistrictOutput;
+  prefecture: CottagePropertyLocationPrefectureOutput;
+}
+
+export type RawRegion = {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  /** Img */
+  img?: string | null;
+};
+
+export type RawDistrict = {
+  /** Id */
+  id?: number | null;
+  /** Region id */
+  region_id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  region: RawRegion;
+};
+
+export interface CottageAdminPropertyDetail {
+  /**
+   * Description ru
+   * @minLength 1
+   */
+  description_ru?: string | null;
+  /**
+   * Description uz
+   * @minLength 1
+   */
+  description_uz?: string | null;
+  /**
+   * Description en
+   * @minLength 1
+   */
+  description_en?: string | null;
+  /**
+   * Check in
+   * @minLength 1
+   */
+  check_in?: string | null;
+  /**
+   * Check out
+   * @minLength 1
+   */
+  check_out?: string | null;
+  /** Is allowed alcohol */
+  is_allowed_alcohol: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /** Is allowed pets */
+  is_allowed_pets: boolean;
+  /** Is quiet hours */
+  is_quiet_hours: boolean;
+}
+
+export type CottagePartnerUser = {
+  /** Id */
+  id: number;
+  /** Role */
+  role?: string | null;
+  /** First name */
+  first_name?: string | null;
+  /** Last name */
+  last_name?: string | null;
+  /** Phone number */
+  phone_number?: string | null;
+  /** Email */
+  email?: string | null;
+  /** Username */
+  username?: string | null;
+  /** Avatar */
+  avatar?: string | null;
+  /** Is active */
+  is_active: boolean;
+  /** Is verified */
+  is_verified: boolean;
+};
+
+export interface CottageAdminList {
+  /** Id */
+  id?: number;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  img: string[];
+  /**
+   * Price per person
+   * @format decimal
+   */
+  price_per_person?: string | null;
+  /**
+   * Price on working days
+   * @format decimal
+   */
+  price_on_working_days?: string | null;
+  /**
+   * Price on weekends
+   * @format decimal
+   */
+  price_on_weekends?: string | null;
+  /** Currency */
+  currency?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  property_location?: CottagePropertyLocationOutput;
+  services: (string | null)[];
+  region: RawRegion;
+  district: RawDistrict;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Property room */
+  property_room?: Record<string, string | null>;
+  /** Comment count */
+  comment_count: number;
+  /** Average rating */
+  average_rating?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Property type id
+   * @format uuid
+   */
+  property_type_id: string;
+  /** Property type */
+  property_type: Record<string, string | null>;
+  price?: (string | null)[];
+  /** Verification status */
+  verification_status?: string | null;
+  /** Weekend only sunday inclusive */
+  weekend_only_sunday_inclusive?: boolean | null;
+  /** Is recommended */
+  is_recommended?: boolean | null;
+  /** Is verified */
+  is_verified?: boolean;
+  /** Is archived */
+  is_archived?: boolean;
+  /** Is testing */
+  is_testing?: boolean;
+  /** Description */
+  description?: string | null;
+  property_detail?: CottageAdminPropertyDetail;
+  partner_user?: CottagePartnerUser;
+}
+
+export interface DistrictList {
+  /** Id */
+  id?: number | null;
+  /** Region id */
+  region_id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  region: RawRegion;
+}
+
+export interface RegionList {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  /** Img */
+  img?: string | null;
+}
+
+export interface ApartmentList {
+  /** Id */
+  id?: number;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  img: string[];
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string | null;
+  /** Currency */
+  currency?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  property_location?: ApartmentPropertyLocationOutput;
+  services: (string | null)[];
+  /** Region id */
+  region_id?: number | null;
+  /** District id */
+  district_id?: number | null;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Property room */
+  property_room?: Record<string, string | null>;
+  /** Apartment number */
+  apartment_number?: string | null;
+  /** Home number */
+  home_number?: string | null;
+  /** Entrance number */
+  entrance_number?: string | null;
+  /** Floor number */
+  floor_number?: string | null;
+  /** Pass code */
+  pass_code?: string | null;
+  /** Average rating */
+  average_rating?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Property type id
+   * @format uuid
+   */
+  property_type_id: string;
+  /** Property type */
+  property_type: Record<string, string | null>;
+}
+
+export interface ApartmentCreate {
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string;
+  /**
+   * Currency
+   * @default "UZS"
+   */
+  currency?: "USD" | "UZS";
+  /**
+   * Latitude
+   * @format decimal
+   */
+  latitude?: string | null;
+  /**
+   * Longitude
+   * @format decimal
+   */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  /** Region id */
+  region_id?: number | null;
+  /** District id */
+  district_id?: number | null;
+  /**
+   * Prefecture id
+   * @format uuid
+   */
+  prefecture_id?: string | null;
+  services?: string[];
+  img?: string[];
+  /** Apartment number */
+  apartment_number: number;
+  /** Home number */
+  home_number: number;
+  /** Entrance number */
+  entrance_number: number;
+  /** Floor number */
+  floor_number: number;
+  /** Pass code */
+  pass_code: number;
+  /**
+   * Description ru
+   * @minLength 1
+   */
+  description_ru: string;
+  /**
+   * Description uz
+   * @minLength 1
+   */
+  description_uz: string;
+  /**
+   * Description en
+   * @minLength 1
+   */
+  description_en?: string;
+  /** Check in */
+  check_in: string;
+  /** Check out */
+  check_out: string;
+  /** Is allowed alcohol */
+  is_allowed_alcohol: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /** Is allowed pets */
+  is_allowed_pets: boolean;
+  /** Is quiet hours */
+  is_quiet_hours: boolean;
+  /** Guests */
+  guests: number;
+  /** Rooms */
+  rooms: number;
+  /** Beds */
+  beds: number;
+  /** Bathrooms */
+  bathrooms: number;
+}
+
+export interface ApartmentUpdate {
+  /**
+   * Title
+   * @minLength 1
+   */
+  title?: string;
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string;
+  /** Currency */
+  currency?: "USD" | "UZS";
+  /**
+   * Latitude
+   * @format decimal
+   */
+  latitude?: string | null;
+  /**
+   * Longitude
+   * @format decimal
+   */
+  longitude?: string | null;
+  /** City */
+  city?: string | null;
+  /** Country */
+  country?: string | null;
+  /** Region id */
+  region_id?: number | null;
+  /** District id */
+  district_id?: number | null;
+  /**
+   * Prefecture id
+   * @format uuid
+   */
+  prefecture_id?: string | null;
+  services?: string[];
+  img?: string[];
+  /**
+   * Description ru
+   * @minLength 1
+   */
+  description_ru?: string;
+  /**
+   * Description uz
+   * @minLength 1
+   */
+  description_uz?: string;
+  /**
+   * Description en
+   * @minLength 1
+   */
+  description_en?: string;
+  /** Check in */
+  check_in?: string;
+  /** Check out */
+  check_out?: string;
+  /** Is allowed alcohol */
+  is_allowed_alcohol?: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate?: boolean;
+  /** Is allowed pets */
+  is_allowed_pets?: boolean;
+  /** Is quiet hours */
+  is_quiet_hours?: boolean;
+  /** Apartment number */
+  apartment_number?: string;
+  /** Home number */
+  home_number?: string;
+  /** Entrance number */
+  entrance_number?: string;
+  /** Floor number */
+  floor_number?: string;
+  /** Pass code */
+  pass_code?: string;
+  /** Guests */
+  guests?: number;
+  /** Rooms */
+  rooms?: number;
+  /** Beds */
+  beds?: number;
+  /** Bathrooms */
+  bathrooms?: number;
+}
+
+export interface RawPropertyReviewClient {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** First name */
+  first_name?: string | null;
+  /** Last name */
+  last_name?: string | null;
+}
+
+export interface RawPropertyReview {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  client: RawPropertyReviewClient;
+  /**
+   * Rating
+   * @format decimal
+   */
+  rating?: string | null;
+  /** Comment */
+  comment?: string | null;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+}
+
+export interface RawPropertyReviewCreate {
+  /**
+   * Rating
+   * @format decimal
+   */
+  rating: string;
+  /** Comment */
+  comment?: string | null;
+}
+
+export interface RawPropertyType {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  /**
+   * Icon url
+   * @minLength 1
+   */
+  icon_url?: string | null;
+  /**
+   * Kind
+   * @minLength 1
+   */
+  kind: string;
+}
+
+export interface CottageList {
+  /** Id */
+  id?: number;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  img: string[];
+  /**
+   * Price per person
+   * @format decimal
+   */
+  price_per_person?: string | null;
+  /**
+   * Price on working days
+   * @format decimal
+   */
+  price_on_working_days?: string | null;
+  /**
+   * Price on weekends
+   * @format decimal
+   */
+  price_on_weekends?: string | null;
+  /** Currency */
+  currency?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  property_location?: CottagePropertyLocationOutput;
+  services: (string | null)[];
+  region: RawRegion;
+  district: RawDistrict;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Property room */
+  property_room?: Record<string, string | null>;
+  /** Comment count */
+  comment_count: number;
+  /** Average rating */
+  average_rating?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Property type id
+   * @format uuid
+   */
+  property_type_id: string;
+  /** Property type */
+  property_type: Record<string, string | null>;
+  price?: (string | null)[];
+}
+
+export interface PropertyPriceHistogramBucket {
+  /**
+   * Min price
+   * @format decimal
+   */
+  min_price: string;
+  /**
+   * Max price
+   * @format decimal
+   */
+  max_price: string;
+  /** Count */
+  count: number;
+}
+
+export interface PropertyPriceHistogram {
+  /**
+   * Currency
+   * @minLength 1
+   */
+  currency: string;
+  /** Total */
+  total: number;
+  /**
+   * Min price
+   * @format decimal
+   */
+  min_price?: string | null;
+  /**
+   * Max price
+   * @format decimal
+   */
+  max_price?: string | null;
+  buckets: PropertyPriceHistogramBucket[];
+}
+
+export interface LocationPrefecture {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+}
+
+export interface LocationDistrictList {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  prefectures?: LocationPrefecture[];
+}
+
+export interface LocationRegionList {
+  /** Id */
+  id?: number | null;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  districts?: LocationDistrictList[];
+}
+
+export interface RegionsResponse {
+  regions: LocationRegionList[];
+}
+
+export interface PropertyMapPin {
+  /**
+   * Guid
+   * @minLength 1
+   */
+  guid: string;
+  /**
+   * Kind
+   * @minLength 1
+   */
+  kind: string;
+  /** Latitude */
+  latitude: number;
+  /** Longitude */
+  longitude: number;
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string | null;
+  /** Currency */
+  currency: string;
+  /** Is favorite */
+  is_favorite: boolean;
+}
+
+export interface PropertyMapCluster {
+  /** Latitude */
+  latitude: number;
+  /** Longitude */
+  longitude: number;
+  /** Count */
+  count: number;
+  /**
+   * Min price
+   * @format decimal
+   */
+  min_price?: string | null;
+  /** Currency */
+  currency: string;
+}
+
+export interface PropertyMapResponse {
+  /** Total */
+  total: number;
+  /** Truncated */
+  truncated: boolean;
+  pins: PropertyMapPin[];
+  clusters: PropertyMapCluster[];
+}
+
+export interface PropertyCard {
+  /**
+   * Guid
+   * @minLength 1
+   */
+  guid: string;
+  /**
+   * Kind
+   * @minLength 1
+   */
+  kind: string;
+  /**
+   * Property type id
+   * @minLength 1
+   */
+  property_type_id?: string | null;
+  /** Title */
+  title: string;
+  img: string[];
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string | null;
+  /**
+   * Price per person
+   * @format decimal
+   */
+  price_per_person?: string | null;
+  /** Currency */
+  currency: string;
+  /** Rating */
+  rating?: number | null;
+  /** Comment count */
+  comment_count: number;
+  /** Location label */
+  location_label: string;
+  /** Guests */
+  guests?: number | null;
+  /** Star rating */
+  star_rating?: number | null;
+  /** Latitude */
+  latitude?: number | null;
+  /** Longitude */
+  longitude?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+}
+
+export interface ApartmentPartnerList {
+  /** Id */
+  id?: number;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  img: string[];
+  /**
+   * Price
+   * @format decimal
+   */
+  price?: string | null;
+  /** Currency */
+  currency?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  property_location?: ApartmentPropertyLocationOutput;
+  services: (string | null)[];
+  /** Region id */
+  region_id?: number | null;
+  /** District id */
+  district_id?: number | null;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Property room */
+  property_room?: Record<string, string | null>;
+  /** Apartment number */
+  apartment_number?: string | null;
+  /** Home number */
+  home_number?: string | null;
+  /** Entrance number */
+  entrance_number?: string | null;
+  /** Floor number */
+  floor_number?: string | null;
+  /** Pass code */
+  pass_code?: string | null;
+  /** Average rating */
+  average_rating?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Property type id
+   * @format uuid
+   */
+  property_type_id: string;
+  /** Property type */
+  property_type: Record<string, string | null>;
+  /** Verification status */
+  verification_status?: string | null;
+  /** Is recommended */
+  is_recommended?: boolean | null;
+}
+
+export interface CottagePartnerList {
+  /** Id */
+  id?: number;
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid: string;
+  /**
+   * Title
+   * @minLength 1
+   */
+  title: string;
+  img: string[];
+  /**
+   * Price per person
+   * @format decimal
+   */
+  price_per_person?: string | null;
+  /**
+   * Price on working days
+   * @format decimal
+   */
+  price_on_working_days?: string | null;
+  /**
+   * Price on weekends
+   * @format decimal
+   */
+  price_on_weekends?: string | null;
+  /** Currency */
+  currency?: string | null;
+  /** Latitude */
+  latitude?: string | null;
+  /** Longitude */
+  longitude?: string | null;
+  /** Country */
+  country?: string | null;
+  /** City */
+  city?: string | null;
+  property_location?: CottagePropertyLocationOutput;
+  services: (string | null)[];
+  region: RawRegion;
+  district: RawDistrict;
+  /** Prefecture id */
+  prefecture_id?: string | null;
+  /** Guests */
+  guests?: number | null;
+  /** Rooms */
+  rooms?: number | null;
+  /** Beds */
+  beds?: number | null;
+  /** Bathrooms */
+  bathrooms?: number | null;
+  /** Property room */
+  property_room?: Record<string, string | null>;
+  /** Comment count */
+  comment_count: number;
+  /** Average rating */
+  average_rating?: number | null;
+  /** Is favorite */
+  is_favorite: boolean;
+  /** Is allowed corporate */
+  is_allowed_corporate: boolean;
+  /**
+   * Created at
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * Property type id
+   * @format uuid
+   */
+  property_type_id: string;
+  /** Property type */
+  property_type: Record<string, string | null>;
+  price?: (string | null)[];
+  /** Verification status */
+  verification_status?: string | null;
+  /** Weekend only sunday inclusive */
+  weekend_only_sunday_inclusive?: boolean | null;
+  /** Is recommended */
+  is_recommended?: boolean | null;
+}
+
 export interface RecommendationItem {
   /**
    * Property guid
@@ -4229,6 +8440,23 @@ export interface RecommendationItem {
   property_kind: string;
   /** Similarity */
   similarity: number;
+}
+
+export interface PropertyServiceList {
+  /**
+   * Guid
+   * @format uuid
+   */
+  guid?: string | null;
+  /** Title */
+  title?: string | null;
+  /** Icon url */
+  icon_url?: string | null;
+  /**
+   * Category key
+   * @minLength 1
+   */
+  category_key?: string | null;
 }
 
 export interface AdminBanner {
@@ -4715,6 +8943,10 @@ export type AdminAuthB2BCompaniesUsersListData = B2BUser[];
 
 export type AdminAuthB2BCompaniesUsersCreateData = B2BUser;
 
+export type AdminAuthB2BOwnershipRequestsListData = any;
+
+export type AdminAuthB2BOwnershipRequestsDecideCreateData = any;
+
 export type AdminAuthB2BSupportListData = SupportThread[];
 
 export type AdminAuthB2BSupportReadData = SupportMessage[];
@@ -4928,6 +9160,8 @@ export type B2BWorkspaceAccountMeDeletionListData = any;
 
 export type B2BWorkspaceAccountOrgsWorkspacesListData = any;
 
+export type B2BWorkspaceAccountTokenRefreshCreateData = any;
+
 export type B2BWorkspaceAccountUsernameCheckListData = any;
 
 export type B2BWorkspaceAccountUsernameSuggestionListData = any;
@@ -4940,13 +9174,37 @@ export type B2BWorkspaceAccountWorkspacesSearchListData = any;
 
 export type B2BWorkspaceAccountWorkspacesOpenCreateData = any;
 
+export type B2BWorkspaceAnalystListData = any;
+
+export type B2BWorkspaceAnalystReportsListData = any;
+
+export type B2BWorkspaceAnalystReportsCreateData = Generate;
+
+export type B2BWorkspaceAnalystReportsReadData = any;
+
+export type B2BWorkspaceAnalystReportsDiscussCreateData = Discuss;
+
+export type B2BWorkspaceAnalystSeenCreateData = any;
+
 export type B2BWorkspaceAppVersionListData = any;
+
+export type B2BWorkspaceArchiveListData = any;
+
+export type B2BWorkspaceAssistantListData = any;
+
+export type B2BWorkspaceAssistantMessagesListData = any;
+
+export type B2BWorkspaceAssistantMessagesCreateData = AiSend;
+
+export type B2BWorkspaceAssistantMessagesDeleteData = any;
 
 export type B2BWorkspaceAttendanceListData = AttendanceDay;
 
 export type B2BWorkspaceAttendanceAbsenceCreateData = AttendanceDay;
 
 export type B2BWorkspaceAttendanceCheckInCreateData = AttendanceDay;
+
+export type B2BWorkspaceAttendanceCheckOutCreateData = AttendanceDay;
 
 export type B2BWorkspaceAttendanceLocationListData = AttendanceLocation;
 
@@ -4964,19 +9222,57 @@ export type B2BWorkspaceAuthLogoutCreateData = any;
 
 export type B2BWorkspaceAuthTokenRefreshCreateData = any;
 
+export type B2BWorkspaceCallsCreateData = Call;
+
+export type B2BWorkspaceCallsHistoryListData = Call[];
+
+export type B2BWorkspaceCallsIncomingListData = Call;
+
+export type B2BWorkspaceCallsReadData = Call;
+
+export type B2BWorkspaceCallsAcceptCreateData = Call;
+
+export type B2BWorkspaceCallsDeclineCreateData = Call;
+
+export type B2BWorkspaceCallsEndCreateData = Call;
+
+export type B2BWorkspaceCallsTokenListData = Call;
+
 export type B2BWorkspaceChatsListData = ChatThread[];
 
 export type B2BWorkspaceChatsCreateData = ChatThread;
 
 export type B2BWorkspaceChatsFlagsCreateData = ChatThread;
 
+export type B2BWorkspaceChatsGroupListData = ChatGroup;
+
+export type B2BWorkspaceChatsGroupPartialUpdateData = ChatGroup;
+
+export type B2BWorkspaceChatsMembersCreateData = ChatGroup;
+
+export type B2BWorkspaceChatsMembersPartialUpdateData = ChatGroup;
+
+export type B2BWorkspaceChatsMembersDeleteData = ChatGroup;
+
 export type B2BWorkspaceChatsMessagesListData = WorkspaceChatMessage[];
 
 export type B2BWorkspaceChatsMessagesCreateData = WorkspaceChatMessage;
 
+export type B2BWorkspaceChatsMessagesPartialUpdateData = WorkspaceChatMessage;
+
 export type B2BWorkspaceChatsMessagesDeleteData = any;
 
+export type B2BWorkspaceChatsMessagesPinCreateData = WorkspaceChatMessage;
+
+export type B2BWorkspaceChatsMessagesPinDeleteData = WorkspaceChatMessage;
+
+export type B2BWorkspaceChatsMessagesReactionsCreateData = WorkspaceChatMessage;
+
 export type B2BWorkspaceChatsReadCreateData = any;
+
+export type B2BWorkspaceCompanyOwnershipRequestsListData = any;
+
+export type B2BWorkspaceCompanyOwnershipRequestsCreateData = OwnershipRequest;
 
 export type B2BWorkspaceCrmCustomersListData = CrmCustomerList;
 
@@ -4984,15 +9280,25 @@ export type B2BWorkspaceCrmCustomersReadData = CrmCustomerDetail;
 
 export type B2BWorkspaceCustomersListData = CustomerList;
 
-export type B2BWorkspaceEmployeeOfMonthListData = EmployeeOfMonth;
+export type B2BWorkspaceDeleteRequestsListData = any;
 
-export type B2BWorkspaceEmployeeOfMonthCreateData = EmployeeOfMonth;
+export type B2BWorkspaceDeleteRequestsCreate1Data = WorkspaceDeleteRequest;
+
+export type B2BWorkspaceDeleteRequestsCreate2Data = any;
+
+export type B2BWorkspaceEmployeeOfMonthListData = EmployeeOfMonthList;
+
+export type B2BWorkspaceEmployeeOfMonthCreateData = EmployeeOfMonthList;
 
 export type B2BWorkspaceEmployeeOfMonthStatsListData = EmployeeMonthlyStat[];
 
 export type B2BWorkspaceEmployeesAccessListData = any;
 
 export type B2BWorkspaceEmployeesAccessUpdateData = EmployeeAccess;
+
+export type B2BWorkspaceEmployeesRemoveCreateData = EmployeeRemove;
+
+export type B2BWorkspaceEmployeesStatsListData = EmployeeStats;
 
 export type B2BWorkspaceEventsListData = CalendarEvent[];
 
@@ -5017,6 +9323,133 @@ export type B2BWorkspaceFoldersListData = WorkspaceFolderList;
 export type B2BWorkspaceFoldersCreateData = WorkspaceFolder;
 
 export type B2BWorkspaceFoldersDeleteData = any;
+
+export type B2BWorkspaceIntegrationsListData = IntegrationList;
+
+export type B2BWorkspaceIntegrationsMetaListData = Integration;
+
+export type B2BWorkspaceIntegrationsMetaDeleteData = Integration;
+
+export type B2BWorkspaceIntegrationsMetaAppListData = MetaSetup;
+
+export type B2BWorkspaceIntegrationsMetaAppUpdateData = MetaSetup;
+
+export type B2BWorkspaceIntegrationsMetaAppDeleteData = MetaSetup;
+
+export type B2BWorkspaceIntegrationsMetaConnectCreateData = MetaConnect;
+
+export type B2BWorkspaceIntegrationsMetaPagesPartialUpdateData = Integration;
+
+export type B2BWorkspaceIntegrationsMetaSyncCreateData = any;
+
+export type B2BWorkspaceIntegrationsReadData = Integration;
+
+export type B2BWorkspaceIntegrationsCreateData = Integration;
+
+export type B2BWorkspaceIntegrationsPartialUpdateData = Integration;
+
+export type B2BWorkspaceIntegrationsDeleteData = Integration;
+
+export type B2BWorkspaceIntegrationsConversationsListData = AiConversationList;
+
+export type B2BWorkspaceIntegrationsConversationsCreateData =
+  AiConversationDetail;
+
+export type B2BWorkspaceIntegrationsConversationsReadData =
+  AiConversationDetail;
+
+export type B2BWorkspaceIntegrationsConversationsDeleteData = any;
+
+export type B2BWorkspaceIntegrationsConversationsMessagesCreateData =
+  AiConversationDetail;
+
+export type B2BWorkspaceIntegrationsImportCreateData = AiImportResult;
+
+export type B2BWorkspaceIntegrationsProjectsListData = AiProjectList;
+
+export type B2BWorkspaceInventoryCategoriesListData = Category[];
+
+export type B2BWorkspaceInventoryCategoriesCreateData = Category;
+
+export type B2BWorkspaceInventoryCategoriesPartialUpdateData = Category;
+
+export type B2BWorkspaceInventoryCategoriesDeleteData = any;
+
+export type B2BWorkspaceInventoryDocumentsListData = DocumentList;
+
+export type B2BWorkspaceInventoryDocumentsCreateData = InventoryDocument;
+
+export type B2BWorkspaceInventoryDocumentsPendingListData = DocumentList;
+
+export type B2BWorkspaceInventoryDocumentsReadData = InventoryDocument;
+
+export type B2BWorkspaceInventoryDocumentsPartialUpdateData = InventoryDocument;
+
+export type B2BWorkspaceInventoryDocumentsDeleteData = any;
+
+export type B2BWorkspaceInventoryDocumentsCancelCreateData = InventoryDocument;
+
+export type B2BWorkspaceInventoryDocumentsConfirmCreateData = InventoryDocument;
+
+export type B2BWorkspaceInventoryDocumentsPreviewListData = StockChange[];
+
+export type B2BWorkspaceInventoryDocumentsReceiveCreateData = InventoryDocument;
+
+export type B2BWorkspaceInventoryDocumentsSendCreateData = InventoryDocument;
+
+export type B2BWorkspaceInventoryExportListData = any;
+
+export type B2BWorkspaceInventoryGenerateListData = any;
+
+export type B2BWorkspaceInventoryImportCommitCreateData = ImportCommit;
+
+export type B2BWorkspaceInventoryImportPreviewCreateData = any;
+
+export type B2BWorkspaceInventoryMovementsListData = MovementList;
+
+export type B2BWorkspaceInventoryMovementsCreateData = InventoryDocument;
+
+export type B2BWorkspaceInventoryProductsListData = ProductList;
+
+export type B2BWorkspaceInventoryProductsCreateData = Product;
+
+export type B2BWorkspaceInventoryProductsReadData = Product;
+
+export type B2BWorkspaceInventoryProductsPartialUpdateData = Product;
+
+export type B2BWorkspaceInventoryProductsDeleteData = any;
+
+export type B2BWorkspaceInventoryProductsMovementsListData = MovementList;
+
+export type B2BWorkspaceInventoryProductsPhotoCreateData = Product;
+
+export type B2BWorkspaceInventoryProductsPhotoDeleteData = any;
+
+export type B2BWorkspaceInventoryProductsPricesListData = PriceHistory[];
+
+export type B2BWorkspaceInventorySettingsListData = Settings;
+
+export type B2BWorkspaceInventorySettingsPartialUpdateData = Settings;
+
+export type B2BWorkspaceInventorySummaryListData = InventorySummary;
+
+export type B2BWorkspaceInventorySuppliersListData = Supplier[];
+
+export type B2BWorkspaceInventorySuppliersCreateData = Supplier;
+
+export type B2BWorkspaceInventorySuppliersReadData = Supplier;
+
+export type B2BWorkspaceInventorySuppliersPartialUpdateData = Supplier;
+
+export type B2BWorkspaceInventorySuppliersDeleteData = any;
+
+export type B2BWorkspaceInventoryWarehousesListData = Warehouse[];
+
+export type B2BWorkspaceInventoryWarehousesCreateData = Warehouse;
+
+export type B2BWorkspaceInventoryWarehousesPartialUpdateData = Warehouse;
+
+export type B2BWorkspaceInventoryWarehousesDeleteData = any;
 
 export type B2BWorkspaceInvitesListData = any;
 
@@ -5044,11 +9477,15 @@ export type B2BWorkspaceLeadsCommentsCreateData = LeadActivity;
 
 export type B2BWorkspaceLeadsCompleteCreateData = Lead;
 
+export type B2BWorkspaceLeadsDueDateCreateData = Lead;
+
 export type B2BWorkspaceLeadsItemsCreateData = LeadItem;
 
 export type B2BWorkspaceLeadsItemsUpdateData = LeadItem[];
 
 export type B2BWorkspaceLeadsItemsDeleteData = any;
+
+export type B2BWorkspaceLeadsQualityCreateData = Lead;
 
 export type B2BWorkspaceLeadsStageCreateData = Lead;
 
@@ -5090,15 +9527,35 @@ export type B2BWorkspaceMeListData = Me;
 
 export type B2BWorkspaceMeDeviceTokenCreateData = any;
 
+export type B2BWorkspaceMePhotoUpdateData = Me;
+
+export type B2BWorkspaceMePhotoDeleteData = Me;
+
 export type B2BWorkspaceMeProfileUpdateData = Me;
 
 export type B2BWorkspaceMeUsernameUpdateData = Me;
+
+export type B2BWorkspaceNotesListData = Note[];
+
+export type B2BWorkspaceNotesCreateData = Note;
+
+export type B2BWorkspaceNotesPartialUpdateData = Note;
+
+export type B2BWorkspaceNotesDeleteData = any;
+
+export type B2BWorkspaceNotesVoiceCreateData = Note;
+
+export type B2BWorkspaceNotesVoiceDeleteData = Note;
 
 export type B2BWorkspaceNotificationsListData = B2BNotification[];
 
 export type B2BWorkspaceNotificationsReadCreateData = any;
 
 export type B2BWorkspaceOrgPeopleListData = OrgPerson[];
+
+export type B2BWorkspacePresenceListData = any;
+
+export type B2BWorkspaceReportsListData = WorkspaceReport;
 
 export type B2BWorkspaceRequestsListData = SecondmentRequest[];
 
@@ -5130,6 +9587,10 @@ export type B2BWorkspaceTasksDeleteData = any;
 
 export type B2BWorkspaceTasksCommentsCreateData = Task;
 
+export type B2BWorkspaceTasksFilesCreateData = Task;
+
+export type B2BWorkspaceTasksFilesDeleteData = Task;
+
 export type B2BWorkspaceTasksStatusCreateData = Task;
 
 export type B2BWorkspaceTasksSubtasksToggleCreateData = Task;
@@ -5141,6 +9602,8 @@ export type B2BWorkspaceTasksVoiceDeleteData = Task;
 export type B2BWorkspaceTeamListData = TeamMember[];
 
 export type B2BWorkspaceTrashListData = any;
+
+export type B2BWorkspaceTrashDeleteData = any;
 
 export type B2BWorkspaceTrashRestoreCreateData = any;
 
@@ -5204,6 +9667,8 @@ export type HotelsTopByBookingsListData = TopHotel[];
 
 export type HotelsReadData = Hotel;
 
+export type HotelsCalendarListData = any;
+
 export type LogsFrontendCreateData = any;
 
 export type NotificationClientListData = any;
@@ -5224,7 +9689,695 @@ export type NotificationPartnerReadCreateData = any;
 
 export type PaymentExchangeRateListData = any;
 
+export type ListPrefecturesData = PrefectureList[];
+
+export type PropertyAdminAllListData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export type PropertyAdminApartmentsCreateData = ApartmentAdminList;
+
+export type PropertyAdminApartmentsReadData = ApartmentAdminList;
+
+export type PropertyAdminApartmentsPartialUpdateData = ApartmentAdminList;
+
+export type AdminCreatePropertyImageApartmentsData = {
+  /** @format uuid */
+  guid?: string;
+  order?: number;
+  is_pending?: boolean;
+  image_url?: string;
+}[];
+
+export type PropertyAdminCottagesCreateData = CottageAdminList;
+
+export type PropertyAdminCottagesReadData = CottageAdminList;
+
+export type PropertyAdminCottagesPartialUpdateData = CottageAdminList;
+
+export type AdminCreatePropertyImageCottagesData = {
+  /** @format uuid */
+  guid?: string;
+  order?: number;
+  is_pending?: boolean;
+  image_url?: string;
+}[];
+
+export type PropertyAdminDistrictsListData = DistrictList[];
+
+export type PropertyAdminPrefecturesListData = PrefectureList[];
+
+export type PropertyAdminRegionsListData = RegionList[];
+
+export type AdminListPropertyTypesData = {
+  /** @format uuid */
+  guid?: string;
+  title_en?: string;
+  title_ru?: string;
+  title_uz?: string;
+  icon_url?: string | null;
+  kind?: string;
+}[];
+
+export interface AdminUploadPropertyTypeIconData {
+  /** @format uuid */
+  guid?: string;
+  icon_url?: string;
+}
+
+export type ListApartmentsData = ApartmentList[];
+
+export interface CreateApartmentData {
+  detail?: string;
+  /** @format uuid */
+  property_id?: string;
+  status_code?: number;
+}
+
+export interface PropertyApartmentsReadData {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  img?: string[];
+  /** @format date-time */
+  created_at?: string;
+  currency?: string | null;
+  /**
+   * Apartment price in UZS (converted from USD if needed). Null for cottages.
+   * @format decimal
+   */
+  price?: number | null;
+  /**
+   * Cottage price per person in UZS. Null for apartments.
+   * @format decimal
+   */
+  price_per_person?: number | null;
+  /**
+   * Cottage working-day price in UZS. Null for apartments.
+   * @format decimal
+   */
+  price_on_working_days?: number | null;
+  /**
+   * Cottage weekend price in UZS. Null for apartments.
+   * @format decimal
+   */
+  price_on_weekends?: number | null;
+  /** Cottage monthly price breakdown. Empty/null for apartments. */
+  monthly_prices?: {
+    /**
+     * First day of the month (YYYY-MM-DD).
+     * @format date
+     */
+    month_from: string;
+    /**
+     * Last day of the month (YYYY-MM-DD).
+     * @format date
+     */
+    month_to: string;
+    /** @format double */
+    price_per_person?: number | null;
+    /** @format double */
+    price_on_working_days?: number | null;
+    /** @format double */
+    price_on_weekends?: number | null;
+  }[];
+  weekend_only_sunday_inclusive?: boolean | null;
+  /** Localized description for cottages. */
+  description?: string | null;
+  /** English description for apartments. */
+  description_en?: string | null;
+  /** Russian description for apartments. */
+  description_ru?: string | null;
+  /** Uzbek description for apartments (falls back to en/ru if empty). */
+  description_uz?: string | null;
+  comment_count?: number;
+  /** @format float */
+  average_rating?: number | null;
+  is_favorite?: boolean;
+  /** List of service UUIDs (apartments). */
+  services?: string[] | null;
+  /** List of service UUIDs (cottages). */
+  property_services?: string[] | null;
+  region_id?: number | null;
+  district_id?: number | null;
+  prefecture_id?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
+  country?: string | null;
+  city?: string | null;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+  apartment_number?: string | null;
+  home_number?: string | null;
+  entrance_number?: string | null;
+  floor_number?: string | null;
+  pass_code?: string | null;
+  /** @format time */
+  check_in?: string | null;
+  /** @format time */
+  check_out?: string | null;
+  is_allowed_alcohol?: boolean;
+  is_allowed_corporate?: boolean;
+  is_allowed_pets?: boolean;
+  is_quiet_hours?: boolean;
+  guests?: number | null;
+  rooms?: number | null;
+  beds?: number | null;
+  bathrooms?: number | null;
+  property_room?: {
+    /** @format uuid */
+    guid?: string | null;
+    guests?: number | null;
+    rooms?: number | null;
+    beds?: number | null;
+    bathrooms?: number | null;
+  };
+}
+
+export interface FullUpdatePropertyData {
+  detail?: string;
+  status_code?: number;
+  warning?: string | null;
+}
+
+export interface CreatePropertyImageApartmentsData {
+  detail?: string;
+  status?: string;
+}
+
+export interface UpdatePropertyImageApartmentsData {
+  detail?: string;
+  status?: string;
+}
+
+export type ListPartnerPropertyReviewsApartmentsData = RawPropertyReview[];
+
+export type ListPropertyReviewsApartmentsData = RawPropertyReview[];
+
+export type CreatePropertyReviewApartmentsData = RawPropertyReview;
+
+export type ListCategoriesData = RawPropertyType[];
+
+export type ListCategoryPropertyRecommendationsData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export type ListCategoryLatestPropertiesData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export type ListCottagesData = CottageList[];
+
+export interface CreateCottageData {
+  detail?: string;
+  /** @format uuid */
+  property_id?: string;
+  status_code?: number;
+}
+
+export interface PropertyCottagesReadData {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  img?: string[];
+  /** @format date-time */
+  created_at?: string;
+  currency?: string | null;
+  /**
+   * Apartment price in UZS (converted from USD if needed). Null for cottages.
+   * @format decimal
+   */
+  price?: number | null;
+  /**
+   * Cottage price per person in UZS. Null for apartments.
+   * @format decimal
+   */
+  price_per_person?: number | null;
+  /**
+   * Cottage working-day price in UZS. Null for apartments.
+   * @format decimal
+   */
+  price_on_working_days?: number | null;
+  /**
+   * Cottage weekend price in UZS. Null for apartments.
+   * @format decimal
+   */
+  price_on_weekends?: number | null;
+  /** Cottage monthly price breakdown. Empty/null for apartments. */
+  monthly_prices?: {
+    /**
+     * First day of the month (YYYY-MM-DD).
+     * @format date
+     */
+    month_from: string;
+    /**
+     * Last day of the month (YYYY-MM-DD).
+     * @format date
+     */
+    month_to: string;
+    /** @format double */
+    price_per_person?: number | null;
+    /** @format double */
+    price_on_working_days?: number | null;
+    /** @format double */
+    price_on_weekends?: number | null;
+  }[];
+  weekend_only_sunday_inclusive?: boolean | null;
+  /** Localized description for cottages. */
+  description?: string | null;
+  /** English description for apartments. */
+  description_en?: string | null;
+  /** Russian description for apartments. */
+  description_ru?: string | null;
+  /** Uzbek description for apartments (falls back to en/ru if empty). */
+  description_uz?: string | null;
+  comment_count?: number;
+  /** @format float */
+  average_rating?: number | null;
+  is_favorite?: boolean;
+  /** List of service UUIDs (apartments). */
+  services?: string[] | null;
+  /** List of service UUIDs (cottages). */
+  property_services?: string[] | null;
+  region_id?: number | null;
+  district_id?: number | null;
+  prefecture_id?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
+  country?: string | null;
+  city?: string | null;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+  apartment_number?: string | null;
+  home_number?: string | null;
+  entrance_number?: string | null;
+  floor_number?: string | null;
+  pass_code?: string | null;
+  /** @format time */
+  check_in?: string | null;
+  /** @format time */
+  check_out?: string | null;
+  is_allowed_alcohol?: boolean;
+  is_allowed_corporate?: boolean;
+  is_allowed_pets?: boolean;
+  is_quiet_hours?: boolean;
+  guests?: number | null;
+  rooms?: number | null;
+  beds?: number | null;
+  bathrooms?: number | null;
+  property_room?: {
+    /** @format uuid */
+    guid?: string | null;
+    guests?: number | null;
+    rooms?: number | null;
+    beds?: number | null;
+    bathrooms?: number | null;
+  };
+}
+
+export interface PartialUpdateCottageData {
+  detail?: string;
+  status_code?: number;
+  warning?: string | null;
+}
+
+export interface CreatePropertyImageCottagesData {
+  detail?: string;
+  status?: string;
+}
+
+export interface UpdatePropertyImageCottagesData {
+  detail?: string;
+  status?: string;
+}
+
+export type ListPartnerPropertyReviewsCottagesData = RawPropertyReview[];
+
+export type ListPropertyReviewsCottagesData = RawPropertyReview[];
+
+export type CreatePropertyReviewCottagesData = RawPropertyReview;
+
+export interface ListSearchDestinationsData {
+  nearby?: object[];
+  recommended?: object[];
+}
+
+export type ListDistrictsData = DistrictList[];
+
+export type GetPropertyFilterMetaData = any;
+
+export type GetPropertyPriceHistogramData = PropertyPriceHistogram;
+
+export type ListLocationsData = RegionsResponse;
+
+export type ListPropertyMapPinsData = PropertyMapResponse;
+
+export type ListPropertyMapCardsData = PropertyCard[];
+
+export type ListAllPartnerPropertiesData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export type ListPartnerApartmentsData = ApartmentPartnerList[];
+
+export type ListPartnerCottagesData = CottagePartnerList[];
+
+export type ListPartnerPropertiesData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export interface GetPropertyAnalyticsData {
+  property?: {
+    /** @format uuid */
+    guid?: string;
+    title?: string;
+    image_url?: string | null;
+    city?: string | null;
+  };
+  range?: string;
+  bookings_overview?: object;
+  bookings_activity?: object[];
+  income_overview?: {
+    balance_amount?: string;
+    currency?: string;
+    bars?: object[];
+  };
+}
+
+export type ListPrefecturesPrefecturesData = PrefectureList[];
+
+export type ListPropertiesData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export interface CreatePropertyData {
+  detail?: string;
+  /** @format uuid */
+  property_id?: string;
+  status_code?: number;
+}
+
+export type ListSavedPropertiesData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export interface FilterPropertyByLinkData {
+  /** @format uuid */
+  guid?: string | null;
+}
+
+export type ListRecommendationsData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
 export type GetPersonalizedRecommendationsData = RecommendationItem[];
+
+export type ListRegionsData = RegionList[];
+
+export type ListPropertiesByRegionData = {
+  /** @format uuid */
+  guid?: string;
+  title?: string;
+  property_type?: object;
+  property_location?: {
+    latitude?: string | null;
+    longitude?: string | null;
+    country?: string | null;
+    city?: string | null;
+    region?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    district?: {
+      id?: number | null;
+      /** @format uuid */
+      guid?: string | null;
+      name?: string | null;
+    };
+    prefecture?: {
+      id?: string | null;
+      name?: string | null;
+    };
+  };
+}[];
+
+export type SearchPropertiesData = PropertyCard[];
+
+export type ListPropertyServicesData = PropertyServiceList[];
+
+export type ListPropertyTypesData = RawPropertyType[];
+
+export interface TogglePropertyFavoriteData {
+  detail?: string;
+  is_favorite?: boolean;
+}
+
+export interface RemovePropertyFavoriteData {
+  detail?: string;
+  is_favorite?: boolean;
+}
 
 export type StoryAdminBannersListData = AdminBanner[];
 
@@ -5925,6 +11078,40 @@ export namespace AdminAuth {
     export type RequestBody = B2BUser;
     export type RequestHeaders = {};
     export type ResponseBody = AdminAuthB2BCompaniesUsersCreateData;
+  }
+
+  /**
+   * @description An owner cannot transfer or close a Company by asking their own workspace — see `WorkspaceOwnershipRequestView` — precisely so that a decision this consequential always has someone outside the company looking at it. This is that someone's inbox.
+   * @tags api
+   * @name AdminAuthB2BOwnershipRequestsList
+   * @summary GET ``/api/admin-auth/b2b/ownership-requests/`` — every company asking to hand itself over or close, waiting on WEEL.
+   * @request GET:/admin-auth/b2b/ownership-requests/
+   * @secure
+   */
+  export namespace AdminAuthB2BOwnershipRequestsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminAuthB2BOwnershipRequestsListData;
+  }
+
+  /**
+   * @description Approving is what actually moves the `owner` role or closes the company; there is no separate "apply" step, because a request marked approved that had not yet been carried out is exactly the kind of row that survives a crash and quietly never happens.
+   * @tags api
+   * @name AdminAuthB2BOwnershipRequestsDecideCreate
+   * @summary POST ``/api/admin-auth/b2b/ownership-requests/<id>/decide/`` — approve or reject one.
+   * @request POST:/admin-auth/b2b/ownership-requests/{request_id}/decide/
+   * @secure
+   */
+  export namespace AdminAuthB2BOwnershipRequestsDecideCreate {
+    export type RequestParams = {
+      requestId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = OwnershipRequestDecision;
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminAuthB2BOwnershipRequestsDecideCreateData;
   }
 
   /**
@@ -7638,6 +12825,22 @@ export namespace B2B {
   }
 
   /**
+   * @description POST /api/b2b/workspace/account/token/refresh/ The account session's half of the refresh above, and its own endpoint rather than a second branch inside it: the two token types are deliberately not interchangeable, and one view that answered for both would be the place that eventually hands a workspace token to a caller holding an account one. Without this the account session could not be renewed at all. It simply died one access lifetime after sign-in, which is what left somebody who had registered but not yet been let into a workspace stuck on "could not load your workspaces" with a Retry button that could never succeed.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAccountTokenRefreshCreate
+   * @summary Exchange an account refresh token for a new pair
+   * @request POST:/b2b/workspace/account/token/refresh/
+   * @secure
+   */
+  export namespace B2BWorkspaceAccountTokenRefreshCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = WorkspaceRefresh;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAccountTokenRefreshCreateData;
+  }
+
+  /**
    * @description GET /api/b2b/workspace/account/username-check/?username=xusan_design Whether a handle is free, and what else to try if it is not. Answered as the field is typed rather than only on submit. A uniqueness rule that is enforced at the end of a form is a form people fill in twice, and the handle is the last screen of registration — the worst place to send somebody back to. Reading this tells the caller whether *some* handle exists, which is exactly what the screen after it does anyway; it needs an account session, so it is not an open directory probe.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceAccountUsernameCheckList
@@ -7742,6 +12945,109 @@ export namespace B2B {
   }
 
   /**
+   * @description GET /analyst/ — the button: whether Weel AI runs here, how many reports are unread, and the latest one.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAnalystList
+   * @summary Weel AI status
+   * @request GET:/b2b/workspace/analyst/
+   * @secure
+   */
+  export namespace B2BWorkspaceAnalystList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAnalystListData;
+  }
+
+  /**
+   * @description GET  /analyst/reports/?period=&limit= — newest first. POST /analyst/reports/ {period} — write one now.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAnalystReportsList
+   * @summary Weel AI reports
+   * @request GET:/b2b/workspace/analyst/reports/
+   * @secure
+   */
+  export namespace B2BWorkspaceAnalystReportsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      period?: "day" | "week" | "month" | "year";
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAnalystReportsListData;
+  }
+
+  /**
+   * @description GET  /analyst/reports/?period=&limit= — newest first. POST /analyst/reports/ {period} — write one now.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAnalystReportsCreate
+   * @summary Write a Weel AI report now
+   * @request POST:/b2b/workspace/analyst/reports/
+   * @secure
+   */
+  export namespace B2BWorkspaceAnalystReportsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = Generate;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAnalystReportsCreateData;
+  }
+
+  /**
+   * @description GET /analyst/reports/<id>/ — the report, in both languages.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAnalystReportsRead
+   * @summary One Weel AI report
+   * @request GET:/b2b/workspace/analyst/reports/{report_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceAnalystReportsRead {
+    export type RequestParams = {
+      reportId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAnalystReportsReadData;
+  }
+
+  /**
+   * @description POST /analyst/reports/<id>/discuss/ — hand the report to the assistant. The two AIs working together: Weel AI found it, the connected assistant explains how to fix it. The report goes into the caller's assistant chat as a card, their question under it, and the assistant's answer comes back — and the chat is then where the conversation carries on.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAnalystReportsDiscussCreate
+   * @summary Ask the assistant about a report
+   * @request POST:/b2b/workspace/analyst/reports/{report_id}/discuss/
+   * @secure
+   */
+  export namespace B2BWorkspaceAnalystReportsDiscussCreate {
+    export type RequestParams = {
+      reportId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = Discuss;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAnalystReportsDiscussCreateData;
+  }
+
+  /**
+   * @description POST /analyst/seen/ — the reader opened the list; the dot goes.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAnalystSeenCreate
+   * @summary Mark Weel AI reports seen
+   * @request POST:/b2b/workspace/analyst/seen/
+   * @secure
+   */
+  export namespace B2BWorkspaceAnalystSeenCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAnalystSeenCreateData;
+  }
+
+  /**
    * @description GET /api/b2b/workspace/app-version/ — may this build still run? The one endpoint in the workspace API that answers before there is a
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceAppVersionList
@@ -7759,6 +13065,86 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceAppVersionListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/archive/ — "История и архив": every completed or deleted task, lead and quick sale, read only. A different door onto rows [WorkspaceTrashView] reads only the deleted half of, open to the whole company rather than gated on the authority to
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceArchiveList
+   * @summary Completed and deleted tasks, leads and quick sales
+   * @request GET:/b2b/workspace/archive/
+   * @secure
+   */
+  export namespace B2BWorkspaceArchiveList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceArchiveListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/assistant/ — the row on the chat list: whether an assistant is connected, and the last thing said in the chat.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAssistantList
+   * @summary The AI assistant's row
+   * @request GET:/b2b/workspace/assistant/
+   * @secure
+   */
+  export namespace B2BWorkspaceAssistantList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAssistantListData;
+  }
+
+  /**
+   * @description GET    /assistant/messages/ — the whole chat. POST   /assistant/messages/ — say something and get the answer. DELETE /assistant/messages/ — start over.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAssistantMessagesList
+   * @summary The assistant chat
+   * @request GET:/b2b/workspace/assistant/messages/
+   * @secure
+   */
+  export namespace B2BWorkspaceAssistantMessagesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAssistantMessagesListData;
+  }
+
+  /**
+   * @description GET    /assistant/messages/ — the whole chat. POST   /assistant/messages/ — say something and get the answer. DELETE /assistant/messages/ — start over.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAssistantMessagesCreate
+   * @summary Ask the assistant
+   * @request POST:/b2b/workspace/assistant/messages/
+   * @secure
+   */
+  export namespace B2BWorkspaceAssistantMessagesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = AiSend;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAssistantMessagesCreateData;
+  }
+
+  /**
+   * @description GET    /assistant/messages/ — the whole chat. POST   /assistant/messages/ — say something and get the answer. DELETE /assistant/messages/ — start over.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAssistantMessagesDelete
+   * @summary Clear the assistant chat
+   * @request DELETE:/b2b/workspace/assistant/messages/
+   * @secure
+   */
+  export namespace B2BWorkspaceAssistantMessagesDelete {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAssistantMessagesDeleteData;
   }
 
   /**
@@ -7810,6 +13196,22 @@ export namespace B2B {
     export type RequestBody = AttendanceCheckIn;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceAttendanceCheckInCreateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/attendance/check-out/ — "Ketdim". The other end of the day from check-in. Needs no capability: it only ever writes the caller's own row. The departure time is the server's, not the request's, for the same reason the arrival time is. Unlike check-in, the geofence is not enforced here — the whole point of checking out is that the person is leaving, so being outside the radius is the expected case. Coordinates, if the phone sends them, are stored for audit parity with the check-in pair. You can only check out of a day you checked into: without an arrival on file there is nothing to close, and the tap is refused rather than inventing a departure with no matching arrival.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceAttendanceCheckOutCreate
+   * @summary Check yourself out for today
+   * @request POST:/b2b/workspace/attendance/check-out/
+   * @secure
+   */
+  export namespace B2BWorkspaceAttendanceCheckOutCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = AttendanceCheckOut;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceAttendanceCheckOutCreateData;
   }
 
   /**
@@ -7945,6 +13347,146 @@ export namespace B2B {
   }
 
   /**
+   * @description POST /calls/ — start a call and ring the other side.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCallsCreate
+   * @summary Start a video/audio call (Jitsi room + JWT)
+   * @request POST:/b2b/workspace/calls/
+   * @secure
+   */
+  export namespace B2BWorkspaceCallsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CallCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCallsCreateData;
+  }
+
+  /**
+   * @description GET /calls/history/?thread_id= | lead_id= | customer_id= — newest first. With no filter, the caller's own calls.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCallsHistoryList
+   * @request GET:/b2b/workspace/calls/history/
+   * @secure
+   */
+  export namespace B2BWorkspaceCallsHistoryList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      thread_id?: number;
+      lead_id?: number;
+      customer_id?: number;
+      before_id?: number;
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCallsHistoryListData;
+  }
+
+  /**
+   * @description Asked on every app resume. A push can be dropped and a socket can be down; this is the third path, and the one that cannot be missed.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCallsIncomingList
+   * @summary GET /calls/incoming/ — the call ringing at me right now, if any.
+   * @request GET:/b2b/workspace/calls/incoming/
+   * @secure
+   */
+  export namespace B2BWorkspaceCallsIncomingList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCallsIncomingListData;
+  }
+
+  /**
+   * @description GET /calls/<id>/ — where the call stands now. The phone polls this when its socket is down, and on resume for a ring it may have missed.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCallsRead
+   * @request GET:/b2b/workspace/calls/{call_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceCallsRead {
+    export type RequestParams = {
+      callId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCallsReadData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCallsAcceptCreate
+   * @summary Accept an incoming call — returns this side's JWT
+   * @request POST:/b2b/workspace/calls/{call_id}/accept/
+   * @secure
+   */
+  export namespace B2BWorkspaceCallsAcceptCreate {
+    export type RequestParams = {
+      callId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCallsAcceptCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCallsDeclineCreate
+   * @request POST:/b2b/workspace/calls/{call_id}/decline/
+   * @secure
+   */
+  export namespace B2BWorkspaceCallsDeclineCreate {
+    export type RequestParams = {
+      callId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCallsDeclineCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCallsEndCreate
+   * @summary Hang up (cancels a call that is still ringing)
+   * @request POST:/b2b/workspace/calls/{call_id}/end/
+   * @secure
+   */
+  export namespace B2BWorkspaceCallsEndCreate {
+    export type RequestParams = {
+      callId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCallsEndCreateData;
+  }
+
+  /**
+   * @description GET /calls/<id>/token/ — a fresh JWT for a call still in progress.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCallsTokenList
+   * @request GET:/b2b/workspace/calls/{call_id}/token/
+   * @secure
+   */
+  export namespace B2BWorkspaceCallsTokenList {
+    export type RequestParams = {
+      callId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCallsTokenListData;
+  }
+
+  /**
    * @description GET  /api/b2b/workspace/chats/ — the caller's conversations. POST /api/b2b/workspace/chats/ — open a direct chat, or a group (managers).
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceChatsList
@@ -7995,6 +13537,106 @@ export namespace B2B {
   }
 
   /**
+   * @description GET   /api/b2b/workspace/chats/<id>/group/ — the group's own screen. PATCH /api/b2b/workspace/chats/<id>/group/ — rename it, or change its picture. The picture arrives as multipart, the same door every other upload uses, so it is quota-checked and accounted for like any other stored object.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsGroupList
+   * @summary Group detail with its members
+   * @request GET:/b2b/workspace/chats/{thread_id}/group/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsGroupList {
+    export type RequestParams = {
+      threadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsGroupListData;
+  }
+
+  /**
+   * @description GET   /api/b2b/workspace/chats/<id>/group/ — the group's own screen. PATCH /api/b2b/workspace/chats/<id>/group/ — rename it, or change its picture. The picture arrives as multipart, the same door every other upload uses, so it is quota-checked and accounted for like any other stored object.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsGroupPartialUpdate
+   * @summary Rename a group or set its picture
+   * @request PATCH:/b2b/workspace/chats/{thread_id}/group/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsGroupPartialUpdate {
+    export type RequestParams = {
+      threadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /**
+       * @minLength 1
+       * @maxLength 200
+       */
+      group_name?: string;
+      /** @format binary */
+      photo?: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsGroupPartialUpdateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/chats/<id>/members/ — add people to a group.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsMembersCreate
+   * @summary Add members to a group
+   * @request POST:/b2b/workspace/chats/{thread_id}/members/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsMembersCreate {
+    export type RequestParams = {
+      threadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = ThreadMembers;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsMembersCreateData;
+  }
+
+  /**
+   * @description PATCH  /api/b2b/workspace/chats/<id>/members/<employee_id>/ — admin or member. DELETE /api/b2b/workspace/chats/<id>/members/<employee_id>/ — take them out. Removing yourself through this endpoint is how leaving works, and it is the one case that needs no admin rights: nobody can be held in a conversation.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsMembersPartialUpdate
+   * @summary Make a member an admin, or an admin an ordinary member
+   * @request PATCH:/b2b/workspace/chats/{thread_id}/members/{employee_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsMembersPartialUpdate {
+    export type RequestParams = {
+      threadId: string;
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = ThreadMemberRole;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsMembersPartialUpdateData;
+  }
+
+  /**
+   * @description PATCH  /api/b2b/workspace/chats/<id>/members/<employee_id>/ — admin or member. DELETE /api/b2b/workspace/chats/<id>/members/<employee_id>/ — take them out. Removing yourself through this endpoint is how leaving works, and it is the one case that needs no admin rights: nobody can be held in a conversation.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsMembersDelete
+   * @summary Remove somebody from a group, or leave it yourself
+   * @request DELETE:/b2b/workspace/chats/{thread_id}/members/{employee_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsMembersDelete {
+    export type RequestParams = {
+      threadId: string;
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsMembersDeleteData;
+  }
+
+  /**
    * @description GET / POST messages in a thread the caller belongs to.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceChatsMessagesList
@@ -8035,6 +13677,7 @@ export namespace B2B {
        */
       text?: string;
       reply_to_id?: number | null;
+      forward_message_id?: number | null;
       /** @format binary */
       file?: File;
     };
@@ -8043,7 +13686,26 @@ export namespace B2B {
   }
 
   /**
-   * @description DELETE /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/ Your own message, always. Anyone else's only if you run the company — a manager has to be able to take down something posted in a shared room, and an employee must not be able to edit the record of what was said.
+   * @description PATCH  /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/ DELETE /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/ Your own message, always. Anyone else's only if you run the company — a manager has to be able to take down something posted in a shared room, and an employee must not be able to edit the record of what was said. Editing is narrower than deleting: only the author, never a manager. A manager removing something is a visible act; a manager rewriting what somebody said is a forgery, and no role should be able to do it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsMessagesPartialUpdate
+   * @summary Edit your own message
+   * @request PATCH:/b2b/workspace/chats/{thread_id}/messages/{message_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsMessagesPartialUpdate {
+    export type RequestParams = {
+      threadId: string;
+      messageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = MessageEdit;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsMessagesPartialUpdateData;
+  }
+
+  /**
+   * @description PATCH  /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/ DELETE /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/ Your own message, always. Anyone else's only if you run the company — a manager has to be able to take down something posted in a shared room, and an employee must not be able to edit the record of what was said. Editing is narrower than deleting: only the author, never a manager. A manager removing something is a visible act; a manager rewriting what somebody said is a forgery, and no role should be able to do it.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceChatsMessagesDelete
    * @summary Delete a message
@@ -8062,6 +13724,63 @@ export namespace B2B {
   }
 
   /**
+   * @description POST   /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/pin/ DELETE the same path — unpin. A pin is about the room, not about the message's author: anybody in it can put something at the top, and anybody in it can take it down again. That is the same rule Telegram uses in a group, and the alternative — only the author may pin their own — makes the feature useless for the case it exists for, which is somebody else's address or meeting time.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsMessagesPinCreate
+   * @summary Pin a message
+   * @request POST:/b2b/workspace/chats/{thread_id}/messages/{message_id}/pin/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsMessagesPinCreate {
+    export type RequestParams = {
+      threadId: string;
+      messageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsMessagesPinCreateData;
+  }
+
+  /**
+   * @description POST   /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/pin/ DELETE the same path — unpin. A pin is about the room, not about the message's author: anybody in it can put something at the top, and anybody in it can take it down again. That is the same rule Telegram uses in a group, and the alternative — only the author may pin their own — makes the feature useless for the case it exists for, which is somebody else's address or meeting time.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsMessagesPinDelete
+   * @summary Unpin a message
+   * @request DELETE:/b2b/workspace/chats/{thread_id}/messages/{message_id}/pin/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsMessagesPinDelete {
+    export type RequestParams = {
+      threadId: string;
+      messageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsMessagesPinDeleteData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/chats/<thread_id>/messages/<message_id>/reactions/ One endpoint for both directions, because the app has one gesture for
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceChatsMessagesReactionsCreate
+   * @summary React to a message, or take the reaction back
+   * @request POST:/b2b/workspace/chats/{thread_id}/messages/{message_id}/reactions/
+   * @secure
+   */
+  export namespace B2BWorkspaceChatsMessagesReactionsCreate {
+    export type RequestParams = {
+      threadId: string;
+      messageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = MessageReaction;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceChatsMessagesReactionsCreateData;
+  }
+
+  /**
    * @description POST /api/b2b/workspace/chats/<id>/read/
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceChatsReadCreate
@@ -8077,6 +13796,38 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceChatsReadCreateData;
+  }
+
+  /**
+   * @description GET/POST /api/b2b/workspace/company/ownership-requests/ — handing the company over, or closing it, neither of which this endpoint ever does itself. Owner only, and on their own company only: an admin or a manager runs a workspace, not the Company it belongs to, and the whole point of routing this through `admin_auth` is that nobody inside the workspace — owner included — can make either thing happen by themselves. See the note on `Role.OWNER` in `access.py`.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCompanyOwnershipRequestsList
+   * @summary This workspace's ownership/closure requests
+   * @request GET:/b2b/workspace/company/ownership-requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceCompanyOwnershipRequestsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCompanyOwnershipRequestsListData;
+  }
+
+  /**
+   * @description GET/POST /api/b2b/workspace/company/ownership-requests/ — handing the company over, or closing it, neither of which this endpoint ever does itself. Owner only, and on their own company only: an admin or a manager runs a workspace, not the Company it belongs to, and the whole point of routing this through `admin_auth` is that nobody inside the workspace — owner included — can make either thing happen by themselves. See the note on `Role.OWNER` in `access.py`.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceCompanyOwnershipRequestsCreate
+   * @summary Ask to transfer or close the company
+   * @request POST:/b2b/workspace/company/ownership-requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceCompanyOwnershipRequestsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = OwnershipRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceCompanyOwnershipRequestsCreateData;
   }
 
   /**
@@ -8138,10 +13889,61 @@ export namespace B2B {
   }
 
   /**
+   * @description GET/POST /api/b2b/workspace/delete-requests/ — TZ §4: asking to delete *this one workspace*, as opposed to [WorkspaceOwnershipRequestView]'s company-wide close, which only WEEL's own desk can grant. A leader (or anybody `IsWorkspaceManager` lets through) may ask; only this workspace's own owner may grant it — see [WorkspaceDeleteRequestDecideView].
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceDeleteRequestsList
+   * @summary This workspace's deletion requests
+   * @request GET:/b2b/workspace/delete-requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceDeleteRequestsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceDeleteRequestsListData;
+  }
+
+  /**
+   * @description GET/POST /api/b2b/workspace/delete-requests/ — TZ §4: asking to delete *this one workspace*, as opposed to [WorkspaceOwnershipRequestView]'s company-wide close, which only WEEL's own desk can grant. A leader (or anybody `IsWorkspaceManager` lets through) may ask; only this workspace's own owner may grant it — see [WorkspaceDeleteRequestDecideView].
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceDeleteRequestsCreate1
+   * @summary Ask to delete this workspace
+   * @request POST:/b2b/workspace/delete-requests/
+   * @secure
+   */
+  export namespace B2BWorkspaceDeleteRequestsCreate1 {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = WorkspaceDeleteRequest;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceDeleteRequestsCreate1Data;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/delete-requests/<id>/<approve|reject>/ Owner only, and only on this same workspace's own pending request — the TZ's "Владелец получает запрос... принимает или отклоняет". Approving marks this workspace `is_active = FALSE`; the org above it and its other workspaces are untouched.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceDeleteRequestsCreate2
+   * @summary Decide a workspace deletion request
+   * @request POST:/b2b/workspace/delete-requests/{request_id}/{action}/
+   * @secure
+   */
+  export namespace B2BWorkspaceDeleteRequestsCreate2 {
+    export type RequestParams = {
+      requestId: string;
+      action: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceDeleteRequestsCreate2Data;
+  }
+
+  /**
    * @description GET/POST /api/b2b/workspace/employee-of-month/ Anyone can see this month's pick; only the owner can make or change it.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceEmployeeOfMonthList
-   * @summary This month's employee of the month
+   * @summary This month's employees of the month
    * @request GET:/b2b/workspace/employee-of-month/
    * @secure
    */
@@ -8157,7 +13959,7 @@ export namespace B2B {
    * @description GET/POST /api/b2b/workspace/employee-of-month/ Anyone can see this month's pick; only the owner can make or change it.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceEmployeeOfMonthCreate
-   * @summary Pick this month's employee of the month (owner only)
+   * @summary Pick this month's employees of the month (owner or administrator)
    * @request POST:/b2b/workspace/employee-of-month/
    * @secure
    */
@@ -8219,6 +14021,42 @@ export namespace B2B {
     export type RequestBody = EmployeeAccess;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceEmployeesAccessUpdateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/employees/<id>/remove/ — end a member's standing. Deactivates rather than deletes: their tasks, leads and history keep the name that was on them.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceEmployeesRemoveCreate
+   * @summary Remove a member
+   * @request POST:/b2b/workspace/employees/{employee_id}/remove/
+   * @secure
+   */
+  export namespace B2BWorkspaceEmployeesRemoveCreate {
+    export type RequestParams = {
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = EmployeeRemove;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceEmployeesRemoveCreateData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/employees/<id>/stats/ — what one colleague is carrying. The two numbers on the card the chat opens when you tap somebody's name. Its own call rather than fields on `/team/`: the roster is fetched to label rows all over the app — assignees, chat titles, event participants — and four counts per person would put a join over every task in the company behind every one of those screens, to draw numbers only this one page shows. Readable by anyone in the workspace, like the roster itself. It says how much work somebody has, never what the work is.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceEmployeesStatsList
+   * @summary One employee's task counts
+   * @request GET:/b2b/workspace/employees/{employee_id}/stats/
+   * @secure
+   */
+  export namespace B2BWorkspaceEmployeesStatsList {
+    export type RequestParams = {
+      employeeId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceEmployeesStatsListData;
   }
 
   /**
@@ -8437,6 +14275,1146 @@ export namespace B2B {
   }
 
   /**
+   * @description GET /api/b2b/workspace/integrations/ — what can be connected, and what is.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsList
+   * @summary List integrations (owner/administrator only)
+   * @request GET:/b2b/workspace/integrations/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsListData;
+  }
+
+  /**
+   * @description GET  /integrations/meta/ — this workspace's Meta connection. DELETE /integrations/meta/ — unplug it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsMetaList
+   * @summary The Meta connection
+   * @request GET:/b2b/workspace/integrations/meta/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsMetaList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsMetaListData;
+  }
+
+  /**
+   * @description GET  /integrations/meta/ — this workspace's Meta connection. DELETE /integrations/meta/ — unplug it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsMetaDelete
+   * @summary Disconnect Meta
+   * @request DELETE:/b2b/workspace/integrations/meta/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsMetaDelete {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsMetaDeleteData;
+  }
+
+  /**
+   * @description GET    /integrations/meta/app/ — what to paste into the Facebook app. PUT    /integrations/meta/app/ — connect through *this workspace's* app. DELETE /integrations/meta/app/ — go back to the deployment's app. The second path, and why it exists: while our own Facebook app is in Meta's review only its listed testers can authorise it, and some customers will not let their advertising data pass through an app they do not own. Both are real, so a workspace may bring its own — and everything below this line stops caring which, because `credentials.for_company` is the one place that decides.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsMetaAppList
+   * @summary What to configure in the Facebook app
+   * @request GET:/b2b/workspace/integrations/meta/app/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsMetaAppList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsMetaAppListData;
+  }
+
+  /**
+   * @description GET    /integrations/meta/app/ — what to paste into the Facebook app. PUT    /integrations/meta/app/ — connect through *this workspace's* app. DELETE /integrations/meta/app/ — go back to the deployment's app. The second path, and why it exists: while our own Facebook app is in Meta's review only its listed testers can authorise it, and some customers will not let their advertising data pass through an app they do not own. Both are real, so a workspace may bring its own — and everything below this line stops caring which, because `credentials.for_company` is the one place that decides.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsMetaAppUpdate
+   * @summary Use this workspace's own Facebook app
+   * @request PUT:/b2b/workspace/integrations/meta/app/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsMetaAppUpdate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = MetaApp;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsMetaAppUpdateData;
+  }
+
+  /**
+   * @description GET    /integrations/meta/app/ — what to paste into the Facebook app. PUT    /integrations/meta/app/ — connect through *this workspace's* app. DELETE /integrations/meta/app/ — go back to the deployment's app. The second path, and why it exists: while our own Facebook app is in Meta's review only its listed testers can authorise it, and some customers will not let their advertising data pass through an app they do not own. Both are real, so a workspace may bring its own — and everything below this line stops caring which, because `credentials.for_company` is the one place that decides.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsMetaAppDelete
+   * @summary Stop using this workspace's own app
+   * @request DELETE:/b2b/workspace/integrations/meta/app/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsMetaAppDelete {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsMetaAppDeleteData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/integrations/meta/connect/ — start the login. Answers with a URL for the phone to open in its browser. The rest happens there and comes back through `public_views.MetaOAuthCallbackView`; the app polls the list endpoint when it returns to the foreground. The state is random and short-lived rather than the company id: it is what ties the callback to this workspace, and a guessable one would let anybody who found the callback URL attach *their* Facebook pages to somebody else's funnel.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsMetaConnectCreate
+   * @summary Begin the Meta connection
+   * @request POST:/b2b/workspace/integrations/meta/connect/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsMetaConnectCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsMetaConnectCreateData;
+  }
+
+  /**
+   * @description PATCH /integrations/meta/pages/<id>/ — pause or resume one page.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsMetaPagesPartialUpdate
+   * @summary Switch one page's ingest on or off
+   * @request PATCH:/b2b/workspace/integrations/meta/pages/{page_row_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsMetaPagesPartialUpdate {
+    export type RequestParams = {
+      pageRowId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = PageToggle;
+    export type RequestHeaders = {};
+    export type ResponseBody =
+      B2BWorkspaceIntegrationsMetaPagesPartialUpdateData;
+  }
+
+  /**
+   * @description POST /integrations/meta/sync/ — fetch recent submissions now. The webhook is how leads arrive; this is the button for the gap it cannot cover — a subscription added after a campaign started, an hour our server was down. Queued rather than run inline: it walks every form on every page and the phone should not hold a request open for it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsMetaSyncCreate
+   * @summary Pull recent Meta leads now
+   * @request POST:/b2b/workspace/integrations/meta/sync/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsMetaSyncCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsMetaSyncCreateData;
+  }
+
+  /**
+   * @description GET    /integrations/<provider>/ — where the connection stands. POST   /integrations/<provider>/ — connect with an API key. PATCH  /integrations/<provider>/ — pick the model. DELETE /integrations/<provider>/ — forget the key.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsRead
+   * @summary The AI connection
+   * @request GET:/b2b/workspace/integrations/{provider}/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsRead {
+    export type RequestParams = {
+      provider: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsReadData;
+  }
+
+  /**
+   * @description GET    /integrations/<provider>/ — where the connection stands. POST   /integrations/<provider>/ — connect with an API key. PATCH  /integrations/<provider>/ — pick the model. DELETE /integrations/<provider>/ — forget the key.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsCreate
+   * @summary Connect Claude or ChatGPT with an API key
+   * @request POST:/b2b/workspace/integrations/{provider}/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsCreate {
+    export type RequestParams = {
+      provider: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AiConnect;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsCreateData;
+  }
+
+  /**
+   * @description GET    /integrations/<provider>/ — where the connection stands. POST   /integrations/<provider>/ — connect with an API key. PATCH  /integrations/<provider>/ — pick the model. DELETE /integrations/<provider>/ — forget the key.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsPartialUpdate
+   * @summary Pick the model
+   * @request PATCH:/b2b/workspace/integrations/{provider}/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsPartialUpdate {
+    export type RequestParams = {
+      provider: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AiModel;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsPartialUpdateData;
+  }
+
+  /**
+   * @description GET    /integrations/<provider>/ — where the connection stands. POST   /integrations/<provider>/ — connect with an API key. PATCH  /integrations/<provider>/ — pick the model. DELETE /integrations/<provider>/ — forget the key.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsDelete
+   * @summary Disconnect
+   * @request DELETE:/b2b/workspace/integrations/{provider}/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsDelete {
+    export type RequestParams = {
+      provider: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsDeleteData;
+  }
+
+  /**
+   * @description GET  /integrations/<provider>/conversations/?project=&q=&limit=&offset= POST /integrations/<provider>/conversations/ — start a chat here.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsConversationsList
+   * @summary The chats
+   * @request GET:/b2b/workspace/integrations/{provider}/conversations/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsConversationsList {
+    export type RequestParams = {
+      provider: string;
+    };
+    export type RequestQuery = {
+      project?: number;
+      q?: string;
+      limit?: number;
+      offset?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsConversationsListData;
+  }
+
+  /**
+   * @description GET  /integrations/<provider>/conversations/?project=&q=&limit=&offset= POST /integrations/<provider>/conversations/ — start a chat here.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsConversationsCreate
+   * @summary Start a chat
+   * @request POST:/b2b/workspace/integrations/{provider}/conversations/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsConversationsCreate {
+    export type RequestParams = {
+      provider: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AiNewConversation;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsConversationsCreateData;
+  }
+
+  /**
+   * @description GET    /integrations/<provider>/conversations/<id>/ — with its turns. DELETE /integrations/<provider>/conversations/<id>/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsConversationsRead
+   * @summary One chat, with its messages
+   * @request GET:/b2b/workspace/integrations/{provider}/conversations/{conversation_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsConversationsRead {
+    export type RequestParams = {
+      provider: string;
+      conversationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsConversationsReadData;
+  }
+
+  /**
+   * @description GET    /integrations/<provider>/conversations/<id>/ — with its turns. DELETE /integrations/<provider>/conversations/<id>/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsConversationsDelete
+   * @summary Delete a chat
+   * @request DELETE:/b2b/workspace/integrations/{provider}/conversations/{conversation_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsConversationsDelete {
+    export type RequestParams = {
+      provider: string;
+      conversationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsConversationsDeleteData;
+  }
+
+  /**
+   * @description POST /integrations/<provider>/conversations/<id>/messages/ — say something and get the assistant's answer. Both turns are stored before the answer is returned, the person's first: a vendor that times out must not lose what they typed, and the app can re-read the chat and see the question waiting.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsConversationsMessagesCreate
+   * @summary Send a message
+   * @request POST:/b2b/workspace/integrations/{provider}/conversations/{conversation_id}/messages/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsConversationsMessagesCreate {
+    export type RequestParams = {
+      provider: string;
+      conversationId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = AiSend;
+    export type RequestHeaders = {};
+    export type ResponseBody =
+      B2BWorkspaceIntegrationsConversationsMessagesCreateData;
+  }
+
+  /**
+   * @description POST /integrations/<provider>/import/ — the vendor's data export.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsImportCreate
+   * @summary Import a Claude / ChatGPT data export
+   * @request POST:/b2b/workspace/integrations/{provider}/import/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsImportCreate {
+    export type RequestParams = {
+      provider: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** @format binary */
+      file: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsImportCreateData;
+  }
+
+  /**
+   * @description GET /integrations/<provider>/projects/
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceIntegrationsProjectsList
+   * @summary The assistant's projects
+   * @request GET:/b2b/workspace/integrations/{provider}/projects/
+   * @secure
+   */
+  export namespace B2BWorkspaceIntegrationsProjectsList {
+    export type RequestParams = {
+      provider: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceIntegrationsProjectsListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryCategoriesList
+   * @summary List product categories
+   * @request GET:/b2b/workspace/inventory/categories/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryCategoriesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryCategoriesListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryCategoriesCreate
+   * @summary Create a product category (manage)
+   * @request POST:/b2b/workspace/inventory/categories/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryCategoriesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CategoryWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryCategoriesCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryCategoriesPartialUpdate
+   * @summary Edit a product category
+   * @request PATCH:/b2b/workspace/inventory/categories/{category_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryCategoriesPartialUpdate {
+    export type RequestParams = {
+      categoryId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = CategoryPatch;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryCategoriesPartialUpdateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryCategoriesDelete
+   * @summary Delete a product category
+   * @request DELETE:/b2b/workspace/inventory/categories/{category_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryCategoriesDelete {
+    export type RequestParams = {
+      categoryId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryCategoriesDeleteData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsList
+   * @summary List stock documents
+   * @request GET:/b2b/workspace/inventory/documents/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      kind?:
+        | "receipt"
+        | "transfer"
+        | "inventory"
+        | "write_off"
+        | "revaluation"
+        | "sale"
+        | "return";
+      status?: "draft" | "sent" | "pending" | "confirmed" | "cancelled";
+      warehouse_id?: number;
+      supplier_id?: number;
+      customer_id?: number;
+      lead_id?: number;
+      q?: string;
+      from?: string;
+      to?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsCreate
+   * @summary File a stock document (and confirm it)
+   * @request POST:/b2b/workspace/inventory/documents/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = DocumentWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsPendingList
+   * @summary Sales waiting for stock (backorders)
+   * @request GET:/b2b/workspace/inventory/documents/pending/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsPendingList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsPendingListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsRead
+   * @summary A stock document with its lines
+   * @request GET:/b2b/workspace/inventory/documents/{document_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsRead {
+    export type RequestParams = {
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsReadData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsPartialUpdate
+   * @summary Edit a draft document
+   * @request PATCH:/b2b/workspace/inventory/documents/{document_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsPartialUpdate {
+    export type RequestParams = {
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = DocumentPatch;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsPartialUpdateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsDelete
+   * @summary Delete a draft document
+   * @request DELETE:/b2b/workspace/inventory/documents/{document_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsDelete {
+    export type RequestParams = {
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsDeleteData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsCancelCreate
+   * @summary Cancel (storno) a document, with a reason
+   * @request POST:/b2b/workspace/inventory/documents/{document_id}/cancel/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsCancelCreate {
+    export type RequestParams = {
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = Cancel;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsCancelCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsConfirmCreate
+   * @summary Confirm a document — apply it to the ledger
+   * @request POST:/b2b/workspace/inventory/documents/{document_id}/confirm/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsConfirmCreate {
+    export type RequestParams = {
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsConfirmCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsPreviewList
+   * @summary What confirming would do to each balance
+   * @request GET:/b2b/workspace/inventory/documents/{document_id}/preview/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsPreviewList {
+    export type RequestParams = {
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsPreviewListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsReceiveCreate
+   * @summary Receive a sent transfer
+   * @request POST:/b2b/workspace/inventory/documents/{document_id}/receive/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsReceiveCreate {
+    export type RequestParams = {
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsReceiveCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryDocumentsSendCreate
+   * @summary Send a transfer (stock leaves the source)
+   * @request POST:/b2b/workspace/inventory/documents/{document_id}/send/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryDocumentsSendCreate {
+    export type RequestParams = {
+      documentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryDocumentsSendCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryExportList
+   * @summary Export the catalogue, balances or ledger as XLSX
+   * @request GET:/b2b/workspace/inventory/export/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryExportList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      what?: "catalog" | "stock" | "movements";
+      from?: string;
+      to?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryExportListData;
+  }
+
+  /**
+   * @description GET /inventory/generate/?what=sku|barcode — a fresh article or barcode.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryGenerateList
+   * @summary Generate an article or barcode
+   * @request GET:/b2b/workspace/inventory/generate/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryGenerateList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      what?: "sku" | "barcode";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryGenerateListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryImportCommitCreate
+   * @summary Write the rows a preview produced
+   * @request POST:/b2b/workspace/inventory/import/commit/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryImportCommitCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = ImportCommit;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryImportCommitCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryImportPreviewCreate
+   * @summary Read an XLSX and say what importing it would do
+   * @request POST:/b2b/workspace/inventory/import/preview/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryImportPreviewCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryImportPreviewCreateData;
+  }
+
+  /**
+   * @description GET  /inventory/movements/ — the ledger, newest first. POST /inventory/movements/ — one line booked straight away, as a document of the matching kind that is confirmed in the same breath.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryMovementsList
+   * @summary List stock movements
+   * @request GET:/b2b/workspace/inventory/movements/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryMovementsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      product_id?: number;
+      warehouse_id?: number;
+      kind?:
+        | "receipt"
+        | "sale"
+        | "write_off"
+        | "transfer"
+        | "adjustment"
+        | "return";
+      category_id?: number;
+      supplier_id?: number;
+      customer_id?: number;
+      author_id?: number;
+      document_id?: number;
+      q?: string;
+      /** ISO date or datetime, inclusive */
+      from?: string;
+      /** ISO date (whole day) or datetime, exclusive */
+      to?: string;
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryMovementsListData;
+  }
+
+  /**
+   * @description GET  /inventory/movements/ — the ledger, newest first. POST /inventory/movements/ — one line booked straight away, as a document of the matching kind that is confirmed in the same breath.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryMovementsCreate
+   * @summary Book a one-line stock operation
+   * @request POST:/b2b/workspace/inventory/movements/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryMovementsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = MovementWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryMovementsCreateData;
+  }
+
+  /**
+   * @description GET  /inventory/products/ — the catalogue with stock per warehouse. POST /inventory/products/ — add to it (manage).
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsList
+   * @summary List products with stock
+   * @request GET:/b2b/workspace/inventory/products/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Name, article, barcode or brand */
+      q?: string;
+      category_id?: number;
+      supplier_id?: number;
+      /** Only products with stock in this warehouse */
+      warehouse_id?: number;
+      brand?: string;
+      kind?: "product" | "service" | "bundle";
+      status?: "active" | "inactive" | "low" | "zero" | "archived";
+      price_min?: number;
+      price_max?: number;
+      low_stock?: boolean;
+      /** Archived products only */
+      all?: boolean;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsListData;
+  }
+
+  /**
+   * @description GET  /inventory/products/ — the catalogue with stock per warehouse. POST /inventory/products/ — add to it (manage).
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsCreate
+   * @summary Create a product (manage)
+   * @request POST:/b2b/workspace/inventory/products/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = ProductWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsRead
+   * @summary Product with stock, components and variants
+   * @request GET:/b2b/workspace/inventory/products/{product_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsRead {
+    export type RequestParams = {
+      productId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsReadData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsPartialUpdate
+   * @summary Edit a product (manage; prices need reprice)
+   * @request PATCH:/b2b/workspace/inventory/products/{product_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsPartialUpdate {
+    export type RequestParams = {
+      productId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = ProductPatch;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsPartialUpdateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsDelete
+   * @summary Archive a product (manage)
+   * @request DELETE:/b2b/workspace/inventory/products/{product_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsDelete {
+    export type RequestParams = {
+      productId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsDeleteData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsMovementsList
+   * @summary One product's stock history
+   * @request GET:/b2b/workspace/inventory/products/{product_id}/movements/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsMovementsList {
+    export type RequestParams = {
+      productId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsMovementsListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsPhotoCreate
+   * @summary Set a product's photo (manage)
+   * @request POST:/b2b/workspace/inventory/products/{product_id}/photo/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsPhotoCreate {
+    export type RequestParams = {
+      productId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsPhotoCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsPhotoDelete
+   * @summary Remove a product's photo (manage)
+   * @request DELETE:/b2b/workspace/inventory/products/{product_id}/photo/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsPhotoDelete {
+    export type RequestParams = {
+      productId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsPhotoDeleteData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryProductsPricesList
+   * @summary One product's price history
+   * @request GET:/b2b/workspace/inventory/products/{product_id}/prices/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryProductsPricesList {
+    export type RequestParams = {
+      productId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryProductsPricesListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventorySettingsList
+   * @summary Stock-room settings
+   * @request GET:/b2b/workspace/inventory/settings/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventorySettingsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventorySettingsListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventorySettingsPartialUpdate
+   * @summary Change stock-room settings (manage)
+   * @request PATCH:/b2b/workspace/inventory/settings/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventorySettingsPartialUpdate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = SettingsWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventorySettingsPartialUpdateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventorySummaryList
+   * @summary Stock value and turnover for a period
+   * @request GET:/b2b/workspace/inventory/summary/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventorySummaryList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      from?: string;
+      to?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventorySummaryListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventorySuppliersList
+   * @summary List suppliers
+   * @request GET:/b2b/workspace/inventory/suppliers/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventorySuppliersList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      q?: string;
+      all?: boolean;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventorySuppliersListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventorySuppliersCreate
+   * @summary Create a supplier (manage)
+   * @request POST:/b2b/workspace/inventory/suppliers/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventorySuppliersCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = SupplierWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventorySuppliersCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventorySuppliersRead
+   * @summary Supplier with purchase history
+   * @request GET:/b2b/workspace/inventory/suppliers/{supplier_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventorySuppliersRead {
+    export type RequestParams = {
+      supplierId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventorySuppliersReadData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventorySuppliersPartialUpdate
+   * @summary Edit a supplier (manage)
+   * @request PATCH:/b2b/workspace/inventory/suppliers/{supplier_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventorySuppliersPartialUpdate {
+    export type RequestParams = {
+      supplierId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = SupplierPatch;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventorySuppliersPartialUpdateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventorySuppliersDelete
+   * @summary Archive a supplier (manage)
+   * @request DELETE:/b2b/workspace/inventory/suppliers/{supplier_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventorySuppliersDelete {
+    export type RequestParams = {
+      supplierId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventorySuppliersDeleteData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryWarehousesList
+   * @summary List warehouses
+   * @request GET:/b2b/workspace/inventory/warehouses/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryWarehousesList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      all?: boolean;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryWarehousesListData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryWarehousesCreate
+   * @summary Create a warehouse (manage)
+   * @request POST:/b2b/workspace/inventory/warehouses/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryWarehousesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = WarehouseWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryWarehousesCreateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryWarehousesPartialUpdate
+   * @summary Edit a warehouse
+   * @request PATCH:/b2b/workspace/inventory/warehouses/{warehouse_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryWarehousesPartialUpdate {
+    export type RequestParams = {
+      warehouseId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = WarehousePatch;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryWarehousesPartialUpdateData;
+  }
+
+  /**
+   * No description
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceInventoryWarehousesDelete
+   * @summary Close a warehouse
+   * @request DELETE:/b2b/workspace/inventory/warehouses/{warehouse_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceInventoryWarehousesDelete {
+    export type RequestParams = {
+      warehouseId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceInventoryWarehousesDeleteData;
+  }
+
+  /**
    * @description GET/POST /api/b2b/workspace/invites/
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceInvitesList
@@ -8487,7 +15465,7 @@ export namespace B2B {
   }
 
   /**
-   * @description GET /api/b2b/workspace/join-requests/ — who is asking to be let in.
+   * @description GET /api/b2b/workspace/join-requests/ — who is asking to be let in. Gated on `EMPLOYEE_INVITE`, the permission to let somebody in. TZ v2 §11 gives "invite members" and "accept join requests" the same answer on every row — the owner and the administrator, a manager only "in their own workspace, when permitted", nobody below — so they are one permission rather than two that would have to be kept in step. The same permission picks who is told when a request arrives, see `access_repository.list_employee_invite_recipients`.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceJoinRequestsList
    * @summary Join requests
@@ -8503,7 +15481,7 @@ export namespace B2B {
   }
 
   /**
-   * @description POST /api/b2b/workspace/join-requests/<id>/<accept|decline>/
+   * @description POST /api/b2b/workspace/join-requests/<id>/<accept|decline>/ Same audience as the list — see [WorkspaceJoinRequestListView]. What standing the person is let in with is chosen per request; changing a role afterwards is a different act and still needs `EMPLOYEE_CHANGE_ROLE`. TZ v2 §5.2 names the three answers — accept as asked, decline, or change the modules and then accept — and two rules on accepting: a role is always assigned, and it may not exceed the acceptor's own.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceJoinRequestsCreate
    * @summary Answer a join request
@@ -8533,6 +15511,8 @@ export namespace B2B {
     export type RequestParams = {};
     export type RequestQuery = {
       status?: "new" | "in_progress" | "completed";
+      quality?: "good" | "bad" | "unmarked";
+      kind?: "lead" | "quick_sale" | "any";
     };
     export type RequestBody = never;
     export type RequestHeaders = {};
@@ -8577,7 +15557,7 @@ export namespace B2B {
    * @description GET /api/b2b/workspace/leads/<id>/ — the whole lead in one response. The detail screen shows the lead, its priced lines, its history and the tasks raised off it all at once, so it fetches them together: four small queries on the server beats four round trips from a phone.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceLeadsDelete
-   * @summary Delete a lead (owner or manager)
+   * @summary Delete a lead (owner or administrator only)
    * @request DELETE:/b2b/workspace/leads/{lead_id}/
    * @secure
    */
@@ -8664,6 +15644,24 @@ export namespace B2B {
   }
 
   /**
+   * @description POST /api/b2b/workspace/leads/<id>/due-date/ — set, move or clear the deal's deadline. The claimant's, like every other write on the deal, and a manager's over their head — a deadline is as often the manager's call as the salesperson's, which is the one place this differs from ``WorkspaceLeadStageView``. A closed lead keeps whatever date it had. Putting a deadline on a deal that is already won or lost sets a clock nothing can run down.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsDueDateCreate
+   * @summary Set or clear a lead's deadline
+   * @request POST:/b2b/workspace/leads/{lead_id}/due-date/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsDueDateCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = LeadDueDateWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsDueDateCreateData;
+  }
+
+  /**
    * @description POST   /api/b2b/workspace/leads/<id>/items/ — add a priced line. PUT    /api/b2b/workspace/leads/<id>/items/ — replace the whole list. Either way the lead's ``amount`` is re-totalled, so the board's money never disagrees with the lines it came from.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceLeadsItemsCreate
@@ -8719,7 +15717,25 @@ export namespace B2B {
   }
 
   /**
-   * @description POST /api/b2b/workspace/leads/<id>/stage/ — move the lead along the funnel. The claimant only, and never on a closed lead. Reaching ``won`` or ``lost`` completes it; that rule lives in the repository so this view does not have to know which stages are terminal.
+   * @description POST /api/b2b/workspace/leads/<id>/quality/ — mark the enquiry good or bad, or take the mark off. Who may: whoever is working the deal, and a manager over their head — the same pair as the deadline, and for the same reason. The salesperson who rang the number is the one who knows it was a wrong number; the manager reading the board is the one who has to be able to correct a lead written off too quickly. A closed lead is *not* refused here, unlike the deadline. A deadline on a finished deal sets a clock nothing runs down, but "that enquiry was never real" is a judgement most often made about a deal that has already been lost — refusing it there would put the mark out of reach on exactly the leads it is for.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceLeadsQualityCreate
+   * @summary Mark a lead good or bad, or clear the mark
+   * @request POST:/b2b/workspace/leads/{lead_id}/quality/
+   * @secure
+   */
+  export namespace B2BWorkspaceLeadsQualityCreate {
+    export type RequestParams = {
+      leadId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = LeadQualityWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceLeadsQualityCreateData;
+  }
+
+  /**
+   * @description POST /api/b2b/workspace/leads/<id>/stage/ — move the lead along the funnel. The claimant only, and never on a closed lead. Reaching ``won`` or ``lost`` completes it; that rule lives in the repository so this view does not have to know which stages are terminal. Takes JSON or ``multipart/form-data``: a move can carry one document — the signed contract behind "Yutdik", the offer behind "Taklif yuborildi" — and it is filed against the history row the move writes, so the feed shows it beside the event it belongs to rather than loose on the drive.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceLeadsStageCreate
    * @summary Change a lead's funnel stage
@@ -8731,7 +15747,32 @@ export namespace B2B {
       leadId: string;
     };
     export type RequestQuery = {};
-    export type RequestBody = LeadStageWrite;
+    export type RequestBody = {
+      stage:
+        | "new"
+        | "interested"
+        | "proposal"
+        | "negotiation"
+        | "contract"
+        | "won"
+        | "lost"
+        | "archived";
+      lost_reason?:
+        | "price"
+        | "competitor"
+        | "no_budget"
+        | "no_response"
+        | "not_needed"
+        | "postponed"
+        | "other";
+      /** @maxLength 2000 */
+      note?: string | null;
+      /**
+       * Optional document filed with the move (multipart only).
+       * @format binary
+       */
+      file?: File;
+    };
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceLeadsStageCreateData;
   }
@@ -9074,6 +16115,41 @@ export namespace B2B {
   }
 
   /**
+   * @description PUT    /api/b2b/workspace/me/photo/ — set your own picture. DELETE /api/b2b/workspace/me/photo/ — go back to initials. Yours alone. There is no path here for changing somebody else's: a photo is the one thing on a roster entry that is unambiguously the person's own, and a workspace that could set it for them is a workspace that can put any face against their name. The bytes go through the same door everything else stored here goes through, so they are checked against the company's quota rather than being a way around it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceMePhotoUpdate
+   * @summary Set your own photo
+   * @request PUT:/b2b/workspace/me/photo/
+   * @secure
+   */
+  export namespace B2BWorkspaceMePhotoUpdate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** @format binary */
+      photo: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMePhotoUpdateData;
+  }
+
+  /**
+   * @description PUT    /api/b2b/workspace/me/photo/ — set your own picture. DELETE /api/b2b/workspace/me/photo/ — go back to initials. Yours alone. There is no path here for changing somebody else's: a photo is the one thing on a roster entry that is unambiguously the person's own, and a workspace that could set it for them is a workspace that can put any face against their name. The bytes go through the same door everything else stored here goes through, so they are checked against the company's quota rather than being a way around it.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceMePhotoDelete
+   * @summary Remove your photo
+   * @request DELETE:/b2b/workspace/me/photo/
+   * @secure
+   */
+  export namespace B2BWorkspaceMePhotoDelete {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceMePhotoDeleteData;
+  }
+
+  /**
    * @description PUT /api/b2b/workspace/me/profile/ — correct your own entry. Yours alone, and only the parts that are actually yours: the name people see and the address they write to. The position, the department and the role are the workspace's account of what you do here and are set by whoever runs it, so the app draws them greyed out with that said in words rather than leaving them off the screen — somebody looking for the field that fixes their job title should find the answer, not an absence. The phone is not editable here either. It is what the login is checked against, and moving it is a different act with an OTP behind it.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceMeProfileUpdate
@@ -9103,6 +16179,114 @@ export namespace B2B {
     export type RequestBody = Username;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceMeUsernameUpdateData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/notes/ — the strip above the calendar. POST /api/b2b/workspace/notes/ — a typed note, or the empty shell a recording is then attached to. Filed under the calendar module because that is the only screen that shows
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceNotesList
+   * @summary List quick notes (own, plus what the workspace shared)
+   * @request GET:/b2b/workspace/notes/
+   * @secure
+   */
+  export namespace B2BWorkspaceNotesList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceNotesListData;
+  }
+
+  /**
+   * @description GET  /api/b2b/workspace/notes/ — the strip above the calendar. POST /api/b2b/workspace/notes/ — a typed note, or the empty shell a recording is then attached to. Filed under the calendar module because that is the only screen that shows
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceNotesCreate
+   * @summary Create a quick note
+   * @request POST:/b2b/workspace/notes/
+   * @secure
+   */
+  export namespace B2BWorkspaceNotesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = NoteWrite;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceNotesCreateData;
+  }
+
+  /**
+   * @description PATCH/DELETE /api/b2b/workspace/notes/<id>/ — the author's own note. There is no GET: the strip loads every note the caller can see in one request and the detail screen is drawn from that, so a per-note fetch would only be a second way for the same row to arrive.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceNotesPartialUpdate
+   * @summary Edit a note — text, colour, pinned, shared
+   * @request PATCH:/b2b/workspace/notes/{note_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceNotesPartialUpdate {
+    export type RequestParams = {
+      noteId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = NotePatch;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceNotesPartialUpdateData;
+  }
+
+  /**
+   * @description PATCH/DELETE /api/b2b/workspace/notes/<id>/ — the author's own note. There is no GET: the strip loads every note the caller can see in one request and the detail screen is drawn from that, so a per-note fetch would only be a second way for the same row to arrive.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceNotesDelete
+   * @summary Delete a note
+   * @request DELETE:/b2b/workspace/notes/{note_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceNotesDelete {
+    export type RequestParams = {
+      noteId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceNotesDeleteData;
+  }
+
+  /**
+   * @description POST/DELETE /api/b2b/workspace/notes/<id>/voice/ — the recording. Its own endpoint rather than a field on the create call, for the reason [WorkspaceTaskVoiceView] gives: a note is created as JSON and a clip is multipart. The app posts the note, gets its id, and sends the recording straight after. A note carries at most one clip, and posting a second replaces the first, bytes and all.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceNotesVoiceCreate
+   * @summary Attach a recording to a note
+   * @request POST:/b2b/workspace/notes/{note_id}/voice/
+   * @secure
+   */
+  export namespace B2BWorkspaceNotesVoiceCreate {
+    export type RequestParams = {
+      noteId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** @format binary */
+      file: File;
+      duration_ms?: number;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceNotesVoiceCreateData;
+  }
+
+  /**
+   * @description POST/DELETE /api/b2b/workspace/notes/<id>/voice/ — the recording. Its own endpoint rather than a field on the create call, for the reason [WorkspaceTaskVoiceView] gives: a note is created as JSON and a clip is multipart. The app posts the note, gets its id, and sends the recording straight after. A note carries at most one clip, and posting a second replaces the first, bytes and all.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceNotesVoiceDelete
+   * @summary Remove a note's recording
+   * @request DELETE:/b2b/workspace/notes/{note_id}/voice/
+   * @secure
+   */
+  export namespace B2BWorkspaceNotesVoiceDelete {
+    export type RequestParams = {
+      noteId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceNotesVoiceDeleteData;
   }
 
   /**
@@ -9141,7 +16325,7 @@ export namespace B2B {
   }
 
   /**
-   * @description GET /api/b2b/workspace/org/people/?search= — who else is in the org. The picker on "So'rov yuborish" searches this rather than `/team/`: the whole point is to reach somebody who is *not* in this workspace. Restricted to the org, so a workspace can only ever ask people who share an owner with it — never the whole of WEEL.
+   * @description GET /api/b2b/workspace/org/people/?search= — anyone in the org. The picker on "So'rov yuborish" searches this rather than `/team/`: it spans every workspace under the same owner, this one included, so a name, handle or phone finds the person wherever they sit. Only the searcher is left out. Restricted to the org — never the whole of WEEL.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceOrgPeopleList
    * @summary Search people in the org's other workspaces
@@ -9156,6 +16340,41 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceOrgPeopleListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/presence/ — who is online right now. The socket says so on connect and pushes every change after that, so this is for the case the socket cannot cover: an app that has just come back to the foreground and wants the current picture before its connection is up.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspacePresenceList
+   * @summary Who is online
+   * @request GET:/b2b/workspace/presence/
+   * @secure
+   */
+  export namespace B2BWorkspacePresenceList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspacePresenceListData;
+  }
+
+  /**
+   * @description GET /api/b2b/workspace/reports/ The profile screen's "Hisobot va analitika": the sales funnel, the task board and the calendar over one window, in one response. One endpoint and not three, because the screen is one screen. Three would mean three round trips on open, three spinners, and — since each would take its own `NOW()` — three windows that do not quite line up. Who sees what is decided twice over: * **Scope.** A manager reads the company; everybody else reads their own work. Not a permission check but the honest reading of the question — a salesperson's report is about their month, and a company total on it would be a number they cannot act on. * **Sections.** A guest lent only the sales board gets `sales` and two nulls. `HasModule` guards one module per view and this view spans three, so the gate is applied per section here rather than on the class.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceReportsList
+   * @summary Sales, tasks and calendar over one window
+   * @request GET:/b2b/workspace/reports/
+   * @secure
+   */
+  export namespace B2BWorkspaceReportsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** How far back to count. Defaults to 'month'; an unknown value falls back to it rather than failing. */
+      period?: "week" | "month" | "quarter" | "year";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceReportsListData;
   }
 
   /**
@@ -9413,6 +16632,46 @@ export namespace B2B {
   }
 
   /**
+   * @description POST /api/b2b/workspace/tasks/<id>/files/ — attach a document to a task. Its own endpoint for the same reason the voice note has one: a task is written as JSON and a document is multipart, so the app posts the task, gets its id, and sends the files straight after. Unlike the voice note a task carries as many documents as were attached — a brief, its annexes and a photographed receipt are three files and replacing one with the next would be a data loss, not a correction. One request carries one file; several are several requests, which is what lets the app report and retry them one at a time instead of losing a whole batch to the one that was over the limit.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceTasksFilesCreate
+   * @summary Attach a document to a task
+   * @request POST:/b2b/workspace/tasks/{task_id}/files/
+   * @secure
+   */
+  export namespace B2BWorkspaceTasksFilesCreate {
+    export type RequestParams = {
+      taskId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** @format binary */
+      file: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceTasksFilesCreateData;
+  }
+
+  /**
+   * @description DELETE /api/b2b/workspace/tasks/<id>/files/<file_id>/ — detach one. The bytes go with the row. There is no trash for a task attachment: the drive is where files are kept, and something attached to a task is part of the task rather than a document in its own right.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceTasksFilesDelete
+   * @summary Detach a document from a task
+   * @request DELETE:/b2b/workspace/tasks/{task_id}/files/{file_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceTasksFilesDelete {
+    export type RequestParams = {
+      taskId: string;
+      fileId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceTasksFilesDeleteData;
+  }
+
+  /**
    * @description POST /api/b2b/workspace/tasks/<id>/status/ The one write an employee always has: moving a task they were given from todo → in progress → done.
    * @tags B2B / Workspace (mobile)
    * @name B2BWorkspaceTasksStatusCreate
@@ -9521,6 +16780,25 @@ export namespace B2B {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = B2BWorkspaceTrashListData;
+  }
+
+  /**
+   * @description DELETE /api/b2b/workspace/trash/<kind>/<id>/ — destroy one for good. The other half of a bin. Without it the only way out of the trash was back into the working set, so something deleted by mistake and something deleted on purpose sat in the same list for the life of the company — which is what the screen's "Butunlay o'chirish" is for. Gated on the same permission as deleting and restoring, and — in the repository — on the row already being in the bin. Nothing live can be reached through this endpoint: an id that was never deleted answers 404 exactly as an id that never existed.
+   * @tags B2B / Workspace (mobile)
+   * @name B2BWorkspaceTrashDelete
+   * @summary Permanently delete a binned object
+   * @request DELETE:/b2b/workspace/trash/{kind}/{object_id}/
+   * @secure
+   */
+  export namespace B2BWorkspaceTrashDelete {
+    export type RequestParams = {
+      kind: string;
+      objectId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = B2BWorkspaceTrashDeleteData;
   }
 
   /**
@@ -10031,6 +17309,23 @@ export namespace Hotels {
     export type RequestHeaders = {};
     export type ResponseBody = HotelsReadData;
   }
+
+  /**
+   * @description GET /api/hotels/{hotel_id}/calendar/?year=&month=&adults= — a free/occupied dot for every day of one month, for one hotel. Hotelios has no per-day availability endpoint, only `search` for a single date range, so this is one 1-night `search` call per day of the month — run several at a time, but still dozens of round trips to Hotelios for a 30-day month. Genuinely slow on a cold call; the result is cached for `_CACHE_TTL_SECONDS` so the same hotel/month is instant for the next person (or the next open of the drawer) within that window.
+   * @tags api
+   * @name HotelsCalendarList
+   * @request GET:/hotels/{hotel_id}/calendar/
+   * @secure
+   */
+  export namespace HotelsCalendarList {
+    export type RequestParams = {
+      hotelId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = HotelsCalendarListData;
+  }
 }
 
 export namespace Logs {
@@ -10221,6 +17516,2049 @@ export namespace Payment {
 
 export namespace Property {
   /**
+   * @description Returns all prefectures, optionally filtered by district_id or district_guid. Results are cached for 10 minutes.
+   * @tags Property / Meta
+   * @name ListPrefectures
+   * @summary List prefectures
+   * @request GET:/property/
+   * @secure
+   */
+  export namespace ListPrefectures {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Filter by district database id. */
+      district_id?: number;
+      /**
+       * Filter by district GUID.
+       * @format uuid
+       */
+      district_guid?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPrefecturesData;
+  }
+
+  /**
+   * @description Returns every apartment and cottage in the database, including unverified and archived. Supports the same filters as public list (search, region, price, sort, limit, etc.).
+   * @tags Admin / Property
+   * @name PropertyAdminAllList
+   * @summary List all properties (admin)
+   * @request GET:/property/admin/all/
+   * @secure
+   */
+  export namespace PropertyAdminAllList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      /** Optional. Omit to return apartments and cottages together. */
+      property_type?: "apartment" | "cottage" | "apartments" | "cottages";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminAllListData;
+  }
+
+  /**
+   * @description Admin-only apartment creation endpoint.
+   * @tags Admin / Property
+   * @name PropertyAdminApartmentsCreate
+   * @summary Create apartment (admin)
+   * @request POST:/property/admin/apartments/
+   * @secure
+   */
+  export namespace PropertyAdminApartmentsCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = ApartmentAdminUpdate;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminApartmentsCreateData;
+  }
+
+  /**
+   * @description Returns the full admin view of an apartment by its guid.
+   * @tags Admin / Property
+   * @name PropertyAdminApartmentsRead
+   * @summary Retrieve apartment (admin)
+   * @request GET:/property/admin/apartments/{apartment_id}/
+   * @secure
+   */
+  export namespace PropertyAdminApartmentsRead {
+    export type RequestParams = {
+      apartmentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminApartmentsReadData;
+  }
+
+  /**
+   * @description Admin-only full update for every writable field on the apartment table,
+   * @tags Admin / Property
+   * @name PropertyAdminApartmentsPartialUpdate
+   * @summary Patch apartment (Admin)
+   * @request PATCH:/property/admin/apartments/{apartment_id}/
+   * @secure
+   */
+  export namespace PropertyAdminApartmentsPartialUpdate {
+    export type RequestParams = {
+      apartmentId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = ApartmentAdminUpdate;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminApartmentsPartialUpdateData;
+  }
+
+  /**
+   * @description Admin-only. Uploads image file(s) and appends them to the property's gallery.
+   * @tags Admin / Property
+   * @name AdminCreatePropertyImageApartments
+   * @summary Upload property image(s) (admin)
+   * @request POST:/property/admin/apartments/{property_id}/images/
+   * @secure
+   */
+  export namespace AdminCreatePropertyImageApartments {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** Image file to upload (JPEG/PNG/WebP). */
+      image: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminCreatePropertyImageApartmentsData;
+  }
+
+  /**
+   * @description Admin-only. Removes a specific image from the property's gallery.
+   * @tags Admin / Property
+   * @name AdminDeletePropertyImageApartments
+   * @summary Delete a specific property image (admin)
+   * @request DELETE:/property/admin/apartments/{property_id}/images/{image_id}/
+   * @secure
+   */
+  export namespace AdminDeletePropertyImageApartments {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+      /** Image URL or stored path of the image to delete. */
+      imageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = any;
+  }
+
+  /**
+   * @description Admin-only cottage creation endpoint.
+   * @tags Admin / Property
+   * @name PropertyAdminCottagesCreate
+   * @summary Create cottage (admin)
+   * @request POST:/property/admin/cottages/
+   * @secure
+   */
+  export namespace PropertyAdminCottagesCreate {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = CottageAdminUpdate;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminCottagesCreateData;
+  }
+
+  /**
+   * @description Returns the full admin view of a cottage by its guid.
+   * @tags Admin / Property
+   * @name PropertyAdminCottagesRead
+   * @summary Retrieve cottage (admin)
+   * @request GET:/property/admin/cottages/{cottage_id}/
+   * @secure
+   */
+  export namespace PropertyAdminCottagesRead {
+    export type RequestParams = {
+      cottageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminCottagesReadData;
+  }
+
+  /**
+   * @description Admin-only partial update for every writable field on the cottage table, including verification/archival/recommendation flags and owner reassignment. Unlike the partner endpoint, this does NOT auto-reset verification on save.
+   * @tags Admin / Property
+   * @name PropertyAdminCottagesPartialUpdate
+   * @summary Patch cottage (admin)
+   * @request PATCH:/property/admin/cottages/{cottage_id}/
+   * @secure
+   */
+  export namespace PropertyAdminCottagesPartialUpdate {
+    export type RequestParams = {
+      cottageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = CottageAdminUpdate;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminCottagesPartialUpdateData;
+  }
+
+  /**
+   * @description Admin-only hard delete of a cottage by its guid.
+   * @tags Admin / Property
+   * @name DeleteAdminCottage
+   * @summary Delete cottage (admin)
+   * @request DELETE:/property/admin/cottages/{cottage_id}/
+   * @secure
+   */
+  export namespace DeleteAdminCottage {
+    export type RequestParams = {
+      cottageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = any;
+  }
+
+  /**
+   * @description Admin-only. Uploads image file(s) and appends them to the property's gallery.
+   * @tags Admin / Property
+   * @name AdminCreatePropertyImageCottages
+   * @summary Upload property image(s) (admin)
+   * @request POST:/property/admin/cottages/{property_id}/images/
+   * @secure
+   */
+  export namespace AdminCreatePropertyImageCottages {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** Image file to upload (JPEG/PNG/WebP). */
+      image: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminCreatePropertyImageCottagesData;
+  }
+
+  /**
+   * @description Admin-only. Removes a specific image from the property's gallery.
+   * @tags Admin / Property
+   * @name AdminDeletePropertyImageCottages
+   * @summary Delete a specific property image (admin)
+   * @request DELETE:/property/admin/cottages/{property_id}/images/{image_id}/
+   * @secure
+   */
+  export namespace AdminDeletePropertyImageCottages {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+      /** Image URL or stored path of the image to delete. */
+      imageId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = any;
+  }
+
+  /**
+   * @description Returns districts, optionally filtered by region_id or region guid.
+   * @tags Admin / Property
+   * @name PropertyAdminDistrictsList
+   * @summary List districts (admin)
+   * @request GET:/property/admin/districts/
+   * @secure
+   */
+  export namespace PropertyAdminDistrictsList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Optional region id (integer) or region guid. */
+      region_id?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminDistrictsListData;
+  }
+
+  /**
+   * @description Returns prefectures, optionally filtered by district_id or district_guid.
+   * @tags Admin / Property
+   * @name PropertyAdminPrefecturesList
+   * @summary List prefectures (admin)
+   * @request GET:/property/admin/prefectures/
+   * @secure
+   */
+  export namespace PropertyAdminPrefecturesList {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Optional district id filter. */
+      district_id?: number;
+      /** Optional district guid filter. */
+      district_guid?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminPrefecturesListData;
+  }
+
+  /**
+   * @description Returns all regions without caching (admin access).
+   * @tags Admin / Property
+   * @name PropertyAdminRegionsList
+   * @summary List regions (admin)
+   * @request GET:/property/admin/regions/
+   * @secure
+   */
+  export namespace PropertyAdminRegionsList {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyAdminRegionsListData;
+  }
+
+  /**
+   * @description Returns all property types with titles in all languages, kind, and current icon URL.
+   * @tags Admin / Property
+   * @name AdminListPropertyTypes
+   * @summary List property types (admin)
+   * @request GET:/property/admin/types/
+   * @secure
+   */
+  export namespace AdminListPropertyTypes {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminListPropertyTypesData;
+  }
+
+  /**
+   * @description Admin-only. Uploads an SVG or PNG icon for the specified property type.
+   * @tags Admin / Property
+   * @name AdminUploadPropertyTypeIcon
+   * @summary Upload icon for a property type
+   * @request POST:/property/admin/types/{type_guid}/icon/
+   * @secure
+   */
+  export namespace AdminUploadPropertyTypeIcon {
+    export type RequestParams = {
+      /**
+       * Property type GUID.
+       * @format uuid
+       */
+      typeGuid: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** Icon image file (SVG or PNG). */
+      icon: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = AdminUploadPropertyTypeIconData;
+  }
+
+  /**
+   * @description Returns verified public apartments. Without `limit` and `page`, all matching rows are returned; with either query param, results are paginated (default page size 20, max `limit` 100). Supports search, filtering, and sorting. `X-Testing-Mode: true` returns only testing apartments; otherwise testing apartments are excluded.
+   * @tags Property / Public
+   * @name ListApartments
+   * @summary List apartments
+   * @request GET:/property/apartments/
+   * @secure
+   */
+  export namespace ListApartments {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
+      "X-Testing-Mode"?: boolean;
+    };
+    export type ResponseBody = ListApartmentsData;
+  }
+
+  /**
+   * @description Partner-only. Creates a new apartment listing. The property is created with verification_status=waiting.
+   * @tags Property / Partner
+   * @name CreateApartment
+   * @summary Create an apartment
+   * @request POST:/property/apartments/
+   * @secure
+   */
+  export namespace CreateApartment {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = ApartmentCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreateApartmentData;
+  }
+
+  /**
+   * No description
+   * @tags api
+   * @name PropertyApartmentsRead
+   * @request GET:/property/apartments/{property_id}/
+   * @secure
+   */
+  export namespace PropertyApartmentsRead {
+    export type RequestParams = {
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyApartmentsReadData;
+  }
+
+  /**
+   * @description Partner-only full update for an apartment or cottage. Mutating fields resets verification status to waiting.
+   * @tags Property / Partner
+   * @name FullUpdateProperty
+   * @summary Fully update a property
+   * @request PATCH:/property/apartments/{property_id}/
+   * @secure
+   */
+  export namespace FullUpdateProperty {
+    export type RequestParams = {
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = ApartmentUpdate;
+    export type RequestHeaders = {};
+    export type ResponseBody = FullUpdatePropertyData;
+  }
+
+  /**
+   * @description Partner-only hard delete of an apartment or cottage.
+   * @tags Property / Partner
+   * @name DeletePropertyApartments
+   * @summary Delete a property
+   * @request DELETE:/property/apartments/{property_id}/
+   * @secure
+   */
+  export namespace DeletePropertyApartments {
+    export type RequestParams = {
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = any;
+  }
+
+  /**
+   * @description Partner-only. Uploads image file(s) and appends them to the property's gallery. If the property is not yet verified, the images are marked as pending approval.
+   * @tags Property / Partner
+   * @name CreatePropertyImageApartments
+   * @summary Upload property image(s)
+   * @request POST:/property/apartments/{property_id}/images/
+   * @secure
+   */
+  export namespace CreatePropertyImageApartments {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** Image file to upload (JPEG/PNG/WebP). */
+      image: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatePropertyImageApartmentsData;
+  }
+
+  /**
+   * @description Partner-only. Replaces a specific image in the property's gallery. If the property is not yet verified, the image is marked as pending approval.
+   * @tags Property / Partner
+   * @name UpdatePropertyImageApartments
+   * @summary Update a specific property image
+   * @request PATCH:/property/apartments/{property_id}/images/{image_url}/
+   * @secure
+   */
+  export namespace UpdatePropertyImageApartments {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+      /** Image URL or stored path of the image to replace. */
+      imageUrl: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** New image file to upload (JPEG/PNG/WebP). */
+      image: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = UpdatePropertyImageApartmentsData;
+  }
+
+  /**
+   * @description Partner-only. Removes a specific image from the property's gallery.
+   * @tags Property / Partner
+   * @name DeletePropertyImageApartments
+   * @summary Delete a specific property image
+   * @request DELETE:/property/apartments/{property_id}/images/{image_url}/
+   * @secure
+   */
+  export namespace DeletePropertyImageApartments {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+      /** Image URL or stored path of the image to delete. */
+      imageUrl: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = any;
+  }
+
+  /**
+   * @description Partner-only. Returns all reviews for a property, including hidden ones.
+   * @tags Property / Partner
+   * @name ListPartnerPropertyReviewsApartments
+   * @summary List all reviews for a property (partner)
+   * @request GET:/property/apartments/{property_id}/partner/reviews/
+   * @secure
+   */
+  export namespace ListPartnerPropertyReviewsApartments {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPartnerPropertyReviewsApartmentsData;
+  }
+
+  /**
+   * @description Returns public reviews for a property. No authentication required.
+   * @tags Property / Reviews
+   * @name ListPropertyReviewsApartments
+   * @summary List property reviews
+   * @request GET:/property/apartments/{property_id}/reviews/
+   * @secure
+   */
+  export namespace ListPropertyReviewsApartments {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPropertyReviewsApartmentsData;
+  }
+
+  /**
+   * @description Client-only. Creates a review for a property the client has an eligible completed or accepted booking for.
+   * @tags Property / Reviews
+   * @name CreatePropertyReviewApartments
+   * @summary Create a property review
+   * @request POST:/property/apartments/{property_id}/reviews/
+   * @secure
+   */
+  export namespace CreatePropertyReviewApartments {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = RawPropertyReviewCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatePropertyReviewApartmentsData;
+  }
+
+  /**
+   * @description Returns the public property categories (apartment, cottage) with localized titles and icon URLs. Hotels are excluded — they are served through the separate Bookhara/Hotelios integration. Results are cached for 10 minutes.
+   * @tags Property / Meta
+   * @name ListCategories
+   * @summary List categories
+   * @request GET:/property/categories/
+   * @secure
+   */
+  export namespace ListCategories {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /**
+       * Preferred language for localized titles. Defaults to Uzbek.
+       * @default "uz"
+       */
+      "Accept-Language"?: "en" | "ru" | "uz";
+    };
+    export type ResponseBody = ListCategoriesData;
+  }
+
+  /**
+   * @description Returns public apartment/cottage listings for the given category guid (the guid returned by /property/categories/). Unknown or hotel category guids return an empty list — hotels are served through the separate Bookhara/Hotelios integration.
+   * @tags Property / Meta
+   * @name ListCategoryPropertyRecommendations
+   * @summary List property recommendations by category
+   * @request GET:/property/categories/{category_id}/properties/
+   * @secure
+   */
+  export namespace ListCategoryPropertyRecommendations {
+    export type RequestParams = {
+      categoryId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListCategoryPropertyRecommendationsData;
+  }
+
+  /**
+   * @description Returns the most recently created public apartment/cottage listings for the given category guid, newest first.
+   * @tags Property / Meta
+   * @name ListCategoryLatestProperties
+   * @summary List latest properties by category
+   * @request GET:/property/categories/{category_id}/properties/latest/
+   * @secure
+   */
+  export namespace ListCategoryLatestProperties {
+    export type RequestParams = {
+      categoryId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListCategoryLatestPropertiesData;
+  }
+
+  /**
+   * @description Returns verified public cottages. Without `limit` and `page`, all matching rows are returned; with either query param, results are paginated (default page size 20, max `limit` 100). Supports search, filtering, and sorting. `X-Testing-Mode: true` returns only testing cottages; otherwise testing cottages are excluded.
+   * @tags Property / Public
+   * @name ListCottages
+   * @summary List cottages
+   * @request GET:/property/cottages/
+   * @secure
+   */
+  export namespace ListCottages {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
+      "X-Testing-Mode"?: boolean;
+    };
+    export type ResponseBody = ListCottagesData;
+  }
+
+  /**
+   * @description Partner-only. Creates a new cottage listing. The property is created with verification_status=waiting.
+   * @tags Property / Partner
+   * @name CreateCottage
+   * @summary Create a cottage
+   * @request POST:/property/cottages/
+   * @secure
+   */
+  export namespace CreateCottage {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = {
+      title: string;
+      /** @default "UZS" */
+      currency?: "USD" | "UZS";
+      /** @default false */
+      weekend_only_sunday_inclusive?: boolean;
+      /**
+       * Per-person price (both months unless you vary via legacy `price` list only).
+       * @format double
+       */
+      price_per_person?: number | null;
+      /**
+       * Working-day rate.
+       * @format double
+       */
+      price_on_working_days?: number | null;
+      /**
+       * Weekend rate.
+       * @format double
+       */
+      price_on_weekends?: number | null;
+      /**
+       * First pricing month: interval start (YYYY-MM-DD). Use with month_to, next_month_from, next_month_to.
+       * @format date
+       */
+      month_from?: string | null;
+      /**
+       * First pricing month: interval end (YYYY-MM-DD). Should be the last day of that month.
+       * @format date
+       */
+      month_to?: string | null;
+      /**
+       * Second pricing month: interval start.
+       * @format date
+       */
+      next_month_from?: string | null;
+      /**
+       * Second pricing month: interval end.
+       * @format date
+       */
+      next_month_to?: string | null;
+      latitude?: string | null;
+      longitude?: string | null;
+      country?: string | null;
+      city?: string | null;
+      region_id?: string | null;
+      district_id?: string | null;
+      /** @format uuid */
+      prefecture_id?: string | null;
+      description_en?: string | null;
+      description_ru?: string | null;
+      description_uz?: string | null;
+      /** @format time */
+      check_in?: string | null;
+      /** @format time */
+      check_out?: string | null;
+      /** @default false */
+      is_allowed_alcohol?: boolean;
+      /** @default false */
+      is_allowed_corporate?: boolean;
+      /** @default false */
+      is_allowed_pets?: boolean;
+      /** @default false */
+      is_quiet_hours?: boolean;
+      /** Service UUIDs (same as legacy `property_services`). */
+      services?: string[];
+      guests?: number | null;
+      rooms?: number | null;
+      beds?: number | null;
+      bathrooms?: number | null;
+      /** Image paths or URLs; a single string is also accepted by the API. */
+      img?: string[] | null;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = CreateCottageData;
+  }
+
+  /**
+   * @description Same as `PropertyRetrieveUpdateDestroyView` but Swagger documents cottage PATCH body (flat, like create).
+   * @tags api
+   * @name PropertyCottagesRead
+   * @request GET:/property/cottages/{property_id}/
+   * @secure
+   */
+  export namespace PropertyCottagesRead {
+    export type RequestParams = {
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = PropertyCottagesReadData;
+  }
+
+  /**
+   * @description Partner-only partial update for a cottage. Request body matches POST /api/property/cottages/ (flat `price_*`, month range fields, location, descriptions, services, rooms); all fields optional.
+   * @tags Property / Partner
+   * @name PartialUpdateCottage
+   * @summary Partially update a cottage
+   * @request PATCH:/property/cottages/{property_id}/
+   * @secure
+   */
+  export namespace PartialUpdateCottage {
+    export type RequestParams = {
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      title?: string;
+      /** @default "UZS" */
+      currency?: "USD" | "UZS";
+      /** @default false */
+      weekend_only_sunday_inclusive?: boolean;
+      /**
+       * Per-person price (both months unless you vary via legacy `price` list only).
+       * @format double
+       */
+      price_per_person?: number | null;
+      /**
+       * Working-day rate.
+       * @format double
+       */
+      price_on_working_days?: number | null;
+      /**
+       * Weekend rate.
+       * @format double
+       */
+      price_on_weekends?: number | null;
+      /**
+       * First pricing month: interval start (YYYY-MM-DD). Use with month_to, next_month_from, next_month_to.
+       * @format date
+       */
+      month_from?: string | null;
+      /**
+       * First pricing month: interval end (YYYY-MM-DD). Should be the last day of that month.
+       * @format date
+       */
+      month_to?: string | null;
+      /**
+       * Second pricing month: interval start.
+       * @format date
+       */
+      next_month_from?: string | null;
+      /**
+       * Second pricing month: interval end.
+       * @format date
+       */
+      next_month_to?: string | null;
+      latitude?: string | null;
+      longitude?: string | null;
+      country?: string | null;
+      city?: string | null;
+      region_id?: string | null;
+      district_id?: string | null;
+      /** @format uuid */
+      prefecture_id?: string | null;
+      description_en?: string | null;
+      description_ru?: string | null;
+      description_uz?: string | null;
+      /** @format time */
+      check_in?: string | null;
+      /** @format time */
+      check_out?: string | null;
+      /** @default false */
+      is_allowed_alcohol?: boolean;
+      /** @default false */
+      is_allowed_corporate?: boolean;
+      /** @default false */
+      is_allowed_pets?: boolean;
+      /** @default false */
+      is_quiet_hours?: boolean;
+      /** Service UUIDs (same as legacy `property_services`). */
+      services?: string[];
+      guests?: number | null;
+      rooms?: number | null;
+      beds?: number | null;
+      bathrooms?: number | null;
+      /** Image paths or URLs; a single string is also accepted by the API. */
+      img?: string[] | null;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = PartialUpdateCottageData;
+  }
+
+  /**
+   * @description Partner-only hard delete of an apartment or cottage.
+   * @tags Property / Partner
+   * @name DeletePropertyCottages
+   * @summary Delete a property
+   * @request DELETE:/property/cottages/{property_id}/
+   * @secure
+   */
+  export namespace DeletePropertyCottages {
+    export type RequestParams = {
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = any;
+  }
+
+  /**
+   * @description Partner-only. Uploads image file(s) and appends them to the property's gallery. If the property is not yet verified, the images are marked as pending approval.
+   * @tags Property / Partner
+   * @name CreatePropertyImageCottages
+   * @summary Upload property image(s)
+   * @request POST:/property/cottages/{property_id}/images/
+   * @secure
+   */
+  export namespace CreatePropertyImageCottages {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** Image file to upload (JPEG/PNG/WebP). */
+      image: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatePropertyImageCottagesData;
+  }
+
+  /**
+   * @description Partner-only. Replaces a specific image in the property's gallery. If the property is not yet verified, the image is marked as pending approval.
+   * @tags Property / Partner
+   * @name UpdatePropertyImageCottages
+   * @summary Update a specific property image
+   * @request PATCH:/property/cottages/{property_id}/images/{image_url}/
+   * @secure
+   */
+  export namespace UpdatePropertyImageCottages {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+      /** Image URL or stored path of the image to replace. */
+      imageUrl: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = {
+      /** New image file to upload (JPEG/PNG/WebP). */
+      image: File;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = UpdatePropertyImageCottagesData;
+  }
+
+  /**
+   * @description Partner-only. Removes a specific image from the property's gallery.
+   * @tags Property / Partner
+   * @name DeletePropertyImageCottages
+   * @summary Delete a specific property image
+   * @request DELETE:/property/cottages/{property_id}/images/{image_url}/
+   * @secure
+   */
+  export namespace DeletePropertyImageCottages {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+      /** Image URL or stored path of the image to delete. */
+      imageUrl: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = any;
+  }
+
+  /**
+   * @description Partner-only. Returns all reviews for a property, including hidden ones.
+   * @tags Property / Partner
+   * @name ListPartnerPropertyReviewsCottages
+   * @summary List all reviews for a property (partner)
+   * @request GET:/property/cottages/{property_id}/partner/reviews/
+   * @secure
+   */
+  export namespace ListPartnerPropertyReviewsCottages {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPartnerPropertyReviewsCottagesData;
+  }
+
+  /**
+   * @description Returns public reviews for a property. No authentication required.
+   * @tags Property / Reviews
+   * @name ListPropertyReviewsCottages
+   * @summary List property reviews
+   * @request GET:/property/cottages/{property_id}/reviews/
+   * @secure
+   */
+  export namespace ListPropertyReviewsCottages {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPropertyReviewsCottagesData;
+  }
+
+  /**
+   * @description Client-only. Creates a review for a property the client has an eligible completed or accepted booking for.
+   * @tags Property / Reviews
+   * @name CreatePropertyReviewCottages
+   * @summary Create a property review
+   * @request POST:/property/cottages/{property_id}/reviews/
+   * @secure
+   */
+  export namespace CreatePropertyReviewCottages {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = RawPropertyReviewCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatePropertyReviewCottagesData;
+  }
+
+  /**
+   * @description Powers the `Где?` sheet. Returns `nearby` places ordered by distance when `lat`/`lon` are supplied, and `recommended` destinations (regions and districts with the most listings) otherwise. `search` filters both lists by name.
+   * @tags Property / Public
+   * @name ListSearchDestinations
+   * @summary Search destinations
+   * @request GET:/property/destinations/
+   * @secure
+   */
+  export namespace ListSearchDestinations {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      search?: string;
+      /** @format float */
+      lat?: number;
+      /** @format float */
+      lon?: number;
+      limit?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListSearchDestinationsData;
+  }
+
+  /**
+   * @description Returns all districts, optionally filtered by region_id or region GUID. Results are cached for 10 minutes.
+   * @tags Property / Meta
+   * @name ListDistricts
+   * @summary List districts
+   * @request GET:/property/districts/
+   * @secure
+   */
+  export namespace ListDistricts {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Filter by region database id or region GUID. */
+      region_id?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListDistrictsData;
+  }
+
+  /**
+   * @description Returns the amenity list grouped by category, the selectable property types and the min/max bounds for the budget slider and the room steppers. Pass any active filters to scope the price bounds to the current result set.
+   * @tags Property / Public
+   * @name GetPropertyFilterMeta
+   * @summary Filter sheet metadata
+   * @request GET:/property/filters/
+   * @secure
+   */
+  export namespace GetPropertyFilterMeta {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      /** Comma-separated amenity GUIDs (Удобства). Repeatable. */
+      services?: string;
+      /** `all` (default) requires every selected amenity, `any` requires at least one. */
+      services_match?: "all" | "any";
+      /** Minimum bedrooms (Спальни). */
+      bedrooms?: number;
+      /** Minimum beds (Кровати). */
+      beds?: number;
+      /** Minimum bathrooms (Ванные комнаты). */
+      bathrooms?: number;
+      /** Minimum guest capacity (Кто). */
+      guests?: number;
+      allowed_pets?: boolean;
+      allowed_alcohol?: boolean;
+      /** Minimum hotel star rating. */
+      min_stars?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetPropertyFilterMetaData;
+  }
+
+  /**
+   * @description Returns the nightly-price distribution for the current filter selection as equal-width buckets, so the filter sheet can draw the bar chart above the budget slider. `min_price`/`max_price` are ignored when building the buckets so the chart keeps its full shape while the handles move.
+   * @tags Property / Public
+   * @name GetPropertyPriceHistogram
+   * @summary Budget slider histogram
+   * @request GET:/property/filters/price-histogram/
+   * @secure
+   */
+  export namespace GetPropertyPriceHistogram {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      /** Comma-separated amenity GUIDs (Удобства). Repeatable. */
+      services?: string;
+      /** `all` (default) requires every selected amenity, `any` requires at least one. */
+      services_match?: "all" | "any";
+      /** Minimum bedrooms (Спальни). */
+      bedrooms?: number;
+      /** Minimum beds (Кровати). */
+      beds?: number;
+      /** Minimum bathrooms (Ванные комнаты). */
+      bathrooms?: number;
+      /** Minimum guest capacity (Кто). */
+      guests?: number;
+      allowed_pets?: boolean;
+      allowed_alcohol?: boolean;
+      /** Minimum hotel star rating. */
+      min_stars?: number;
+      /** Number of histogram bars. Default 30, max 60. */
+      buckets?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetPropertyPriceHistogramData;
+  }
+
+  /**
+   * @description Returns the full hierarchical location tree: regions → districts → prefectures. Results are cached for 10 minutes.
+   * @tags Property / Meta
+   * @name ListLocations
+   * @summary List location tree
+   * @request GET:/property/location/
+   * @secure
+   */
+  export namespace ListLocations {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /**
+       * Preferred language for localized titles. Defaults to Uzbek.
+       * @default "uz"
+       */
+      "Accept-Language"?: "en" | "ru" | "uz";
+    };
+    export type ResponseBody = ListLocationsData;
+  }
+
+  /**
+   * @description Returns lightweight map markers for the current viewport. Below `cluster_max_zoom` nearby properties are merged into clusters; above it every property is returned as a pin carrying its nightly price. Tap handling should fetch the card via `/property/map/cards/`. Accepts every filter supported by `/property/properties/`.
+   * @tags Property / Public
+   * @name ListPropertyMapPins
+   * @summary Map pins and clusters
+   * @request GET:/property/map/
+   * @secure
+   */
+  export namespace ListPropertyMapPins {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      /**
+       * South-west corner latitude of the visible map viewport.
+       * @format float
+       */
+      sw_lat?: number;
+      /**
+       * South-west corner longitude of the visible map viewport.
+       * @format float
+       */
+      sw_lon?: number;
+      /**
+       * North-east corner latitude of the visible map viewport.
+       * @format float
+       */
+      ne_lat?: number;
+      /**
+       * North-east corner longitude of the visible map viewport.
+       * @format float
+       */
+      ne_lon?: number;
+      /** Viewport as `sw_lat,sw_lon,ne_lat,ne_lon`. Alternative to the four corner params. */
+      bbox?: string;
+      /** Current map zoom level (0–20). Results are clustered below `cluster_max_zoom` (default 14) and returned as individual pins above it. */
+      zoom?: number;
+      /** Zoom level from which clustering is disabled. Default 14. */
+      cluster_max_zoom?: number;
+      /** Comma-separated property kinds: `apartment,cottage`. Repeatable. */
+      property_types?: string;
+      /** Comma-separated amenity GUIDs (Удобства). Repeatable. */
+      services?: string;
+      /** `all` (default) requires every selected amenity, `any` requires at least one. */
+      services_match?: "all" | "any";
+      /** Minimum bedrooms (Спальни). */
+      bedrooms?: number;
+      /** Minimum beds (Кровати). */
+      beds?: number;
+      /** Minimum bathrooms (Ванные комнаты). */
+      bathrooms?: number;
+      /** Minimum guest capacity (Кто). */
+      guests?: number;
+      allowed_pets?: boolean;
+      allowed_alcohol?: boolean;
+      /** Minimum hotel star rating. */
+      min_stars?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
+      "X-Testing-Mode"?: boolean;
+    };
+    export type ResponseBody = ListPropertyMapPinsData;
+  }
+
+  /**
+   * @description Returns the card payload (image, title, rating, nightly price, district line and review count) for up to 20 properties. Used when a map price pin is tapped. Unknown GUIDs are skipped silently.
+   * @tags Property / Public
+   * @name ListPropertyMapCards
+   * @summary Property cards by GUID
+   * @request GET:/property/map/cards/
+   * @secure
+   */
+  export namespace ListPropertyMapCards {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Comma-separated property GUIDs (max 20). Repeatable. */
+      guids: string;
+      /**
+       * Reference date used to pick the seasonal price. Defaults to today.
+       * @format date
+       */
+      from_date?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPropertyMapCardsData;
+  }
+
+  /**
+   * @description Admin or Partner. Returns every property owned by the requested owner (or the authenticated owner). Admins can pass owner_id to query another owner's listings.
+   * @tags Property / Partner
+   * @name ListAllPartnerProperties
+   * @summary List all properties for an owner
+   * @request GET:/property/partner/all/
+   * @secure
+   */
+  export namespace ListAllPartnerProperties {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      /** Admin only: target owner user id. Partners ignore this and always use the JWT subject. */
+      owner_id?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListAllPartnerPropertiesData;
+  }
+
+  /**
+   * @description Partner-only. Returns the authenticated partner's own apartments, including unverified and archived. Supports the same filters as public list.
+   * @tags Property / Partner
+   * @name ListPartnerApartments
+   * @summary List partner apartments
+   * @request GET:/property/partner/apartments/
+   * @secure
+   */
+  export namespace ListPartnerApartments {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPartnerApartmentsData;
+  }
+
+  /**
+   * @description Partner-only. Returns the authenticated partner's own cottages, including unverified and archived. Supports the same filters as public list.
+   * @tags Property / Partner
+   * @name ListPartnerCottages
+   * @summary List partner cottages
+   * @request GET:/property/partner/cottages/
+   * @secure
+   */
+  export namespace ListPartnerCottages {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPartnerCottagesData;
+  }
+
+  /**
+   * @description Partner-only. Returns the authenticated partner's own apartments and cottages, including unverified and archived. Supports the same filters as public list.
+   * @tags Property / Partner
+   * @name ListPartnerProperties
+   * @summary List partner properties
+   * @request GET:/property/partner/properties/
+   * @secure
+   */
+  export namespace ListPartnerProperties {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      /** Filter by property kind. Omit to return both. */
+      property_type?: "apartment" | "cottage";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPartnerPropertiesData;
+  }
+
+  /**
+   * @description Partner-only. Returns booking statistics, cancellation metrics, and income breakdown for a specific property over a given time range.
+   * @tags Property / Partner
+   * @name GetPropertyAnalytics
+   * @summary Get property analytics
+   * @request GET:/property/partner/properties/{property_id}/analytics/
+   * @secure
+   */
+  export namespace GetPropertyAnalytics {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {
+      /**
+       * Time range for analytics.
+       * @default "month"
+       */
+      range?: "week" | "month" | "quarter" | "year";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = GetPropertyAnalyticsData;
+  }
+
+  /**
+   * @description Returns all prefectures, optionally filtered by district_id or district_guid. Results are cached for 10 minutes.
+   * @tags Property / Meta
+   * @name ListPrefecturesPrefectures
+   * @summary List prefectures
+   * @request GET:/property/prefectures/
+   * @secure
+   */
+  export namespace ListPrefecturesPrefectures {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Filter by district database id. */
+      district_id?: number;
+      /**
+       * Filter by district GUID.
+       * @format uuid
+       */
+      district_guid?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListPrefecturesPrefecturesData;
+  }
+
+  /**
+   * @description Returns verified public apartments and cottages. Use `property_type` or `kind` to filter to one property kind. `X-Testing-Mode: true` returns only testing properties; otherwise testing properties are excluded.
+   * @tags Property / Public
+   * @name ListProperties
+   * @summary List properties
+   * @request GET:/property/properties/
+   * @secure
+   */
+  export namespace ListProperties {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
+      "X-Testing-Mode"?: boolean;
+    };
+    export type ResponseBody = ListPropertiesData;
+  }
+
+  /**
+   * @description Partner-only compatibility endpoint. Creates an apartment by default, or a cottage when the URL forces cottage mode.
+   * @tags Property / Partner
+   * @name CreateProperty
+   * @summary Create a property
+   * @request POST:/property/properties/
+   * @secure
+   */
+  export namespace CreateProperty {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = ApartmentCreate;
+    export type RequestHeaders = {};
+    export type ResponseBody = CreatePropertyData;
+  }
+
+  /**
+   * @description Client-only. Returns the authenticated client's favorited properties (apartments and cottages). Supports the same filters as public list.
+   * @tags Property / Client
+   * @name ListSavedProperties
+   * @summary List saved (favorite) properties
+   * @request GET:/property/properties/favorites/
+   * @secure
+   */
+  export namespace ListSavedProperties {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListSavedPropertiesData;
+  }
+
+  /**
+   * @description Accepts a property URL or link and returns the matching property GUID if found.
+   * @tags Property / Public
+   * @name FilterPropertyByLink
+   * @summary Filter property by link
+   * @request POST:/property/properties/filter-by-link/
+   * @secure
+   */
+  export namespace FilterPropertyByLink {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = {
+      url?: string;
+      link?: string;
+    };
+    export type RequestHeaders = {};
+    export type ResponseBody = FilterPropertyByLinkData;
+  }
+
+  /**
+   * @description Returns featured, best-reviewed, or most-booked properties. Supports filtering by kind (apartment, cottage, or both). Results are cached for 60 seconds.
+   * @tags Property / Public
+   * @name ListRecommendations
+   * @summary List recommended properties
+   * @request GET:/property/recommendations/
+   * @secure
+   */
+  export namespace ListRecommendations {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      kind?: "property" | "apartment" | "cottage";
+      type?: "featured" | "best-by-reviews" | "most-booked";
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
+      "X-Testing-Mode"?: boolean;
+    };
+    export type ResponseBody = ListRecommendationsData;
+  }
+
+  /**
    * @description Returns KNN-based personalized property recommendations for the authenticated client. Uses pgvector cosine similarity on client and property embeddings built from booking history, reviews, and preferences.
    * @tags Property / Recommendations
    * @name GetPersonalizedRecommendations
@@ -10244,6 +19582,289 @@ export namespace Property {
     export type RequestBody = never;
     export type RequestHeaders = {};
     export type ResponseBody = GetPersonalizedRecommendationsData;
+  }
+
+  /**
+   * @description Returns all regions with titles and image URLs. Results are cached for 10 minutes.
+   * @tags Property / Meta
+   * @name ListRegions
+   * @summary List regions
+   * @request GET:/property/regions/
+   * @secure
+   */
+  export namespace ListRegions {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = ListRegionsData;
+  }
+
+  /**
+   * @description Returns apartments and cottages filtered by a specific region. Supports the same query filters as the public list. `X-Testing-Mode: true` returns only testing properties; otherwise testing properties are excluded.
+   * @tags Property / Public
+   * @name ListPropertiesByRegion
+   * @summary List properties by region
+   * @request GET:/property/regions/{region_id}/properties/
+   * @secure
+   */
+  export namespace ListPropertiesByRegion {
+    export type RequestParams = {
+      regionId: string;
+    };
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
+      "X-Testing-Mode"?: boolean;
+    };
+    export type ResponseBody = ListPropertiesByRegionData;
+  }
+
+  /**
+   * @description Mixed apartment / cottage search returning the compact card payload used on the search results screen: image, title, rating, `от X / 1 чел · ночь`, district line and review count. Accepts the full filter set plus `property_types` multi-select.
+   * @tags Property / Public
+   * @name SearchProperties
+   * @summary Search properties (card list)
+   * @request GET:/property/search/
+   * @secure
+   */
+  export namespace SearchProperties {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Fuzzy text search using pg_trgm trigrams. Matches against property title and city — tolerates typos and partial words. */
+      search?: string;
+      /**
+       * Latitude for geographic radius search. Requires `lon` to be set.
+       * @format float
+       */
+      lat?: number;
+      /**
+       * Longitude for geographic radius search. Requires `lat` to be set.
+       * @format float
+       */
+      lon?: number;
+      /**
+       * Search radius in kilometres. Default: 10. Only used when `lat` and `lon` are provided.
+       * @format float
+       */
+      radius?: number;
+      /** Location UUID or integer ID. Tried as region GUID → district GUID → prefecture GUID. */
+      location_id?: string;
+      region_id?: number;
+      district_id?: number;
+      /** @format uuid */
+      prefecture_id?: string;
+      /** Filter by property kind. Omit in the generic /properties/ endpoint to return all supported kinds. */
+      property_type?: "apartment" | "cottage";
+      corporate?: boolean;
+      min_price?: number;
+      max_price?: number;
+      currency?: string;
+      sort?:
+        | "price_high"
+        | "price_low"
+        | "rating_high"
+        | "rating_low"
+        | "reviews_high"
+        | "reviews_low"
+        | "title_asc"
+        | "title_desc"
+        | "corporate_yes"
+        | "corporate_no";
+      ordering?: string;
+      /** @format date */
+      from_date?: string;
+      limit?: number;
+      page?: number;
+      /**
+       * South-west corner latitude of the visible map viewport.
+       * @format float
+       */
+      sw_lat?: number;
+      /**
+       * South-west corner longitude of the visible map viewport.
+       * @format float
+       */
+      sw_lon?: number;
+      /**
+       * North-east corner latitude of the visible map viewport.
+       * @format float
+       */
+      ne_lat?: number;
+      /**
+       * North-east corner longitude of the visible map viewport.
+       * @format float
+       */
+      ne_lon?: number;
+      /** Viewport as `sw_lat,sw_lon,ne_lat,ne_lon`. Alternative to the four corner params. */
+      bbox?: string;
+      /** Current map zoom level (0–20). Results are clustered below `cluster_max_zoom` (default 14) and returned as individual pins above it. */
+      zoom?: number;
+      /** Zoom level from which clustering is disabled. Default 14. */
+      cluster_max_zoom?: number;
+      /** Comma-separated property kinds: `apartment,cottage`. Repeatable. */
+      property_types?: string;
+      /** Comma-separated amenity GUIDs (Удобства). Repeatable. */
+      services?: string;
+      /** `all` (default) requires every selected amenity, `any` requires at least one. */
+      services_match?: "all" | "any";
+      /** Minimum bedrooms (Спальни). */
+      bedrooms?: number;
+      /** Minimum beds (Кровати). */
+      beds?: number;
+      /** Minimum bathrooms (Ванные комнаты). */
+      bathrooms?: number;
+      /** Minimum guest capacity (Кто). */
+      guests?: number;
+      allowed_pets?: boolean;
+      allowed_alcohol?: boolean;
+      /** Minimum hotel star rating. */
+      min_stars?: number;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /** When `true`, return only testing properties. When omitted or false, testing properties are excluded. */
+      "X-Testing-Mode"?: boolean;
+    };
+    export type ResponseBody = SearchPropertiesData;
+  }
+
+  /**
+   * @description Returns all available property services (amenities) with localized titles and icon URLs. Results are cached for 10 minutes.
+   * @tags Property / Meta
+   * @name ListPropertyServices
+   * @summary List property services
+   * @request GET:/property/services/
+   * @secure
+   */
+  export namespace ListPropertyServices {
+    export type RequestParams = {};
+    export type RequestQuery = {
+      /** Restrict the list to services that apply to this property type (e.g. hotel, room). */
+      property_type?: string;
+    };
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /**
+       * Preferred language for localized titles. Defaults to Uzbek.
+       * @default "uz"
+       */
+      "Accept-Language"?: "en" | "ru" | "uz";
+    };
+    export type ResponseBody = ListPropertyServicesData;
+  }
+
+  /**
+   * @description Returns the public property types with localized titles, icon URLs, and `kind` field. Results are cached for 10 minutes.
+   * @tags Property / Meta
+   * @name ListPropertyTypes
+   * @summary List property types
+   * @request GET:/property/types/
+   * @secure
+   */
+  export namespace ListPropertyTypes {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {
+      /**
+       * Preferred language for localized titles. Defaults to Uzbek.
+       * @default "uz"
+       */
+      "Accept-Language"?: "en" | "ru" | "uz";
+    };
+    export type ResponseBody = ListPropertyTypesData;
+  }
+
+  /**
+   * @description Client-only. Adds the property to favorites if not present, or removes it if already favorited. Returns the new is_favorite state.
+   * @tags Property / Client
+   * @name TogglePropertyFavorite
+   * @summary Toggle property favorite
+   * @request POST:/property/{property_id}/favorite/
+   * @secure
+   */
+  export namespace TogglePropertyFavorite {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = TogglePropertyFavoriteData;
+  }
+
+  /**
+   * @description Client-only. Removes a property from the authenticated client's favorites.
+   * @tags Property / Client
+   * @name RemovePropertyFavorite
+   * @summary Remove property from favorites
+   * @request DELETE:/property/{property_id}/favorite/
+   * @secure
+   */
+  export namespace RemovePropertyFavorite {
+    export type RequestParams = {
+      /**
+       * Property GUID.
+       * @format uuid
+       */
+      propertyId: string;
+    };
+    export type RequestQuery = {};
+    export type RequestBody = never;
+    export type RequestHeaders = {};
+    export type ResponseBody = RemovePropertyFavoriteData;
   }
 }
 
