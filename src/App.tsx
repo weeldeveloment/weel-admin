@@ -9,6 +9,7 @@ const UsersPage = lazy(() => import('./pages/UsersPage'))
 const B2BPage = lazy(() => import('./pages/B2BPage'))
 const ChatPage = lazy(() => import('./pages/ChatPage'))
 const B2BSupportPage = lazy(() => import('./pages/B2BSupportPage'))
+const B2BOwnershipPage = lazy(() => import('./pages/B2BOwnershipPage'))
 const BookingsPage = lazy(() => import('./pages/BookingsPage'))
 const Partner = lazy(() => import('./pages/Partner'))
 const ActivitiesPage = lazy(() => import('./pages/ActivitiesPage'))
@@ -61,6 +62,7 @@ function App() {
           <Route path="chat" element={<ChatPage />} />
           <Route path="chat/:partnerId" element={<ChatPage />} />
           <Route path="b2b-support" element={<B2BSupportPage />} />
+          <Route path="b2b-ownership" element={<B2BOwnershipPage />} />
           <Route path="partner/:partnerId" element={<Partner />} />
           <Route path="activities" element={<ActivitiesPage />} />
           <Route path="activities/:guid/calendar" element={<ActivityCalendarPage />} />

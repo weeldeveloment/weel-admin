@@ -2831,7 +2831,6 @@ export interface TaskWrite {
   /**
    * Title
    * @minLength 1
-   * @maxLength 300
    */
   title: string;
   /**
@@ -3489,7 +3488,6 @@ export interface TaskPatch {
   /**
    * Title
    * @minLength 1
-   * @maxLength 300
    */
   title?: string;
   /** Description */

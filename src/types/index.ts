@@ -190,6 +190,29 @@ export interface AdminB2BUser {
   created_at?: string
 }
 
+/**
+ * One request from a company owner's mobile app to hand the company over to
+ * someone else, or to close it — neither of which the app can do on its own.
+ * See `WorkspaceOwnershipRequestView` / `AdminB2BOwnershipRequestsView` in
+ * weel-backend-v2.
+ */
+export interface AdminB2BOwnershipRequest {
+  id: number
+  company_id: number
+  company_name: string
+  kind: 'transfer' | 'close'
+  requested_by: number
+  requested_by_name?: string | null
+  target_employee_id?: number | null
+  target_name?: string | null
+  reason: string
+  status: 'pending' | 'approved' | 'rejected'
+  review_note?: string | null
+  reviewed_by_user_id?: number | null
+  reviewed_at?: string | null
+  created_at: string
+}
+
 export interface StoryMedia {
   guid: string
   media_type: string

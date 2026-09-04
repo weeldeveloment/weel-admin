@@ -83,7 +83,7 @@ api.interceptors.response.use(
 // ── PMS Calendar API ─────────────────────────────────────────────
 
 import type { PMSBooking, PMSCalendarSlot, PMSRoom, PMSRoomBed, PMSProperty, PMSRate, PMSRoomType, PMSRoomCondition, PMSRoomAvailability } from "@/types/pms"
-import type { AdminB2BCompany, AdminB2BUser, B2BSupportMessage, B2BSupportThread } from "@/types"
+import type { AdminB2BCompany, AdminB2BOwnershipRequest, AdminB2BUser, B2BSupportMessage, B2BSupportThread } from "@/types"
 
 export type PMSRoomUpdate = {
   condition?: PMSRoomCondition
@@ -304,6 +304,31 @@ export function replyToB2BSupportThread(
   text: string,
 ): Promise<B2BSupportMessage> {
   return adminAuthPost<B2BSupportMessage>(`/admin-auth/b2b/support/${employeeId}/`, { text })
+}
+
+// ── B2B ownership / closure requests ────────────────────────────────
+//
+// An owner's app cannot transfer or close a company by itself — see
+// `WorkspaceOwnershipRequestView` — so every one of these is waiting on a
+// decision here. Approving is what actually moves the `owner` role or shuts
+// the company down; there is no separate step after this one.
+
+export async function fetchB2BOwnershipRequests(): Promise<AdminB2BOwnershipRequest[]> {
+  const data = await adminAuthGet<{ results: AdminB2BOwnershipRequest[] }>(
+    '/admin-auth/b2b/ownership-requests/',
+  )
+  return data.results
+}
+
+export function decideB2BOwnershipRequest(
+  requestId: number,
+  action: 'approve' | 'reject',
+  note?: string,
+): Promise<AdminB2BOwnershipRequest> {
+  return adminAuthPost<AdminB2BOwnershipRequest>(
+    `/admin-auth/b2b/ownership-requests/${requestId}/decide/`,
+    { action, note: note ?? '' },
+  )
 }
 
 export async function fetchExchangeRate(): Promise<number> {
