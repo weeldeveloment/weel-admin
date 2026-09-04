@@ -6,6 +6,10 @@ import './index.css'
 import './i18n'
 import App from './App'
 import { ThemeProvider } from './components/theme-provider'
+import { installObservabilityHooks } from './lib/observability'
+
+// Brauzer xatolarini Grafana/Loki'ga yuborish (render'dan oldin).
+installObservabilityHooks()
 
 const queryClient = new QueryClient({
   defaultOptions: {
