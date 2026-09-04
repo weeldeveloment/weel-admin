@@ -107,6 +107,14 @@ jobs:
           SECRET_KEY: ci-only-not-a-real-secret
           DJANGO_ALLOWED_HOSTS: example.com
           REDIS_CONNECTION_STRING: redis://localhost:6379/0
+          # The backend refuses to boot with DEBUG=0 and no integration hosts
+          # set (Bookhara/Hotelios), since a real deploy that forgot them
+          # would silently point at test environments. Generating a schema is
+          # still a DEBUG=0 boot, so the hosts are named here rather than the
+          # guard disarmed. Nothing is called: the generator only walks the
+          # URL conf.
+          BOOKHARA_BASE_URL: https://bookhara.invalid
+          HOTELIOS_BASE_URL: https://hotelios.invalid
         run: bun run generate:openapi-types
 
       - name: Kod yangi kontraktga mos keladimi
